@@ -1,0 +1,24 @@
+.about-page-wrapper {
+  min-height: 60vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px 40px 20px;
+  box-sizing: border-box;
+}
+
+/* Add this class to wrap your accordion */
+.accordion-container {
+  width: 100%;
+  max-width: 32rem; /* matches max-w-lg */
+  min-height: 400px; /* adjust this value based on your content */
+}
+
+.about-welcome-message {
+  font-family: "Readex Pro", sans-serif;
+  font-size: 3rem;
+  color: hsl(var(--foreground));
+  text-align: center;
+  padding-bottom: 40px;
+}
