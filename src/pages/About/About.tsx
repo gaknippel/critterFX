@@ -1,7 +1,7 @@
 import './About.css'
 
 import SplitText from '../../components/SplitText'
-
+import FadeContent from '@/components/FadeContent'
 
 import {
   Accordion,
@@ -13,21 +13,21 @@ import {
 const items = [
   {
     value: "item-1",
-    trigger: "it's not working!",
+    trigger: "what is this app?",
     content:
-      "this app might have a lot of bugs, i mainly use it for myself, so if it works for me thats fine (sorry)",
+      "this is a hub for my personal editing effects and animation presets i use in my videos. if you like my editing style, or just want some cool presets, use this app! :D",
   },
   {
     value: "item-2",
-    trigger: "what is this app?",
+    trigger: "there are alot of bugs!!!",
     content:
-      "this is a youtube downloader! sick of all those sketchy websites or paid subscriptions for a basic feature? use this!",
+      "im still working on it :( sorry",
   },
   {
     value: "item-3",
     trigger: "how did i make this?",
     content:
-      "this app was made with tauri, typescript + react, shadcnui, reactbits, and yt-dlp.",
+      "this app was made with tauri (Rust), typescript + react, shadcnui, and reactbits",
   },
 ]
 
@@ -41,20 +41,9 @@ export default function About() {
   return (
     <div className='about-page-wrapper'>
 
-        <SplitText
-          text="about this app"
-          className="about-welcome-message"
-          delay={15}
-          duration={0.6}
-          ease="power3.out"
-          splitType="chars"
-          from={{ opacity: 0, y: 40 }}
-          to={{ opacity: 1, y: 0 }}
-          threshold={0.1}
-          rootMargin="-100px"
-          textAlign="center"
-          onLetterAnimationComplete={handleAnimationComplete}
-        />
+        <FadeContent blur={false} duration={1000} easing="power2.out" initialOpacity={0} className='about-welcome-message'>
+      about
+    </FadeContent>
       <div className='accordion-container'>
         <Accordion
           type="single"
