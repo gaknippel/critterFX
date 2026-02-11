@@ -21,7 +21,7 @@ const presets = [
     id: 1,
     name: 'animated content',
     category: 'text',
-    previewGif: '/path/to/preview1.gif',
+    previewGif: '/path/to',
     description: 'text animations'
   },
   {
@@ -49,7 +49,7 @@ const presets = [
     id: 5,
     name: 'sticker animation script',
     category: 'scripts',
-    previewGif: '/path/to/preview4.gif',
+    previewGif: '/previews/stickerscript.gif',
     description: 'stickers covering screen!   '
   },
 ]
@@ -109,10 +109,11 @@ export default function Home() {
               {filteredPresets.map((preset) => (
                 <div key={preset.id} className="preset-card">
                   <div className="preset-preview">
-                    {/* Replace with actual GIF preview */}
-                    <div className="preview-placeholder">
-                      <span>preview</span>
-                    </div>
+                      <img 
+                        src={preset.previewGif} 
+                        alt={preset.name}
+                        loading="lazy"
+                      />
                   </div>
                   <div className="preset-info">
                     <h3 className="preset-name">{preset.name}</h3>
