@@ -1,4 +1,4 @@
-import { FileQuestionMark, Home, Cog, Github } from "lucide-react"
+import { FileQuestionMark, Columns3Cog, Cog, Github } from "lucide-react"
 import { Link } from "react-router-dom"  // ← Add this import
 
 import {
@@ -16,9 +16,9 @@ import {
 // Menu items.
 const items = [
   {
-    title: "home",
+    title: "presets",
     url: "/",
-    icon: Home,
+    icon: Columns3Cog,
   },
   {
     title: "about",

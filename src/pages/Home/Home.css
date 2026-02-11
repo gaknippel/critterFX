@@ -64,12 +64,12 @@
 }
 
 .sidebar-title {
-  font-size: 0.75rem; /* Smaller font for title */
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em; /* More letter spacing */
+  font-size: 1.25rem; /* Smaller font for title */
+  letter-spacing: 0.03em;
+  font-weight: 700; /* More letter spacing */
   color: hsl(var(--muted-foreground));
   padding: 0 1.5rem 0.75rem; /* Adjusted padding */
+  font-family: "Source Code Pro", monospace;
   margin: 0;
 }
 
@@ -101,12 +101,14 @@
 
 .category-item:hover {
   background: hsl(var(--accent));
+  transform: translateY(-3px);
 }
 
 .category-item.active {
   background: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
-  font-weight: 500;
+  font-weight: 900;
+  font-size: 1.0rem;
 }
 
 /* Presets Grid */
@@ -138,12 +140,12 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Lighter shadow */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Lighter shadow */
 }
 
 .preset-card:hover {
   border-color: hsl(var(--primary));
-  transform: translateY(-2px);
+  transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* More pronounced hover shadow */
 }
 

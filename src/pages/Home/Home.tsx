@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Search } from "lucide-react"
+import FadeContent from '@/components/FadeContent'
 
 // Sample data structure - replace with your actual presets
 const categories = [
@@ -12,6 +13,7 @@ const categories = [
   { id: 'shapes', name: 'shape animations' },
   { id: 'particles', name: 'particles & effects' },
   { id: 'backgrounds', name: 'backgrounds' },
+  { id: 'scripts', name: 'scripts' },
 ]
 
 const presets = [
@@ -43,6 +45,13 @@ const presets = [
     previewGif: '/path/to/preview4.gif',
     description: 'text animations'
   },
+  {
+    id: 5,
+    name: 'sticker animation script',
+    category: 'scripts',
+    previewGif: '/path/to/preview4.gif',
+    description: 'stickers covering screen!   '
+  },
 ]
 
 export default function Home() {
@@ -58,12 +67,14 @@ export default function Home() {
   return (
     <div className="home-page-wrapper">
       <div className="home-header">
-        <h1 className="home-title">preset browser</h1>
+        <FadeContent blur={false} duration={1000} easing="power2.out" initialOpacity={0} className='home-title'>
+        preset browser
+        </FadeContent>
         <div className="search-container">
           <Search className="search-icon" />
           <Input
             type="text"
-            placeholder="Search presets..."
+            placeholder="search presets..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input"
@@ -91,6 +102,7 @@ export default function Home() {
         </aside>
 
         {/* Presets Grid */}
+        <FadeContent blur={false} duration={1000} easing="power2.out" initialOpacity={0} className='presets-main'>
         <main className="presets-main">
           <ScrollArea className="presets-scroll">
             <div className="presets-grid">
@@ -111,6 +123,7 @@ export default function Home() {
             </div>
           </ScrollArea>
         </main>
+        </FadeContent>
       </div>
     </div>
   )
