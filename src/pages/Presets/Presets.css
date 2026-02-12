@@ -97,11 +97,13 @@
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: left;
+  white-space: pre-wrap; /* Add this */
+  word-break: break-word; /* Add this */
 }
 
 .category-item:hover {
   background: hsl(var(--accent));
-  transform: translateY(-3px);
+  transform: translateY(-5px);
 }
 
 .category-item.active {

@@ -1,4 +1,4 @@
-import './Home.css'
+import './Presets.css'
 import { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -11,7 +11,7 @@ const categories = [
   { id: 'text', name: 'text animations' },
   { id: 'transitions', name: 'transitions' },
   { id: 'shapes', name: 'shape animations' },
-  { id: 'particles', name: 'particles & effects' },
+  { id: 'particles', name: 'effects' },
   { id: 'backgrounds', name: 'backgrounds' },
   { id: 'scripts', name: 'scripts' },
 ]
@@ -54,7 +54,7 @@ const presets = [
   },
 ]
 
-export default function Home() {
+export default function Presets() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
 
