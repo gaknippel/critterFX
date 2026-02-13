@@ -1,68 +1,26 @@
 import './Presets.css'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Search } from "lucide-react"
 import FadeContent from '@/components/FadeContent'
-
-// Sample data structure - replace with your actual presets
-const categories = [
-  { id: 'all', name: 'all presets' },
-  { id: 'text', name: 'text animations' },
-  { id: 'transitions', name: 'transitions' },
-  { id: 'shapes', name: 'shape animations' },
-  { id: 'particles', name: 'effects' },
-  { id: 'backgrounds', name: 'backgrounds' },
-  { id: 'scripts', name: 'scripts' },
-]
-
-const presets = [
-  {
-    id: 1,
-    name: 'animated content',
-    category: 'text',
-    previewGif: '/path/to',
-    description: 'text animations'
-  },
-  {
-    id: 2,
-    name: 'animated list',
-    category: 'text',
-    previewGif: '/path/to/preview2.gif',
-    description: 'components'
-  },
-  {
-    id: 3,
-    name: 'antigravity',
-    category: 'particles',
-    previewGif: '/path/to/preview3.gif',
-    description: 'animations'
-  },
-  {
-    id: 4,
-    name: 'ASCII text',
-    category: 'text',
-    previewGif: '/path/to/preview4.gif',
-    description: 'text animations'
-  },
-  {
-    id: 5,
-    name: 'sticker animation script',
-    category: 'scripts',
-    previewGif: '/previews/stickerscript.gif',
-    description: 'stickers covering screen!   '
-  },
-]
+import { presets, categories } from '@/data/presets'  // ←shared data file
 
 export default function Presets() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const navigate = useNavigate()
 
   const filteredPresets = presets.filter(preset => {
     const matchesCategory = selectedCategory === 'all' || preset.category === selectedCategory
     const matchesSearch = preset.name.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
   })
+
+  const handlePresetClick = (presetId: number) => {
+    navigate(`/preset/${presetId}`)
+  }
 
   return (
     <div className="home-page-wrapper">
@@ -83,7 +41,6 @@ export default function Presets() {
       </div>
 
       <div className="home-content-layout">
-        {/* Categories Sidebar */}
         <aside className="categories-sidebar">
           <h2 className="sidebar-title">categories</h2>
           <ScrollArea className="categories-scroll">
@@ -101,13 +58,17 @@ export default function Presets() {
           </ScrollArea>
         </aside>
 
-        {/* Presets Grid */}
+        {/* presets grid */}
         <FadeContent blur={false} duration={1000} easing="power2.out" initialOpacity={0} className='presets-main'>
         <main className="presets-main">
           <ScrollArea className="presets-scroll">
             <div className="presets-grid">
               {filteredPresets.map((preset) => (
-                <div key={preset.id} className="preset-card">
+                <div 
+                  key={preset.id} 
+                  className="preset-card"
+                  onClick={() => handlePresetClick(preset.id)}
+                >
                   <div className="preset-preview">
                       <img 
                         src={preset.previewGif} 

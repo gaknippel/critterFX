@@ -47,6 +47,7 @@
   position: sticky;
   top: 2rem;
   align-self: start;
+  overflow: hidden;
 }
 
 .preset-preview-large {
