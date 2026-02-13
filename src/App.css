@@ -81,6 +81,7 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --preset-info-bg: oklch(0.97 0 0); 
+  --download-button-bg: oklch(70.115% 0.22183 141.442);
 }
 
 .dark {
@@ -116,6 +117,8 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
   --preset-info-bg: oklch(22.213% 0.00003 271.152); 
+  --download-button-bg: oklch(66.129% 0.20407 141.37);
+  --download-button-bg-hover: oklch(71.641% 0.22189 141.394);
 }
 .midnight {
   --background: oklch(0.12 0.015 250);

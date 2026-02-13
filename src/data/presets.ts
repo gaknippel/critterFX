@@ -16,16 +16,16 @@ export interface Preset { //preset data as an interface
 export const presets: Preset[] = [
   {   
     id: 1,
-    name: 'animated content',
-    category: 'text',
+    name: 'bright flash',
+    category: 'transitions',
     previewGif: '/previews/animated-content.gif',
-    description: 'text animations',
-    longDescription: 'This preset creates smooth, professional text animations with customizable timing and easing options. Perfect for titles, lower thirds, and any text-based content.',
-    dependencies: ['None'],
+    description: 'a small camera flash.',
+    longDescription: 'creates a small bright flash for intro transitions.',
+    dependencies: ['none'],
     aeVersion: '2023 or later',
     fileSize: '2.4 MB',
-    author: 'Your Name',
-    tags: ['text', 'animation', 'titles']
+    author: 'critterfarts',
+    tags: ['transition', 'intro', 'flash']
   },
   {
     id: 2,

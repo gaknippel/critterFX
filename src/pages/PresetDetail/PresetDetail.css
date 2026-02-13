@@ -70,13 +70,14 @@
   width: 100%;
   font-size: 1.1rem;
   padding: 1.5rem;
-  background: hsl(var(--primary));
+  background: var(--download-button-bg);
   color: hsl(var(--primary-foreground));
 }
 
 .download-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  background: var(--download-button-bg-hover);
 }
 
 /* Right Side - Details */
