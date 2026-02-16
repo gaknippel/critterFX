@@ -30,6 +30,25 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
+    ],
+    "resources": [
+      "resources/presets/*"
     ]
+  },
+  "plugins": {
+    "fs": {
+      "scope": [
+        "$APPDATA/*",
+        "$APPDATA/**",
+        "$RESOURCE/*",
+        "$RESOURCE/**",
+        "C:\\Program Files\\Adobe\\**",
+        "$DOCUMENT\\Adobe\\**"
+      ]
+    },
+    "dialog": {
+      "open": true,
+      "save": false
+    }
   }
 }
