@@ -1,10 +1,12 @@
-use tauri::command;
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+use tauri::Manager;
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct AEInstallation {
+#[derive(Debug, Serialize, Deserialize, Clone)] //deserialize and serialize allow to convert
+struct AEInstallation {                         //to JSON
     version: String,
     scripts_path: String,
     user_presets_path: String,
@@ -17,10 +19,11 @@ struct PathConfig {
     custom_presets_path: Option<String>,
 }
 
-#[command]
-fn scan_ae_installations() -> Vec<AEInstallation> {
+#[tauri::command]
+fn scan_ae_installations() -> Vec<AEInstallation> { //main fn for scanning your AE
     let mut installations = Vec::new();
     
+    //ae from 2025 to 2020
     let versions = vec![
         "2025", "2024", "2023", "2022", "2021", "2020"
     ];
@@ -37,11 +40,11 @@ fn scan_ae_installations() -> Vec<AEInstallation> {
             version
         );
         
-        // Check if paths exist
+        // check if paths exist
         let scripts_exists = PathBuf::from(&scripts_path).exists();
         let presets_exists = PathBuf::from(&user_presets_path).exists();
         
-        // Only add if at least one path exists
+        // only add if at least one path exists
         if scripts_exists || presets_exists {
             installations.push(AEInstallation {
                 version: version.to_string(),
@@ -54,6 +57,10 @@ fn scan_ae_installations() -> Vec<AEInstallation> {
     
     installations
 }
+
+
+
+
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
