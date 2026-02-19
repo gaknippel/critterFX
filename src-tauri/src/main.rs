@@ -86,17 +86,18 @@ fn get_path_config(app: tauri::AppHandle) -> Result<PathConfig, String>{ //can s
         .app_data_dir()
         .map_err(|e| e.to_string())?;
 
-    let config_path = app_dir.join("path_config.json")
+    let config_path = app_dir.join("path_config.json");
 
     if config_path.exists() {
-        let content = fs::read_to_string(&config_path)
+        let content = fs::read_to_string(&config_path);
             .map_err(|e| e.to_string())?; //error mapping
         
         let config: PathConfig = serde_json::from_str(&content)
             .map_err(|e| e.to_string())?; //error mapping
         
         Ok(config)
-    } else { //will execute first time launch, since no custom stuff
+    } 
+    else { //will execute first time launch, since no custom stuff
         Ok(PathConfig { 
             custom_scripts_path: None,
             custom_presets_path: None,
