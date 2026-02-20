@@ -132,31 +132,11 @@ export default function Settings() {
       </FadeContent>
 
       <div className="space-y-6 max-w-4xl mx-auto">
-        {/* Appearance Section */}
-        <section className="settings-section">
-          <h2 className="text-xl font-semibold mb-2">appearance</h2>
-          <div className="flex items-center justify-between">
-            <span>theme</span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">theme</Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>light</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>dark</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("midnight")}>midnight</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("forest")}>forest</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("sunset")}>sunset</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>system</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </section>
-
        <section className="settings-section">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">after effects paths</h2>
             <Button 
+              className="settings-btn"
               onClick={handleScan} 
               disabled={isScanning}
               variant="outline"
@@ -168,14 +148,14 @@ export default function Settings() {
           </div>
 
 
-         {/* Detected Installations */}
+         {/* detected installations */}
           {installations.length > 0 && (
             <Alert className="mb-4">
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
                 <div className="font-semibold mb-2">detected installations:</div>
                 {installations.map((inst) => (
-                  <div key={inst.version} className="flex items-center justify-between py-2 border-t border-border">
+                  <div key={inst.version} className="flex items-center justify-between gap-4 py-2 border-t border-border">
                     <div>
                       <div className="font-medium">After Effects {inst.version}</div>
                       <div className="text-xs text-muted-foreground">
@@ -186,6 +166,7 @@ export default function Settings() {
                       </div>
                     </div>
                     <Button 
+                      className="settings-btn"
                       size="sm" 
                       variant="secondary"
                       onClick={() => handleUseDetectedPath(inst)}
@@ -227,7 +208,7 @@ export default function Settings() {
                   </div>
                 )}
               </div>
-              <Button onClick={handleBrowseScripts} variant="outline">
+              <Button className="settings-btn" onClick={handleBrowseScripts} variant="outline">
                 <FolderOpen className="h-4 w-4" />
               </Button>
             </div>
@@ -253,20 +234,41 @@ export default function Settings() {
                   </div>
                 )}
               </div>
-              <Button onClick={handleBrowsePresets} variant="outline">
+              <Button className="settings-btn" onClick={handleBrowsePresets} variant="outline">
                 <FolderOpen className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          {/* Save Button */}
+          {/* save button */}
           <div className="flex items-center gap-3">
-            <Button onClick={handleSavePaths}>
+            <Button className="settings-btn" onClick={handleSavePaths}>
               save paths
             </Button>
             {saveMessage && (
               <span className="text-sm text-muted-foreground">{saveMessage}</span>
             )}
+          </div>
+        </section>
+
+        {/* appearance section */}
+        <section className="settings-section">
+          <h2 className="text-xl font-semibold mb-2">appearance</h2>
+          <div className="flex items-center justify-between">
+            <span>theme</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="settings-btn" variant="outline">theme</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setTheme("light")}>light</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>dark</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("midnight")}>midnight</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("forest")}>forest</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("sunset")}>sunset</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("system")}>system</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </section>
 

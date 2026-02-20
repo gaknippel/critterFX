@@ -59,26 +59,12 @@ fn scan_ae_installations() -> Vec<AEInstallation> { //main fn for scanning your 
 }
 
 #[tauri::command] //verify if we can actually write files to adobe location
-fn verify_path(path: String) -> Result<bool, String> { //returns true or error
+fn verify_path(path: String) -> Result<bool, String> {
     let path_buf = PathBuf::from(&path);
-
-    if !path_buf.exists(){
-        return Ok(false);
-    }
-
-    let test_file = path_buf.join(".ae_preset_manager_test");
-
-    match fs::write(&test_file, "test") {
-        Ok(_) => {
-            //clean up the test file
-            let _ = fs::remove_file(test_file);
-            Ok(true)
-
-        }
-
-        Err(_) => Ok(false)
-    }
+    
+    Ok(path_buf.exists())
 }
+
 
 #[tauri::command]
 fn get_path_config(app: tauri::AppHandle) -> Result<PathConfig, String>{ //can succeed and return path config, or fail and return message
