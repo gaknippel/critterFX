@@ -113,11 +113,16 @@ export default function Settings() {
     }
   };
 
-  const handleUseDetectedPath = (installation: AEInstallation) => {
+  const handleUseDetectedPath = async (installation: AEInstallation) => {
     setCustomScriptsPath(installation.scripts_path);
     setCustomPresetsPath(installation.user_presets_path);
-    setScriptsPathValid(true);
-    setPresetsPathValid(true);
+
+    const scriptsValid = await verifyPath(installation.scripts_path);
+    const presetsValid = await verifyPath(installation.user_presets_path);
+    
+    setScriptsPathValid(scriptsValid);
+    setPresetsPathValid(presetsValid);
+
   };
   
   return(
@@ -129,7 +134,7 @@ export default function Settings() {
       <div className="space-y-6 max-w-4xl mx-auto">
         {/* Appearance Section */}
         <section className="settings-section">
-          <h2 className="text-xl font-semibold mb-4">appearance</h2>
+          <h2 className="text-xl font-semibold mb-2">appearance</h2>
           <div className="flex items-center justify-between">
             <span>theme</span>
             <DropdownMenu>
@@ -147,8 +152,128 @@ export default function Settings() {
             </DropdownMenu>
           </div>
         </section>
+
+       <section className="settings-section">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">after effects paths</h2>
+            <Button 
+              onClick={handleScan} 
+              disabled={isScanning}
+              variant="outline"
+              size="sm"
+            >
+              <Search className="mr-2 h-4 w-4" />
+              {isScanning ? 'scanning...' : 'scan again'}
+            </Button>
+          </div>
+
+
+         {/* Detected Installations */}
+          {installations.length > 0 && (
+            <Alert className="mb-4">
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription>
+                <div className="font-semibold mb-2">detected installations:</div>
+                {installations.map((inst) => (
+                  <div key={inst.version} className="flex items-center justify-between py-2 border-t border-border">
+                    <div>
+                      <div className="font-medium">After Effects {inst.version}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Scripts: {inst.scripts_path}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Presets: {inst.user_presets_path}
+                      </div>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="secondary"
+                      onClick={() => handleUseDetectedPath(inst)}
+                    >
+                      use this
+                    </Button>
+                  </div>
+                ))}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {installations.length === 0 && !isScanning && (
+            <Alert className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                no after effects installations detected. set custom paths below.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <div className="space-y-2 mb-4">
+            <label className="text-sm font-medium">scripts folder</label>
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Input
+                  value={customScriptsPath}
+                  onChange={(e) => setCustomScriptsPath(e.target.value)}
+                  placeholder="C:\Program Files\Adobe\Adobe After Effects 2024\Support Files\Scripts"
+                  className={scriptsPathValid === false ? 'border-destructive' : ''}
+                />
+                {scriptsPathValid !== null && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {scriptsPathValid ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-destructive" />
+                    )}
+                  </div>
+                )}
+              </div>
+              <Button onClick={handleBrowseScripts} variant="outline">
+                <FolderOpen className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2 mb-4">
+            <label className="text-sm font-medium">user presets folder</label>
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Input
+                  value={customPresetsPath}
+                  onChange={(e) => setCustomPresetsPath(e.target.value)}
+                  placeholder="C:\Users\YourName\Documents\Adobe\After Effects\User Presets"
+                  className={presetsPathValid === false ? 'border-destructive' : ''}
+                />
+                {presetsPathValid !== null && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {presetsPathValid ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-destructive" />
+                    )}
+                  </div>
+                )}
+              </div>
+              <Button onClick={handleBrowsePresets} variant="outline">
+                <FolderOpen className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div className="flex items-center gap-3">
+            <Button onClick={handleSavePaths}>
+              save paths
+            </Button>
+            {saveMessage && (
+              <span className="text-sm text-muted-foreground">{saveMessage}</span>
+            )}
+          </div>
+        </section>
+
       </div>
     </div>
+
+    
   )
 
 

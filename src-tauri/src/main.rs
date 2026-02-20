@@ -89,7 +89,7 @@ fn get_path_config(app: tauri::AppHandle) -> Result<PathConfig, String>{ //can s
     let config_path = app_dir.join("path_config.json");
 
     if config_path.exists() {
-        let content = fs::read_to_string(&config_path);
+        let content = fs::read_to_string(&config_path)
             .map_err(|e| e.to_string())?; //error mapping
         
         let config: PathConfig = serde_json::from_str(&content)
