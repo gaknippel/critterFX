@@ -1,7 +1,9 @@
-export interface Preset { //preset data as an interface
+export interface Preset {
   id: number
   name: string
   category: string
+  fileName: string
+  downloadUrl: string
   previewGif: string
   description: string
   longDescription?: string
@@ -12,83 +14,49 @@ export interface Preset { //preset data as an interface
   tags?: string[]
 }
 
-
-export const presets: Preset[] = [
-  {   
-    id: 1,
-    name: 'bright flash',
-    category: 'transitions',
-    previewGif: '/previews/animated-content.gif',
-    description: 'a small camera flash.',
-    longDescription: 'creates a small bright flash for intro transitions.',
-    dependencies: ['none'],
-    aeVersion: '2023 or later',
-    fileSize: '2.4 MB',
-    author: 'critterfarts',
-    tags: ['transition', 'intro', 'flash']
-  },
-  {
-    id: 2,
-    name: 'animated list',
-    category: 'text',
-    previewGif: '/previews/animated-list.gif',
-    description: 'components',
-    longDescription: 'Animated list component with staggered entrance animations.',
-    dependencies: ['None'],
-    aeVersion: '2022 or later',
-    fileSize: '1.8 MB',
-    author: 'Your Name',
-    tags: ['list', 'components']
-  },
-  {
-    id: 3,
-    name: 'antigravity',
-    category: 'particles',
-    previewGif: '/previews/antigravity.gif',
-    description: 'animations',
-    longDescription: 'Creates floating particle effects that defy gravity.',
-    dependencies: ['Particular plugin'],
-    aeVersion: '2023 or later',
-    fileSize: '4.1 MB',
-    author: 'Your Name',
-    tags: ['particles', 'effects', 'gravity']
-  },
-  {
-    id: 4,
-    name: 'ASCII text',
-    category: 'text',
-    previewGif: '/previews/ascii-text.gif',
-    description: 'text animations',
-    longDescription: 'Transform text into ASCII art with animated glitch effects.',
-    dependencies: ['None'],
-    aeVersion: '2022 or later',
-    fileSize: '1.5 MB',
-    author: 'Your Name',
-    tags: ['text', 'ascii', 'glitch']
-  },
-  {
-    id: 5,
-    name: 'sticker animation script',
-    category: 'scripts',
-    previewGif: '/previews/stickerscript.gif',
-    description: 'stickers covering screen!',
-    longDescription: 'creates a dynamic sticker aninmation that covers the screen with customizable properties.',
-    dependencies: ['none'],
-    aeVersion: '2023 or later',
-    fileSize: '3.2 MB',
-    author: 'critterfarts',
-    tags: ['script', 'stickers', 'effects', 'fun', 'steamhappy']
-  },
-]
-
 export const categories = [
   { id: 'all', name: 'all presets' },
-  { id: 'text', name: 'text animations' },
+  { id: 'textAnims', name: 'text animations' },
   { id: 'transitions', name: 'transitions' },
-  { id: 'shapes', name: 'shape animations' },
-  { id: 'particles', name: 'effects' },
+  { id: 'shapeAnims', name: 'shape animations' },
+  { id: 'effects', name: 'effects' },
   { id: 'backgrounds', name: 'backgrounds' },
   { id: 'scripts', name: 'scripts' },
 ]
 
+const MANIFEST_URL = 'https://raw.githubusercontent.com/YOUR-USERNAME/critterFX-presets/main/manifest.json'
 
+let cachedPresets: Preset[] | null = null
+
+/**
+ * fetch presets from github manifest
+ */
+export async function fetchPresets(): Promise<Preset[]> {
+  // return cached if we already fetched
+  if (cachedPresets) {
+    return cachedPresets
+  }
+
+  try {
+    const response = await fetch(MANIFEST_URL)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch manifest: ${response.statusText}`)
+    }
+    
+    const data = await response.json()
+    cachedPresets = data.presets
+    return data.presets
+  } catch (error) {
+    console.error('Failed to fetch presets:', error)
+    // return empty array as fallback
+    return []
+  }
+}
+
+/**
+ * refresh presets from github (force refetch)
+ */
+export async function refreshPresets(): Promise<Preset[]> {
+  cachedPresets = null
+  return fetchPresets()
+}
