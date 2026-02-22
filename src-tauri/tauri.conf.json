@@ -24,13 +24,24 @@
           "identifier": "main-capability",
           "windows": ["main"],
           "permissions": [
-            "core:default",
-            "fs:allow-read",
-            "fs:allow-write",
-            "fs:allow-exists",
-            "fs:allow-mkdir",
-            "fs:allow-remove",
-            "dialog:allow-open"
+          "core:default",
+          {
+            "identifier": "fs:scope",
+            "allow": [
+              "$DOWNLOAD/*",
+              "$DOWNLOAD/**"
+            ]
+          },
+          "fs:allow-read",
+          "fs:allow-write",
+          "fs:allow-exists",
+          "fs:allow-mkdir",
+          "fs:allow-remove",
+          "fs:allow-read-text-file",
+          "fs:allow-write-text-file",
+          "fs:allow-write-file",
+          "dialog:allow-open",
+          "core:path:default"
           ]
         }
       ]
