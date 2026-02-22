@@ -1,4 +1,4 @@
-export interface Preset {
+export interface Preset { //struct for a preset
   id: number
   name: string
   category: string
@@ -14,7 +14,7 @@ export interface Preset {
   tags?: string[]
 }
 
-export const categories = [
+export const categories = [ //categories for presets
   { id: 'all', name: 'all presets' },
   { id: 'textAnims', name: 'text animations' },
   { id: 'transitions', name: 'transitions' },
@@ -24,30 +24,35 @@ export const categories = [
   { id: 'scripts', name: 'scripts' },
 ]
 
-const MANIFEST_URL = 'https://raw.githubusercontent.com/YOUR-USERNAME/critterFX-presets/main/manifest.json'
+const MANIFEST_URL = 'https://raw.githubusercontent.com/gaknippel/critterFX-presets/main/manifest.json'
 
-let cachedPresets: Preset[] | null = null
+let cachedPresets: Preset[] | null = null 
 
 /**
  * fetch presets from github manifest
  */
 export async function fetchPresets(): Promise<Preset[]> {
   // return cached if we already fetched
-  if (cachedPresets) {
+  if (cachedPresets)  //if it exists
+  {
     return cachedPresets
   }
 
-  try {
+  try 
+  {
     const response = await fetch(MANIFEST_URL)
-    if (!response.ok) {
+    if (!response.ok) 
+    {
       throw new Error(`Failed to fetch manifest: ${response.statusText}`)
     }
     
     const data = await response.json()
     cachedPresets = data.presets
     return data.presets
-  } catch (error) {
-    console.error('Failed to fetch presets:', error)
+  } 
+  catch (error) 
+  {
+    console.error('failed to fetch presets:', error)
     // return empty array as fallback
     return []
   }

@@ -2,35 +2,84 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Download, Info, Package, FileCode } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { useState, useEffect } from 'react'
+import { toast } from "sonner"
 import './PresetDetail.css'
-import { presets } from '@/data/presets'  // import shared data file
+import { fetchPresets, type Preset } from '@/data/presets'
+import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
 
 export default function PresetDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  
-  // find the preset by ID from the shared data
-  const preset = presets.find(p => p.id === parseInt(id || '0'))
+  const [preset, setPreset] = useState<Preset | null>(null)
+  const [isInstalling, setIsInstalling] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null)
 
-  // error
+  // load preset data
+  useEffect(() => {
+    loadPreset()
+  }, [id])
+
+  const loadPreset = async () => {
+    const presets = await fetchPresets()
+    const found = presets.find(p => p.id === parseInt(id || '0'))
+    setPreset(found || null)
+  }
+
   if (!preset) {
     return (
       <div className="preset-detail-wrapper">
         <div className="preset-not-found">
-          <h1>preset not found</h1>
+          <h1>Preset not found</h1>
           <Button onClick={() => navigate('/')}>
             <ArrowLeft className="mr-2" />
-            back to browser
+            Back to Browser
           </Button>
         </div>
       </div>
     )
   }
 
+  const handleDownload = async () => {
+    setIsInstalling(true)
+    setDownloadProgress({ downloaded: 0, total: 100, percentage: 0 })
+
+    try 
+    {
+      const result = await downloadAndInstall(
+        preset,
+        (progress) => setDownloadProgress(progress)
+      )
+
+      if (result.success) 
+      {
+        toast.success("success!", {
+          description: result.message,
+        })
+      } 
+      else 
+      {
+        toast.error("installation failed", {
+          description: result.message,
+        })
+      }
+    } 
+    catch (error) 
+    {
+      toast.error("error", {
+        description: `failed to install preset: ${error}`,
+      })
+    } finally {
+      setIsInstalling(false)
+      setDownloadProgress(null)
+    }
+  }
+
   return (
     <div className="preset-detail-wrapper">
       <div className="preset-detail-header">
-        <Button 
+        <Button
           variant="ghost" 
           onClick={() => navigate('/')}
           className="back-button"
@@ -40,9 +89,7 @@ export default function PresetDetail() {
         </Button>
       </div>
 
-      {/* main content */}
       <div className="preset-detail-content">
-        {/* left side */}
         <div className="preset-preview-section">
           <div className="preset-preview-large">
             <img 
@@ -50,13 +97,34 @@ export default function PresetDetail() {
               alt={preset.name}
             />
           </div>
-          <Button className="download-button" size="lg">
+          
+          {/* download progress */}
+          {downloadProgress && (
+            <div className="mb-4">
+              <Progress value={downloadProgress.percentage} />
+              <p className="text-sm text-center mt-2 text-muted-foreground">
+                {downloadProgress.percentage}% - downloading...
+              </p>
+            </div>
+          )}
+
+          <Button 
+            className="download-button" 
+            size="lg"
+            onClick={handleDownload}
+            disabled={isInstalling}
+          >
             <Download className="mr-2" />
-            download preset
+            {isInstalling ? 'Installing...' : 'Install to After Effects'}
           </Button>
+
+          {preset.fileSize && (
+            <p className="text-sm text-center mt-2 text-muted-foreground">
+              file size: {preset.fileSize}
+            </p>
+          )}
         </div>
 
-        {/* right side */}
         <div className="preset-details-section">
           <div className="preset-header-info">
             <h1 className="preset-detail-title">{preset.name}</h1>
@@ -69,7 +137,6 @@ export default function PresetDetail() {
             ))}
           </div>
 
-          {/* description */}
           <div className="detail-section">
             <div className="section-header">
               <Info size={20} />
@@ -78,7 +145,6 @@ export default function PresetDetail() {
             <p className="detail-text">{preset.longDescription || preset.description}</p>
           </div>
 
-          {/* technical info */}
           <div className="detail-section">
             <div className="section-header">
               <FileCode size={20} />
@@ -100,11 +166,10 @@ export default function PresetDetail() {
             </div>
           </div>
 
-          {/* dependencies */}
           <div className="detail-section">
             <div className="section-header">
               <Package size={20} />
-              <h2>plug-ins needed:</h2>
+              <h2>dependencies</h2>
             </div>
             <ul className="dependencies-list">
               {preset.dependencies?.map((dep, index) => (

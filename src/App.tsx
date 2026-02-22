@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "./components/app-sidebar"
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
 import "./App.css";
 
 
@@ -17,6 +18,7 @@ export default function App() {
             <Outlet />
           </SidebarInset>
         </SidebarProvider>
+        <Toaster />
     </ThemeProvider>
     </div>
     
