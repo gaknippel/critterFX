@@ -123,37 +123,130 @@ fn save_path_config(
 }
 
 #[tauri::command]
-fn install_preset(preset_type : String, file_name: String, source_path: String) -> Result<String, String> {
-    let dest_dir = match preset_type.as_str() 
-    {
+fn install_preset(
+    app: tauri::AppHandle,
+    preset_type: String, 
+    file_name: String,
+    source_path: String
+) -> Result<String, String> {
+
+
+    println!("install preset called");
+
+    let config = get_path_config(app.clone())?;
+
+        let dest_dir = match preset_type.as_str() 
+        {
         "script" => 
         {
-            PathBuf::from("C:\\Program Files\\Adobe\\Adobe After Effects 2024\\Support Files\\Scripts")
+            //use custom path if available, otherwise default
+            if let Some(custom_path) = config.custom_scripts_path 
+            {
+                PathBuf::from(custom_path)
+            } 
+            else 
+            {
+                //try to find AE installation
+                let installations = scan_ae_installations();
+                if let Some(first) = installations.first() 
+                {
+                    PathBuf::from(&first.scripts_path)
+                } 
+                else 
+                {
+                    return Err("no AE installation found. configute path in settings.".to_string());
+                }
+            }
         },
         "preset" => 
         {
-            let mut path = PathBuf::from(std::env::var("USERPROFILE").unwrap());
-            path.push("Documents\\Adobe\\After Effects\\User Presets");
-            path
+            if let Some(custom_path) = config.custom_presets_path 
+            {
+                PathBuf::from(custom_path)
+            } 
+            else 
+            {
+                let installations = scan_ae_installations();
+                if let Some(first) = installations.first() 
+                {
+                    PathBuf::from(&first.user_presets_path)
+                }
+                else
+                {
+                    return Err("no AE installation found. configute path in settings.".to_string());
+                }
+            }
         },
         _ => return Err("invalid preset type".to_string())
     };
-
-    // create directory if it doesn't exist
-    if !dest_dir.exists() 
-    {
-        fs::create_dir_all(&dest_dir).map_err(|e| e.to_string())?;
+    
+    println!("   dest_dir: {:?}", dest_dir);
+    
+    // create directory if needed
+    if !dest_dir.exists() {
+        println!("creating directory...");
+        fs::create_dir_all(&dest_dir).map_err(|e| {
+            println!("failed to create dir: {}", e);
+            e.to_string()
+        })?;
     }
-
-    // build destination file path
+    
     let mut dest_path = dest_dir.clone();
     dest_path.push(&file_name);
+    
+    println!("   copying from: {:?}", source_path);
+    println!("   copying to: {:?}", dest_path);
+    
+    if preset_type == "script" 
+    {
+    // try normal copy first
+    match fs::copy(&source_path, &dest_path) 
+    {
+        Ok(_) => 
+        {
+            println!("copied without elevation");
+        },
+        Err(_) => 
+        {
+            println!("u need sigma admin perms foid");
+            #[cfg(windows)]
+            request_admin_and_copy(&source_path, dest_path.to_str().unwrap())?;
+        }
+    }
+    } 
+    else 
+    {
+        // presets dont need admin
+        fs::copy(&source_path, &dest_path).map_err(|e| e.to_string())?;
+    }
+    
+    println!("success!");
+    Ok(format!("successfully installed {} to after effects", file_name))
+}
 
-    // copy file from source to destination
-    fs::copy(&source_path, &dest_path)
+#[cfg(windows)]
+fn request_admin_and_copy(source: &str, dest: &str) -> Result<(), String> {
+    use std::process::Command;
+    use std::os::windows::process::CommandExt;
+    
+    const CREATE_NO_WINDOW: u32 = 0x08000000;
+    
+    // Use PowerShell to elevate and copy
+    let script = format!(
+        "Start-Process powershell -WindowStyle Hidden -Verb RunAs -ArgumentList '-Command \"Copy-Item -Path ''{}'' -Destination ''{}'' -Force\"'",
+        source, dest
+    );
+    
+    let output = Command::new("powershell")
+        .args(&["-WindowStyle", "Hidden", "-Command", &script])
+        .output()
         .map_err(|e| e.to_string())?;
     
-    Ok(format!("successfully installed {} to after effects", file_name))
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err("user denied admin access or copy failed".to_string())
+    }
 }
 
 

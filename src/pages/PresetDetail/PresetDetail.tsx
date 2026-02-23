@@ -115,7 +115,7 @@ export default function PresetDetail() {
             disabled={isInstalling}
           >
             <Download className="mr-2" />
-            {isInstalling ? 'Installing...' : 'Install to After Effects'}
+            {isInstalling ? 'Installing...' : 'install to AE'}
           </Button>
 
           {preset.fileSize && (
