@@ -1,5 +1,6 @@
 import { FileQuestionMark, Columns3Cog, Cog, Github } from "lucide-react"
-import { Link } from "react-router-dom"  // ← Add this import
+import { Link } from "react-router-dom"
+import { open } from '@tauri-apps/plugin-shell'
 
 import {
   Sidebar,
@@ -13,7 +14,6 @@ import {
   SidebarFooter
 } from "@/components/ui/sidebar"
 
-// Menu items.
 const items = [
   {
     title: "presets",
@@ -30,10 +30,13 @@ const items = [
     url: "/settings",
     icon: Cog,
   },
-
 ]
 
 export function AppSidebar() {
+  const handleGithubClick = async () => {
+    await open('https://github.com/gaknippel/critterFX')
+  }
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -58,14 +61,13 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <a href="https://github.com/gaknippel/critterFX" target="_blank" rel="noopener noreferrer">
-                <Github />
-                <span>view the source code!</span>
-              </a>
+            <SidebarMenuButton onClick={handleGithubClick}>
+              <Github />
+              <span>view the source code!</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-    </Sidebar>  )
+    </Sidebar>
+  )
 }

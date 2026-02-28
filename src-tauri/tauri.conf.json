@@ -41,7 +41,8 @@
           "fs:allow-write-text-file",
           "fs:allow-write-file",
           "dialog:allow-open",
-          "core:path:default"
+          "core:path:default",
+          "shell:allow-open"
           ]
         }
       ]
