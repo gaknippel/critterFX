@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import './PresetDetail.css'
 import { fetchPresets, type Preset } from '@/data/presets'
 import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
+import { categories } from '@/data/presets'
 
 export default function PresetDetail() {
   const { id } = useParams()
@@ -15,6 +16,7 @@ export default function PresetDetail() {
   const [preset, setPreset] = useState<Preset | null>(null)
   const [isInstalling, setIsInstalling] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null)
+  
 
   // load preset data
   useEffect(() => {
@@ -75,6 +77,7 @@ export default function PresetDetail() {
       setDownloadProgress(null)
     }
   }
+  const categoryName = categories.find(cat => cat.id === preset.category)?.name || preset.category
 
   return (
     <div className="preset-detail-wrapper">
@@ -118,17 +121,13 @@ export default function PresetDetail() {
             {isInstalling ? 'Installing...' : 'install to AE'}
           </Button>
 
-          {preset.fileSize && (
-            <p className="text-sm text-center mt-2 text-muted-foreground">
-              file size: {preset.fileSize}
-            </p>
-          )}
+
         </div>
 
         <div className="preset-details-section">
           <div className="preset-header-info">
             <h1 className="preset-detail-title">{preset.name}</h1>
-            <p className="preset-detail-category">{preset.category}</p>
+            <p className="preset-detail-category">{categoryName}</p>
           </div>
 
           <div className="preset-tags">
