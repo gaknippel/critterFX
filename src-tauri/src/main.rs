@@ -233,12 +233,13 @@ fn request_admin_and_copy(source: &str, dest: &str) -> Result<(), String> {
     
     // Use PowerShell to elevate and copy
     let script = format!(
-        "Start-Process powershell -WindowStyle Hidden -Verb RunAs -ArgumentList '-Command \"Copy-Item -Path ''{}'' -Destination ''{}'' -Force\"'",
+        "Start-Process powershell -WindowStyle Hidden -Verb RunAs -ArgumentList '-WindowStyle Hidden -Command \"Copy-Item -Path ''{}'' -Destination ''{}'' -Force\"'",
         source, dest
     );
     
     let output = Command::new("powershell")
         .args(&["-WindowStyle", "Hidden", "-Command", &script])
+        .creation_flags(CREATE_NO_WINDOW)
         .output()
         .map_err(|e| e.to_string())?;
     
