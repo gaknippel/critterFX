@@ -231,7 +231,7 @@ fn request_admin_and_copy(source: &str, dest: &str) -> Result<(), String> {
     
     const CREATE_NO_WINDOW: u32 = 0x08000000;
     
-    // Use PowerShell to elevate and copy
+    // use powerShell to elevate and copy
     let script = format!(
         "Start-Process powershell -WindowStyle Hidden -Verb RunAs -ArgumentList '-WindowStyle Hidden -Command \"Copy-Item -Path ''{}'' -Destination ''{}'' -Force\"'",
         source, dest
@@ -254,7 +254,6 @@ fn request_admin_and_copy(source: &str, dest: &str) -> Result<(), String> {
 
 fn main() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![

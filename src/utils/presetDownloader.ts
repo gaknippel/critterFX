@@ -1,7 +1,6 @@
 // src/utils/presetDownloader.ts
 import { invoke } from '@tauri-apps/api/core'
 import { downloadDir } from '@tauri-apps/api/path'
-import { writeFile } from '@tauri-apps/plugin-fs'
 import { getActivePaths } from './aePathManager'
 import type { Preset } from '@/data/presets'
 
@@ -114,8 +113,11 @@ export async function downloadAndInstall(
     //save temp to downloads folder
     const downloadPath = await downloadDir()
     const tempPath = `${downloadPath}/${preset.fileName}`
-    
-    await writeFile(tempPath, fileData)
+
+    await invoke('plugin:fs|write_binary_file', {
+      path: tempPath,
+      contents: Array.from(fileData)
+    })
 
     const presetType = getPresetType(preset.fileName)
     
@@ -156,7 +158,10 @@ export async function downloadPreset(
     const downloadPath = await downloadDir()
     const filePath = `${downloadPath}/${preset.fileName}`
     
-    await writeFile(filePath, fileData)
+      await invoke('plugin:fs|write_binary_file', {
+      path: filePath,
+      contents: Array.from(fileData)
+    })
 
     return {
       success: true,
