@@ -26,7 +26,6 @@
           "permissions": [
             "core:default",
             "core:path:default",
-            "core:fs:default",
             "dialog:allow-open",
             "shell:allow-open"
           ]

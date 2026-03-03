@@ -114,7 +114,7 @@ export async function downloadAndInstall(
     const downloadPath = await downloadDir()
     const tempPath = `${downloadPath}/${preset.fileName}`
 
-    await invoke('plugin:fs|write_binary_file', {
+    await invoke('write_binary_file', {
       path: tempPath,
       contents: Array.from(fileData)
     })
@@ -158,7 +158,7 @@ export async function downloadPreset(
     const downloadPath = await downloadDir()
     const filePath = `${downloadPath}/${preset.fileName}`
     
-      await invoke('plugin:fs|write_binary_file', {
+      await invoke('write_binary_file', {
       path: filePath,
       contents: Array.from(fileData)
     })
