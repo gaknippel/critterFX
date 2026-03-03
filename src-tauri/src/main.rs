@@ -176,16 +176,44 @@ fn install_preset(
         match fs::copy(&source_path, &dest_path) {
             Ok(_) => {
                 println!("copied without elevation");
-            }
+
+                match fs::remove_file(&source_path) {
+                    Ok(_) => {
+                        println!("temp file deleted successfully!")
+                    }
+                    Err(e) => {
+                        println!("temp file had a problem deleting: {}", e);
+                    }
+                }
+            },
             Err(_) => {
                 println!("u need sigma admin perms foid");
                 #[cfg(windows)]
                 request_admin_and_copy(&source_path, dest_path.to_str().unwrap())?;
+
+                match fs::remove_file(&source_path) {
+                    Ok(_) => {
+                        println!("temp file deleted successfully!")
+                    }
+                    Err(e) => {
+                        println!("temp file had a problem deleting: {}", e);
+                    }
+                }
             }
         }
     } else {
         // presets dont need admin
         fs::copy(&source_path, &dest_path).map_err(|e| e.to_string())?;
+
+
+        match fs::remove_file(&source_path) {
+            Ok(_) => {
+                println!("temp file deleted successfully!")
+            }
+            Err(e) => {
+                println!("temp file had a problem deleting: {}", e);
+            }
+        }
     }
 
     println!("success!");
