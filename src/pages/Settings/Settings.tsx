@@ -171,7 +171,7 @@ export default function Settings() {
                       variant="secondary"
                       onClick={() => handleUseDetectedPath(inst)}
                     >
-                      use this
+                      use
                     </Button>
                   </div>
                 ))}

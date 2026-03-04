@@ -81,7 +81,6 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --preset-info-bg: oklch(0.97 0 0); 
-  --download-button-bg: oklch(70.115% 0.22183 141.442);
 }
 
 .dark {
@@ -154,7 +153,9 @@
   --sidebar-border: oklch(0.30 0.03 250);
   --sidebar-ring: oklch(0.65 0.22 250);
   --patchNotes-BG: oklch(0.25 0.025 250);
-  --preset-info-bg: oklch(0.97 0 0); 
+  --preset-info-bg: oklch(61.988% 0.14099 244.062); 
+  --download-button-bg: oklch(63.985% 0.14868 242.702);
+  --download-button-bg-hover: oklch(68.913% 0.17506 245.437);
 }
 
 .forest {
