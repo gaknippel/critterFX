@@ -18,6 +18,7 @@ struct AEInstallation {
 struct PathConfig {
     custom_scripts_path: Option<String>,
     custom_presets_path: Option<String>,
+    custom_composition_path: Option<String>,
 }
 
 #[tauri::command]
@@ -83,6 +84,7 @@ fn get_path_config(app: tauri::AppHandle) -> Result<PathConfig, String> {
         Ok(PathConfig {
             custom_scripts_path: None,
             custom_presets_path: None,
+            custom_composition_path: None,
         })
     }
 }
@@ -92,6 +94,7 @@ fn save_path_config(
     app: tauri::AppHandle,
     scripts_path: Option<String>,
     presets_path: Option<String>,
+    composition_path: Option<String>,
 ) -> Result<(), String> {
     let app_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
 
@@ -103,6 +106,7 @@ fn save_path_config(
     let config = PathConfig {
         custom_scripts_path: scripts_path,
         custom_presets_path: presets_path,
+        custom_composition_path: composition_path,
     };
 
     let config_json = serde_json::to_string_pretty(&config).map_err(|e| e.to_string())?;
@@ -149,6 +153,15 @@ fn install_preset(
                 } else {
                     return Err("no AE installation found. configute path in settings.".to_string());
                 }
+            }
+        }
+        "composition" => {
+            if let Some(custom_path) = config.custom_composition_path {
+                PathBuf::from(custom_path)
+            } else {
+                let mut path = PathBuf::from(std::env::var("USERPROFILE").unwrap());
+                path.push("Documents\\critterFX\\Compositions");
+                path
             }
         }
         _ => return Err("invalid preset type".to_string()),

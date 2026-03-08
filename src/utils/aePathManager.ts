@@ -1,17 +1,20 @@
 import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
+import { documentDir, join } from '@tauri-apps/api/path'
 
 export interface AEInstallation
 {
     version: string
     scripts_path: string
     user_presets_path: string
+    composition_path: string
     exists: boolean
 }
 
 export interface PathConfig {
     custom_scripts_path?: string
     custom_presets_path?: string
+    custom_composition_path?: string
 }
 
 
@@ -39,11 +42,13 @@ export async function getPathConfig(): Promise<PathConfig> {
  */
 export async function savePathConfig(
   scriptsPath?: string,
-  presetsPath?: string
+  presetsPath?: string,
+  compositionPath?: string,
 ): Promise<void> {
   await invoke('save_path_config', {
     scriptsPath,
     presetsPath,
+    compositionPath,
   })
 }
 
@@ -60,20 +65,22 @@ export async function pickFolder(): Promise<string | null> {
 }
 
 /**
- * Get the active installation paths (custom or auto-detected)
+ * get the active installation paths (custom or default ones)
  */
 export async function getActivePaths(): Promise<{
   scriptsPath: string | null
   presetsPath: string | null
+  compositionPath: string |null
   source: 'custom' | 'detected' | 'none'
 }> {
   // first check for custom paths
   const config = await getPathConfig()
   
-  if (config.custom_scripts_path || config.custom_presets_path) {
+  if (config.custom_scripts_path || config.custom_presets_path || config.custom_composition_path) {
     return {
       scriptsPath: config.custom_scripts_path || null,
       presetsPath: config.custom_presets_path || null,
+      compositionPath: config.custom_composition_path || null,
       source: 'custom'
     }
   }
@@ -84,9 +91,13 @@ export async function getActivePaths(): Promise<{
   if (installations.length > 0) {
     // use the latest version found
     const latest = installations[0]
+
+    const docsDir = await documentDir();
+    const defaultCompositionPath = await join(docsDir, 'critterFX', 'Compositions');
     return {
       scriptsPath: latest.scripts_path,
       presetsPath: latest.user_presets_path,
+      compositionPath: defaultCompositionPath,
       source: 'detected'
     }
   }
@@ -94,6 +105,7 @@ export async function getActivePaths(): Promise<{
   return {
     scriptsPath: null,
     presetsPath: null,
+    compositionPath: null,
     source: 'none'
   }
 }

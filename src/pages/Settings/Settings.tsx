@@ -30,9 +30,11 @@ export default function Settings() {
   const [installations, setInstallations] = useState<AEInstallation[]>([]);
   const [customScriptsPath, setCustomScriptsPath] = useState('');
   const [customPresetsPath, setCustomPresetsPath] = useState('');
+  const [customCompositionPath, setCustomCompositionPath] = useState('');
   const [isScanning, setIsScanning] = useState(false);
   const [scriptsPathValid, setScriptsPathValid] = useState<boolean | null>(null);
   const [presetsPathValid, setPresetsPathValid] = useState<boolean | null>(null);
+  const [compositionPathValid, setCompositionPathValid] = useState<boolean | null>(null);
   const [saveMessage, setSaveMessage] = useState('');
 
 
@@ -55,6 +57,12 @@ export default function Settings() {
       setCustomPresetsPath(config.custom_presets_path);
       const valid = await verifyPath(config.custom_presets_path);
       setPresetsPathValid(valid);
+    }
+    if (config.custom_composition_path)
+    {
+      setCustomCompositionPath(config.custom_composition_path);
+      const valid = await verifyPath(config.custom_composition_path);
+      setCompositionPathValid(valid);
     }
 
 
@@ -98,11 +106,22 @@ export default function Settings() {
   }
 };
 
+const handleBrowseCompositions = async () => {
+  const folder = await pickFolder();
+  if(folder)
+  {
+    setCustomCompositionPath(folder);
+    const valid = await verifyPath(folder);
+    setCompositionPathValid(valid);
+  }
+}
+
  const handleSavePaths = async () => {
     try {
       await savePathConfig(
         customScriptsPath || undefined,
-        customPresetsPath || undefined
+        customPresetsPath || undefined,
+        customCompositionPath || undefined,
       );
       setSaveMessage('Paths saved successfully!');
       setTimeout(() => setSaveMessage(''), 3000);
@@ -235,6 +254,32 @@ export default function Settings() {
                 )}
               </div>
               <Button className="settings-btn" onClick={handleBrowsePresets} variant="outline">
+                <FolderOpen className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+           <div className="space-y-2 mb-4">
+            <label className="text-sm font-medium">compositions folder (custom)</label>
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Input
+                  value={customCompositionPath}
+                  onChange={(e) => setCustomCompositionPath(e.target.value)}
+                  placeholder="C:\Users\YourName\Documents\critterFX\Compositions"
+                  className={compositionPathValid === false ? 'border-destructive' : ''}
+                />
+                {compositionPathValid !== null && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {compositionPathValid ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-destructive" />
+                    )}
+                  </div>
+                )}
+              </div>
+              <Button className="settings-btn" onClick={handleBrowseCompositions} variant="outline">
                 <FolderOpen className="h-4 w-4" />
               </Button>
             </div>

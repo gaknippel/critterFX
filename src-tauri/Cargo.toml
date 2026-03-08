@@ -1,7 +1,7 @@
 [package]
-name = "citterDownloader"
-version = "1.1.6"
-description = "A youtube downloader Tauri App"
+name = "citterFX"
+version = "1.0.0"
+description = "A hub for AE presets."
 authors = ["Greyson Knippel"]
 edition = "2024"
 # changed git stuff

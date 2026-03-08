@@ -82,9 +82,24 @@ async function downloadFile(
 /**
  * split filename to determine if its jsx or ffx file
  */
-function getPresetType(fileName: string): 'script' | 'preset' {
+function getPresetType(fileName: string): 'script' | 'preset' | 'composition' {
   const ext = fileName.split('.').pop()?.toLowerCase()
-  return ext === 'jsx' ? 'script' : 'preset'
+  if (ext == 'jsx')
+  {
+    return 'script'
+  }
+  else if (ext == 'ffx')
+  {
+    return 'preset'
+  }
+  else if (ext == 'aep')
+  {
+    return 'composition'
+  }
+  else
+  {
+    throw new Error(`unknown file type: ${ext}`)
+  }
 }
 
 /**
@@ -128,10 +143,24 @@ export async function downloadAndInstall(
       sourcePath: tempPath,
     })
 
+    let installedPath: string | null
+    if (presetType === 'script')
+    {
+      installedPath = paths.scriptsPath
+    }
+    else if (presetType === 'preset')
+    {
+      installedPath = paths.presetsPath
+    }
+    else
+    {
+      installedPath = paths.compositionPath
+    }
+
     return {
       success: true,
       message: result,
-      installedPath: presetType === 'script' ? paths.scriptsPath : paths.presetsPath
+      installedPath
     }
 
   } 
