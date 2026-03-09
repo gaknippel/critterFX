@@ -9,6 +9,7 @@ import './PresetDetail.css'
 import { fetchPresets, type Preset } from '@/data/presets'
 import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
 import { categories } from '@/data/presets'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
 
 export default function PresetDetail() {
   const { id } = useParams()
@@ -120,6 +121,49 @@ export default function PresetDetail() {
             <Download className="mr-2" />
             {isInstalling ? 'Installing...' : 'install to AE'}
           </Button>
+            {/*only appears for composition presets (.aep files!) */}
+            {preset.fileName.endsWith('.aep') && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="lg" className="w-full mt-4">
+                    <Info className="mr-2 h-5 w-5" />
+                    how to use!!!
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>how to import this composition</DialogTitle>
+                    <DialogDescription>
+                      this is a composition preset, so you have to import it manually through AE.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="rounded-lg overflow-hidden border">
+                      <img 
+                        src="/howtoinstallcomps.gif" 
+                        alt="import tutorial animation"
+                        className="w-full"
+                      />
+                    </div>
+                    
+                    {/* instructions */}
+                    <ol className="space-y-2 list-decimal list-inside">
+                      <li className="text-sm">open AE</li>
+                      <li className="text-sm">go to <strong>file → import → file</strong> (or press <kbd className="px-2 py-1 bg-muted rounded text-xs">Ctrl+I</kbd>)</li>
+                      <li className="text-sm">go to: <code className="px-2 py-1 bg-muted rounded text-xs">Documents\critterFX\Compositions</code></li>
+                      <li className="text-sm">select <strong>{preset.fileName}</strong></li>
+                      <li className="text-sm">click "import", and use it in the project panel</li>
+                    </ol>
+
+                    <div className="bg-muted p-3 rounded-lg">
+                      <p className="text-sm text-muted-foreground">
+                        💡 <strong>tip:</strong> you can also drag and drop the .aep file directly into the AE project panel.
+                      </p>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
 
 
         </div>
