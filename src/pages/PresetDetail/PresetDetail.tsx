@@ -134,12 +134,12 @@ const handleAnimationComplete = () => {
                 <DialogTrigger asChild>
                   <Button variant="outline" size="lg" className="w-full mt-4">
                     <Info className="mr-2 h-5 w-5" />
-                    how to use!!!
+                    how to install!!! (IMPORTANT)
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl">
                   <DialogHeader>
-                    <DialogTitle>how to import this composition</DialogTitle>
+                    <DialogTitle>how to import compositions</DialogTitle>
                     <DialogDescription>
                       this is a composition preset, so you have to import it manually through AE.
                     </DialogDescription>

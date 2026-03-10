@@ -81,20 +81,22 @@ export default function Presets(){
    return (
     <div className="home-page-wrapper">
       <div className="home-header">
-              <SplitText
-          text="preset browser"
-          className="home-title"
-          delay={20}
-          duration={1.5}
-          ease="elastic.out(1, 0.3)"
-          splitType="chars"
-          from={{ opacity: 0, y: 5 }}
-          to={{ opacity: 1, y: 0 }}
-          threshold={0.1}
-          rootMargin="-100px"
-          textAlign="center"
-          onLetterAnimationComplete={handleAnimationComplete}
-        />
+        <div className="title-container">
+          <SplitText
+            text="preset browser"
+            className="home-title"
+            delay={20}
+            duration={1.5}
+            ease="elastic.out(1, 0.3)"
+            splitType="chars"
+            from={{ opacity: 0, y: 5 }}
+            to={{ opacity: 1, y: 0 }}
+            threshold={0.1}
+            rootMargin="-100px"
+            textAlign="center"
+            onLetterAnimationComplete={handleAnimationComplete}
+          />
+        </div>
         <div className="search-container">
           <Search className="search-icon" />
           <Input

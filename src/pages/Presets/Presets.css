@@ -14,6 +14,18 @@
   gap: 2rem;
 }
 
+.title-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.home-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
 .home-title {
   font-size: 2.25rem; 
   font-family: "Instrument Sans", sans-serif;
