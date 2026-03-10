@@ -10,6 +10,7 @@ import { fetchPresets, type Preset } from '@/data/presets'
 import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
 import { categories } from '@/data/presets'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
+import SplitText from '@/components/SplitText'
 
 export default function PresetDetail() {
   const { id } = useParams()
@@ -28,6 +29,8 @@ export default function PresetDetail() {
     const presets = await fetchPresets()
     const found = presets.find(p => p.id === parseInt(id || '0'))
     setPreset(found || null)
+
+    window.scrollTo(0, 0)
   }
 
   if (!preset) {
@@ -78,6 +81,10 @@ export default function PresetDetail() {
       setDownloadProgress(null)
     }
   }
+const handleAnimationComplete = () => {
+  console.log('All letters have animated!');
+};
+
   const categoryName = categories.find(cat => cat.id === preset.category)?.name || preset.category
 
   return (
@@ -170,7 +177,22 @@ export default function PresetDetail() {
 
         <div className="preset-details-section">
           <div className="preset-header-info">
-            <h1 className="preset-detail-title">{preset.name}</h1>
+            <h1>
+          <SplitText
+          text={preset.name}
+          className="preset-detail-title"
+          delay={20}
+          duration={1.5}
+          ease="elastic.out(1, 0.3)"
+          splitType="chars"
+          from={{ opacity: 0, y: 5 }}
+          to={{ opacity: 1, y: 0 }}
+          threshold={0.1}
+          rootMargin="-100px"
+          textAlign="center"
+          onLetterAnimationComplete={handleAnimationComplete}
+        />
+        </h1>
             <p className="preset-detail-category">{categoryName}</p>
           </div>
 

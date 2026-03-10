@@ -41,9 +41,20 @@ export default function About() {
   return (
     <div className='about-page-wrapper'>
 
-        <FadeContent blur={false} duration={1000} easing="power2.out" initialOpacity={0} className='about-welcome-message'>
-      about
-    </FadeContent>
+              <SplitText
+          text="about"
+          className="about-welcome-message"
+          delay={20}
+          duration={1.5}
+          ease="elastic.out(1, 0.3)"
+          splitType="chars"
+          from={{ opacity: 0, y: 5 }}
+          to={{ opacity: 1, y: 0 }}
+          threshold={0.1}
+          rootMargin="-100px"
+          textAlign="center"
+          onLetterAnimationComplete={handleAnimationComplete}
+        />
       <div className='accordion-container'>
         <Accordion
           type="single"

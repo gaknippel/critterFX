@@ -8,15 +8,16 @@
   box-sizing: border-box;
 }
 
-/* Add this class to wrap your accordion */
+
 .accordion-container {
   width: 100%;
-  max-width: 32rem; /* matches max-w-lg */
-  min-height: 400px; /* adjust this value based on your content */
+  max-width: 32rem; 
+  min-height: 400px; 
 }
 
 .about-welcome-message {
-  font-family: "Source Code Pro", monospace;
+  font-family: "Instrument Sans", sans-serif;
+  font-weight: 700;
   font-size: 3rem;
   color: hsl(var(--foreground));
   text-align: center;

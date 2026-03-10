@@ -9,7 +9,8 @@
 }
 
 .settings-welcome-message {
-  font-family: "Source Code Pro", monospace;
+  font-family: "Instrument Sans", sans-serif;
+  font-weight: 700;
   font-size: 3rem;
   color: hsl(var(--foreground));
   text-align: center;
@@ -17,11 +18,37 @@
 }
 
 .settings-section {
-  background: hsl(var(--card));
+  background: hsl(var(--card) / 40%);
+  backdrop-filter: blur(8px);
   border: 1px solid hsl(var(--border));
   border-radius: 0.75rem;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
+}
+
+.settings-section [data-slot="alert"] {
+  background: transparent !important;
+}
+
+.settings-section [data-slot="alert-description"] {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Make paths in alert less muted */
+.settings-section [data-slot="alert-description"] .text-muted-foreground {
+  color: hsl(var(--foreground) / 80%) !important;
+}
+
+/* Make the "use" buttons in the alert transparent */
+.settings-section [data-slot="alert-description"] .settings-btn {
+  background: transparent !important;
+  border: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.settings-section [data-slot="alert-description"] .settings-btn:hover {
+  background: hsl(var(--accent) / 30%) !important;
 }
 
 .settings-section h2 {
@@ -29,7 +56,6 @@
   margin: 0 0 1rem 0;
 }
 
-/* Path status indicators */
 .path-status-valid {
   color: hsl(120, 100%, 40%);
 }
@@ -38,7 +64,6 @@
   color: hsl(var(--destructive));
 }
 
-/* Custom Settings Button Styling */
 .settings-btn {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
   position: relative;
@@ -48,7 +73,7 @@
 
 .settings-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow lift */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
 }
 
 .settings-btn:active {
@@ -56,8 +81,6 @@
   box-shadow: none;
 }
 
-/* Optional: Add a subtle gradient on hover or default */
-/* We use a pseudo-element for the gradient to blend nicely with existing themes */
 .settings-btn::before {
   content: "";
   position: absolute;
@@ -80,12 +103,11 @@
 }
 
 .settings-btn:active::before {
-  background: rgba(255, 255, 255, 0.3); /* Stronger flash */
+  background: rgba(255, 255, 255, 0.3);
   opacity: 1;
-  transition: opacity 0s; /* Instant flash */
+  transition: opacity 0s; 
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .settings-welcome-message {
     font-size: 2rem;

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert"
 import { Input } from "@/components/ui/input"
 import { FolderOpen, CheckCircle, AlertCircle, Search } from 'lucide-react'
-import FadeContent from '@/components/FadeContent';
+import SplitText from '@/components/SplitText';
 
 import {
   scanAEInstallations,
@@ -132,6 +132,10 @@ const handleBrowseCompositions = async () => {
     }
   };
 
+  const handleAnimationComplete = () => {
+  console.log('All letters have animated!');
+};
+
   const handleUseDetectedPath = async (installation: AEInstallation) => {
     setCustomScriptsPath(installation.scripts_path);
     setCustomPresetsPath(installation.user_presets_path);
@@ -146,9 +150,20 @@ const handleBrowseCompositions = async () => {
   
   return(
        <div className="settings-page-wrapper p-4 md:p-6">
-      <FadeContent blur={false} duration={1000} easing="power2.out" initialOpacity={0} className='settings-welcome-message'>
-        settings
-      </FadeContent>
+            <SplitText
+              text="settings"
+              className="settings-welcome-message"
+              delay={20}
+              duration={1.5}
+              ease="elastic.out(1, 0.3)"
+              splitType="chars"
+              from={{ opacity: 0, y: 5 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="center"
+              onLetterAnimationComplete={handleAnimationComplete}
+            />
 
       <div className="space-y-6 max-w-4xl mx-auto">
        <section className="settings-section">
@@ -176,12 +191,12 @@ const handleBrowseCompositions = async () => {
                 {installations.map((inst) => (
                   <div key={inst.version} className="flex items-center justify-between gap-4 py-2 border-t border-border">
                     <div>
-                      <div className="font-medium">After Effects {inst.version}</div>
-                      <div className="text-xs text-muted-foreground">
-                        Scripts: {inst.scripts_path}
+                      <div className="font-medium">after effects {inst.version}</div>
+                      <div className="text-xs">
+                        scripts: {inst.scripts_path}
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        Presets: {inst.user_presets_path}
+                      <div className="text-xs">
+                        presets: {inst.user_presets_path}
                       </div>
                     </div>
                     <Button 

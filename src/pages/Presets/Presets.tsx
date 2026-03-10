@@ -7,6 +7,7 @@ import { Search, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import FadeContent from '@/components/FadeContent'
 import { fetchPresets, refreshPresets, categories, type Preset } from '@/data/presets'
+import SplitText from '@/components/SplitText'
 
 export default function Presets(){
   const [presets, setPresets] = useState<Preset[]>([])
@@ -58,6 +59,12 @@ export default function Presets(){
       setIsRefreshing(false)
     }
   }
+  
+
+  const handleAnimationComplete = () => {
+  console.log('All letters have animated!');
+};
+
 
 
     const filteredPresets = presets.filter(preset => {
@@ -74,9 +81,20 @@ export default function Presets(){
    return (
     <div className="home-page-wrapper">
       <div className="home-header">
-        <FadeContent blur={false} duration={1000} easing="power2.out" initialOpacity={0} className='home-title'>
-          preset browser
-        </FadeContent>
+              <SplitText
+          text="preset browser"
+          className="home-title"
+          delay={20}
+          duration={1.5}
+          ease="elastic.out(1, 0.3)"
+          splitType="chars"
+          from={{ opacity: 0, y: 5 }}
+          to={{ opacity: 1, y: 0 }}
+          threshold={0.1}
+          rootMargin="-100px"
+          textAlign="center"
+          onLetterAnimationComplete={handleAnimationComplete}
+        />
         <div className="search-container">
           <Search className="search-icon" />
           <Input
@@ -99,7 +117,7 @@ export default function Presets(){
       </div>
 
       <div className="home-content-layout">
-        {/* categories Sidebar */}
+        {/* categories sidebar */}
         <aside className="categories-sidebar">
           <h2 className="sidebar-title">categories</h2>
           <ScrollArea className="categories-scroll">
@@ -117,7 +135,7 @@ export default function Presets(){
           </ScrollArea>
         </aside>
 
-        {/* presets Grid */}
+        {/* presets grid */}
         <FadeContent blur={false} duration={1000} easing="power2.out" initialOpacity={0} className='presets-main'>
           <main className="presets-main">
             <ScrollArea className="presets-scroll">
