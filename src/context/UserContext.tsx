@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
-import { isSupabaseConfigured, supabase, supabaseConfigError } from '@/lib/supabase'
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { supabase } from '@/lib/supabase'
+
 
 type UserProfile = {
   id: string
@@ -12,6 +13,7 @@ type UserContextType = {
   signOut: () => void
 }
 
+
 const UserContext = createContext<UserContextType | null>(null)
 
 export function UserProvider({ children }: { children: ReactNode }) {
@@ -19,12 +21,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setUser(null)
-      setIsLoading(false)
-      return
-    }
-
     const syncUserProfile = async (userId: string) => {
       setIsLoading(true)
 
@@ -58,6 +54,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
+        // Break out of the auth callback before fetching profile data.
         setTimeout(() => {
           void syncUserProfile(session.user.id)
         }, 0)
@@ -72,12 +69,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signOut = async () => {
-    if (!isSupabaseConfigured) {
-      console.error(supabaseConfigError)
-      setUser(null)
-      return
-    }
-
     await supabase.auth.signOut()
     setUser(null)
   }

@@ -1,4 +1,4 @@
-import { isSupabaseConfigured, supabase, supabaseConfigError } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase"
 
 export interface Preset {
   id: string
@@ -20,9 +20,11 @@ export interface Preset {
   view_count: number
   is_approved: boolean
   is_featured: boolean
-  previewGif?: string
-  fileName?: string
-  aeVersion?: string
+
+
+  previewGif?: string  // alias for preview_gif_url
+  fileName?: string    // alias for file_name
+  aeVersion?: string   // alias for ae_version
 }
 
 export const categories = [
@@ -37,26 +39,25 @@ export const categories = [
 ]
 
 export async function fetchPresets(): Promise<Preset[]> {
-  if (!isSupabaseConfigured) {
-    console.error(supabaseConfigError)
-    return []
-  }
-
-  const { data, error } = await supabase
+   console.log('fetchPresets called')
+    const {data, error} = await supabase
     .from('presets')
     .select('*')
-    .eq('is_approved', true)
-    .order('created_at', { ascending: false })
+    .eq('is_approved', true)  // only show approved presets
+    .order('created_at', { ascending: false })  // newest 
+
+  console.log('fetchPresets result:', data, error)  // ← add this
+
 
   if (error) {
     console.error('error fetching presets:', error)
     return []
   }
 
-  return (data || []).map((preset) => ({
+   return (data || []).map(preset => ({
     ...preset,
-    previewGif: preset.preview_gif_url,
-    fileName: preset.file_name,
-    aeVersion: preset.ae_version,
+    previewGif: preset.preview_gif_url,  // add alias
+    fileName: preset.file_name,           // add alias
+    aeVersion: preset.ae_version,         // add alias
   }))
 }
