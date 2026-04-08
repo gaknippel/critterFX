@@ -1,15 +1,39 @@
-import './Presets.css'
+import './home.css'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Search, RefreshCw } from "lucide-react"
+import { 
+  Search, 
+  RefreshCw, 
+  Type, 
+  MoveHorizontal, 
+  Shapes, 
+  Sparkles, 
+  Image, 
+  Code, 
+  Layers, 
+  LayoutGrid,
+  Download,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
-import FadeContent from '@/components/FadeContent'
-import { fetchPresets, refreshPresets, categories, type Preset } from '@/data/presets'
+import { Skeleton } from '@/components/ui/skeleton'
+import { fetchPresets, categories, type Preset } from '@/lib/api'
 import SplitText from '@/components/SplitText'
+import FadeContent from '@/components/FadeContent'
 
-export default function Presets(){
+const IconMap: Record<string, any> = {
+  LayoutGrid,
+  Type,
+  MoveHorizontal,
+  Shapes,
+  Sparkles,
+  Image,
+  Code,
+  Layers,
+}
+
+export default function Home() {
   const [presets, setPresets] = useState<Preset[]>([])
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -17,68 +41,52 @@ export default function Presets(){
   const [isRefreshing, setIsRefreshing] = useState(false)
   const navigate = useNavigate()
 
-
-
    useEffect(() => {
     loadPresets()
   }, [])
 
-
-   const loadPresets = async () => {
+  const loadPresets = async () => {
     setIsLoading(true)
-    try 
-    {
+    try {
       const data = await fetchPresets()
       setPresets(data)
-    } 
-    catch (error) 
-    {
+    } catch (error) {
       console.error('failed to load presets:', error)
-    } 
-    finally 
-    {
+    } finally {
       setIsLoading(false)
     }
   }
 
-
-   const handleRefresh = async () => 
-    {
+  const handleRefresh = async () => {
     setIsRefreshing(true)
-    try 
-    {
-      const data = await refreshPresets()
+    try {
+      const data = await fetchPresets()
       setPresets(data)
-    } 
-    catch (error) 
-    {
+    } catch (error) {
       console.error('failed to refresh presets:', error)
-    } 
-    finally
-    {
+    } finally {
       setIsRefreshing(false)
     }
   }
   
-
   const handleAnimationComplete = () => {
   console.log('All letters have animated!');
 };
 
-
-
-    const filteredPresets = presets.filter(preset => {
+  const filteredPresets = presets.filter(preset => {
     const matchesCategory = selectedCategory === 'all' || preset.category === selectedCategory
     const matchesSearch = preset.name.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
   })
 
-
-  const handlePresetClick = (presetId: number) => {
+  const handlePresetClick = (presetId: string) => {  // changed from number to string
     navigate(`/preset/${presetId}`)
   }
 
-   return (
+
+
+  return(
+
     <div className="home-page-wrapper">
       <div className="home-header">
         <div className="title-container">
@@ -121,18 +129,22 @@ export default function Presets(){
       <div className="home-content-layout">
         {/* categories sidebar */}
         <aside className="categories-sidebar">
-          <h2 className="sidebar-title">categories</h2>
           <ScrollArea className="categories-scroll">
+            <h2 className="sidebar-title">categories</h2>
             <nav className="categories-nav">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`category-item ${selectedCategory === category.id ? 'active' : ''}`}
-                >
-                  {category.name}
-                </button>
-              ))}
+              {categories.map((category) => {
+                const Icon = IconMap[category.icon || 'LayoutGrid']
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`category-item ${selectedCategory === category.id ? 'active' : ''}`}
+                  >
+                    <Icon className="category-icon" />
+                    <span className="category-name">{category.name}</span>
+                  </button>
+                )
+              })}
             </nav>
           </ScrollArea>
         </aside>
@@ -142,13 +154,17 @@ export default function Presets(){
           <main className="presets-main">
             <ScrollArea className="presets-scroll">
               {isLoading ? (
-                <div className="flex items-center justify-center h-64">
-                  <p className="text-muted-foreground">loading presets...</p>
+                    <div className="presets-grid">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="preset-card">
+                  <Skeleton className="w-full aspect-video" />
+                  <div className="preset-info">
+                    <Skeleton className="h-5 w-3/4 mb-2" />
+                    <Skeleton className="h-3 w-full" />
+                  </div>
                 </div>
-              ) : filteredPresets.length === 0 ? (
-                <div className="flex items-center justify-center h-64">
-                  <p className="text-muted-foreground">no presets found</p>
-                </div>
+              ))}
+             </div>
               ) : (
                 <div className="presets-grid">
                   {filteredPresets.map((preset) => (
@@ -163,9 +179,14 @@ export default function Presets(){
                           alt={preset.name}
                           loading="lazy"
                         />
+                        <div className="preset-download-badge">
+                          <Download size={12} />
+                          <span>{preset.download_count}</span>
+                        </div>
                       </div>
                       <div className="preset-info">
                         <h3 className="preset-name">{preset.name}</h3>
+                        <p className="preset-author">by {preset.author_name || 'Unknown'}</p>
                         <p className="preset-description">{preset.description}</p>
                       </div>
                     </div>

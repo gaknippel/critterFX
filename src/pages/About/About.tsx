@@ -1,7 +1,6 @@
 import './About.css'
 
 import SplitText from '../../components/SplitText'
-import FadeContent from '@/components/FadeContent'
 
 import {
   Accordion,
@@ -32,29 +31,26 @@ const items = [
 ]
 
 const handleAnimationComplete = () => {
-  console.log('All letters have animated!');
-};
-
-
+  console.log('All letters have animated!')
+}
 
 export default function About() {
   return (
     <div className='about-page-wrapper'>
-
-              <SplitText
-          text="about"
-          className="about-welcome-message"
-          delay={20}
-          duration={1.5}
-          ease="elastic.out(1, 0.3)"
-          splitType="chars"
-          from={{ opacity: 0, y: 5 }}
-          to={{ opacity: 1, y: 0 }}
-          threshold={0.1}
-          rootMargin="-100px"
-          textAlign="center"
-          onLetterAnimationComplete={handleAnimationComplete}
-        />
+      <SplitText
+        text="about"
+        className="about-welcome-message"
+        delay={20}
+        duration={1.5}
+        ease="elastic.out(1, 0.3)"
+        splitType="chars"
+        from={{ opacity: 0, y: 5 }}
+        to={{ opacity: 1, y: 0 }}
+        threshold={0.1}
+        rootMargin="-100px"
+        textAlign="center"
+        onLetterAnimationComplete={handleAnimationComplete}
+      />
       <div className='accordion-container'>
         <Accordion
           type="single"

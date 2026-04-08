@@ -1,34 +1,40 @@
 import { createBrowserRouter } from 'react-router-dom'
-import App from './App'  
-import Presets from './pages/Presets/Presets'
-import About from './pages/About/About'
-import Settings from './pages/Settings/Settings'
-import PresetDetail from './pages/PresetDetail/PresetDetail';
+import Upload from './pages/Upload/Upload'
+import Auth from './pages/Auth/Auth'
+import Home from '@/pages/Home/home'
+import Profile from './pages/Profile/Profile'
+import PresetDetail from './pages/PresetDetail/PresetDetail'
+import { Layout } from './components/Layout'
 
-
-const router = createBrowserRouter([
+export const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
+    element: <Layout />,
     children: [
       {
         index: true,
-        element: <Presets />,
+        element: <Home />
       },
       {
-        path: 'about',
-        element: <About />,
+        path: 'upload',
+        element: <Upload />
       },
       {
-        path: 'settings',
-        element: <Settings />,
+        path: 'auth',
+        element: <Auth />
       },
       {
         path: 'preset/:id',
         element: <PresetDetail />,
       },
-    ],
-  },
+      {
+        path: 'profile',
+        element: <Profile />
+      },
+      {
+        path: 'profile/:id',
+        element: <Profile />,
+      }
+    ]
+  }
 ])
-
-export default router
