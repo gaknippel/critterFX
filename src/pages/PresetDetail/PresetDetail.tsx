@@ -15,6 +15,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import FadeContent from '@/components/FadeContent'
 
+import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
+
 
 export default function PresetDetail() {
   const { id } = useParams()
@@ -24,6 +26,10 @@ export default function PresetDetail() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState('');
   const [isPostingComment, setIsPostingComment] = useState(false);
+
+  const [isInstalling, setIsInstalling] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null)
+  
 
   const { user } = useUserContext()
   
@@ -75,6 +81,41 @@ export default function PresetDetail() {
     subscription.unsubscribe()
   }
 }, [id])
+
+    const handleDownload = async () => {
+    setIsInstalling(true)
+    setDownloadProgress({ downloaded: 0, total: 100, percentage: 0 })
+
+    try 
+    {
+      const result = await downloadAndInstall(
+        preset,
+        (progress) => setDownloadProgress(progress)
+      )
+
+      if (result.success) 
+      {
+        toast.success("success!", {
+          description: result.message,
+        })
+      } 
+      else 
+      {
+        toast.error("installation failed", {
+          description: result.message,
+        })
+      }
+    } 
+    catch (error) 
+    {
+      toast.error("error", {
+        description: `failed to install preset: ${error}`,
+      })
+    } finally {
+      setIsInstalling(false)
+      setDownloadProgress(null)
+    }
+  }
 
   const handleAuthorClick = async (userId: string) => {
     const { data } = await supabase
@@ -202,7 +243,7 @@ export default function PresetDetail() {
             <img src={preset.previewGif} alt={preset.name} />
           </div>
 
-        <Dialog onOpenChange={(open) => {
+        {/* <Dialog onOpenChange={(open) => {
           if (open) {
             supabase.rpc('increment_download_count', { preset_id: id })
           }
@@ -232,7 +273,14 @@ export default function PresetDetail() {
                 </Button>
               </div>
             </DialogContent>
-          </Dialog>
+          </Dialog> */}
+
+          <Button 
+            className="download-button" 
+            size="lg"
+            onClick={handleDownload}
+            disabled={isInstalling}
+          ></Button>
 
           {preset.file_name.endsWith('.aep') && (
             <Dialog>
