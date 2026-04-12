@@ -1,8 +1,9 @@
 // src/utils/presetDownloader.ts
 import { invoke } from '@tauri-apps/api/core'
-import { downloadDir } from '@tauri-apps/api/path'
 import { getActivePaths } from './aePathManager'
-import type { Preset } from '@/data/presets'
+import type { Preset } from '@/lib/api'
+import { downloadDir, join } from '@tauri-apps/api/path'
+
 
 export interface DownloadProgress {
   downloaded: number
@@ -20,12 +21,12 @@ export interface InstallResult {
  * download raw file from url with wonky bit and chunk stuff
  */
 async function downloadFile(
-  url: string, 
+  file_url: string, 
   onProgress?: (progress: DownloadProgress) => void
 ): Promise<Uint8Array> {
 
-    console.log("downloading from url", url)
-  const response = await fetch(url)
+  console.log("downloading from url", file_url)
+  const response = await fetch(file_url)
   console.log("response status: ", response.status)
   console.log("response OK?", response.ok)
   
@@ -109,6 +110,10 @@ export async function downloadAndInstall(
   preset: Preset,
   onProgress?: (progress: DownloadProgress) => void
 ): Promise<InstallResult> {
+  
+  console.log('downloadAndInstall called, preset:', preset)
+  console.log('file_url:', preset.file_url)
+  console.log('file_name:', preset.file_name)
   try 
   {
     //get installation paths from path manager
@@ -123,23 +128,23 @@ export async function downloadAndInstall(
 
     onProgress?.({ downloaded: 0, total: 100, percentage: 0 }) //set progress bar to default stuff
     
-    const fileData = await downloadFile(preset.downloadUrl, onProgress)
+    const fileData = await downloadFile(preset.file_url, onProgress)
 
     //save temp to downloads folder
     const downloadPath = await downloadDir()
-    const tempPath = `${downloadPath}/${preset.fileName}`
+    const tempPath = await join(downloadPath, preset.file_name)
 
     await invoke('write_binary_file', {
       path: tempPath,
       contents: Array.from(fileData)
     })
 
-    const presetType = getPresetType(preset.fileName)
+    const presetType = getPresetType(preset.file_name)
     
     const result = await invoke<string>('install_preset', 
     {
       presetType,
-      fileName: preset.fileName,
+      fileName: preset.file_name,
       sourcePath: tempPath,
     })
 
@@ -182,10 +187,11 @@ export async function downloadPreset(
   onProgress?: (progress: DownloadProgress) => void
 ): Promise<{ success: boolean; path?: string; error?: string }> {
   try {
-    const fileData = await downloadFile(preset.downloadUrl, onProgress)
+    const fileData = await downloadFile(preset.file_url, onProgress)
     
     const downloadPath = await downloadDir()
-    const filePath = `${downloadPath}/${preset.fileName}`
+    const filePath = await join(downloadPath, preset.file_name)
+
     
       await invoke('write_binary_file', {
       path: filePath,

@@ -238,19 +238,28 @@ fn install_preset(
 
 #[cfg(windows)]
 fn request_admin_and_copy(source: &str, dest: &str) -> Result<(), String> {
-    use std::os::windows::process::CommandExt;
     use std::process::Command;
-
+    use std::os::windows::process::CommandExt;
+    
     const CREATE_NO_WINDOW: u32 = 0x08000000;
 
-    // use powerShell to elevate and copy
+    // use cmd instead of powershell to avoid the blue window
     let script = format!(
-        "Start-Process powershell -WindowStyle Hidden -Verb RunAs -ArgumentList '-WindowStyle Hidden -Command \"Copy-Item -Path ''{}'' -Destination ''{}'' -Force\"'",
+        "Copy-Item -Path '{}' -Destination '{}' -Force",
         source, dest
     );
 
     let output = Command::new("powershell")
-        .args(&["-WindowStyle", "Hidden", "-Command", &script])
+        .args(&[
+            "-NonInteractive",
+            "-NoProfile", 
+            "-WindowStyle", "Hidden",
+            "-Command",
+            &format!(
+                "Start-Process powershell -Verb RunAs -Wait -WindowStyle Hidden -ArgumentList '-NonInteractive -NoProfile -WindowStyle Hidden -Command \"Copy-Item -Path ''{}'' -Destination ''{}'' -Force\"'",
+                source, dest
+            )
+        ])
         .creation_flags(CREATE_NO_WINDOW)
         .output()
         .map_err(|e| e.to_string())?;
@@ -258,7 +267,7 @@ fn request_admin_and_copy(source: &str, dest: &str) -> Result<(), String> {
     if output.status.success() {
         Ok(())
     } else {
-        Err("user denied admin access or copy failed".to_string())
+        Err(format!("copy failed: {}", String::from_utf8_lossy(&output.stderr)))
     }
 }
 

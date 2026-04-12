@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Download, Info, Package, FileCode, MessageSquare, Send } from 'lucide-react'
+import { ArrowLeft, Download, Info, Package, FileCode, MessageSquare, Send, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
 import { useState, useEffect } from 'react'
 import './PresetDetail.css'
 import { fetchPresets, categories, type Preset } from '@/lib/api'
@@ -280,7 +281,31 @@ export default function PresetDetail() {
             size="lg"
             onClick={handleDownload}
             disabled={isInstalling}
-          ></Button>
+          >
+            {isInstalling ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                installing...
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-5 w-5" />
+                install to AE
+              </>
+            )}
+          </Button>
+
+          {isInstalling && downloadProgress && (
+            <div className="download-progress-container">
+              <Progress value={downloadProgress.percentage} className="h-2" />
+              <div className="progress-details">
+                <span>{downloadProgress.percentage}% downloaded</span>
+                <span>
+                  {(downloadProgress.downloaded / 1024 / 1024).toFixed(2)} MB / {(downloadProgress.total / 1024 / 1024).toFixed(2)} MB
+                </span>
+              </div>
+            </div>
+          )}
 
           {preset.file_name.endsWith('.aep') && (
             <Dialog>
