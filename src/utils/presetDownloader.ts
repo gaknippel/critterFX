@@ -57,12 +57,12 @@ async function downloadFile(
     chunks.push(value)
     downloaded += value.length
 
-    if (onProgress && total > 0) 
+    if (onProgress) 
     {
       onProgress({
         downloaded,
         total,
-        percentage: Math.round((downloaded / total) * 100)
+        percentage: total > 0 ? Math.round((downloaded / total) * 100) : 0
       })
     }
   }
@@ -126,7 +126,7 @@ export async function downloadAndInstall(
       }
     }
 
-    onProgress?.({ downloaded: 0, total: 100, percentage: 0 }) //set progress bar to default stuff
+    onProgress?.({ downloaded: 0, total: 0, percentage: 0 }) //set progress bar to default stuff
     
     const fileData = await downloadFile(preset.file_url, onProgress)
 

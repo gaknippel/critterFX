@@ -17,6 +17,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import FadeContent from '@/components/FadeContent'
 
 import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
+import { formatBytes } from '@/lib/utils'
 
 
 export default function PresetDetail() {
@@ -85,7 +86,7 @@ export default function PresetDetail() {
 
     const handleDownload = async () => {
     setIsInstalling(true)
-    setDownloadProgress({ downloaded: 0, total: 100, percentage: 0 })
+    setDownloadProgress({ downloaded: 0, total: 0, percentage: 0 })
 
     try 
     {
@@ -96,6 +97,7 @@ export default function PresetDetail() {
 
       if (result.success) 
       {
+        supabase.rpc('increment_download_count', {preset_id: id})
         toast.success("success!", {
           description: result.message,
         })
@@ -299,9 +301,10 @@ export default function PresetDetail() {
             <div className="download-progress-container">
               <Progress value={downloadProgress.percentage} className="h-2" />
               <div className="progress-details">
-                <span>{downloadProgress.percentage}% downloaded</span>
+                <span>{downloadProgress.percentage > 0 ? `${downloadProgress.percentage}% downloaded` : 'downloading...'}</span>
                 <span>
-                  {(downloadProgress.downloaded / 1024 / 1024).toFixed(2)} MB / {(downloadProgress.total / 1024 / 1024).toFixed(2)} MB
+                  {formatBytes(downloadProgress.downloaded)} 
+                  {downloadProgress.total > 0 ? ` / ${formatBytes(downloadProgress.total)}` : ''}
                 </span>
               </div>
             </div>
