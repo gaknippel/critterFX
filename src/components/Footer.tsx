@@ -8,7 +8,7 @@ export function Footer() {
         {/* Left: Links */}
         <div className="footer-links">
           <a
-            href="https://github.com/gaknippel/critterFX-web"
+            href="https://github.com/gaknippel/critterFX"
             target="_blank"
             rel="noopener noreferrer"
             className="footer-link"
