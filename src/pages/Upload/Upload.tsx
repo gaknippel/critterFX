@@ -90,6 +90,11 @@ if (!user) {
   }
 
   const handlePresetFileChange = (file: File) => {
+    const ext = file.name.split('.').pop()?.toLowerCase()
+    if (!['ffx', 'jsx', 'aep'].includes(ext || '')) {
+      toast.error('invalid file type! only .ffx, .jsx, and .aep files are allowed.')
+      return
+    }
     setPresetFile(file)
     const detected = detectCategory(file)
     if (detected) setCategory(detected)
@@ -102,19 +107,31 @@ if (!user) {
     if (file) handlePresetFileChange(file)
   }
 
-  const handleGifDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setGifDragOver(false)
-    const file = e.dataTransfer.files[0]
-    if (file && file.type === 'image/gif') {
+    const handleGifDrop = (e: React.DragEvent) => {
+      e.preventDefault()
+      setGifDragOver(false)
+      const file = e.dataTransfer.files[0]
+      if (!file) return
+      
+      if (file.type !== 'image/gif') {
+        toast.error('preview must be a GIF!')
+        return
+      }
+      
       setGifFile(file)
     }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!presetFile || !gifFile || !user) return
     setIsUploading(true)
+
+    if(!category){
+      toast.error('please select a category!')
+      return
+    }
+
+    setIsUploading(true)  // only set loading after passes
 
     try {
       // upload preset file
@@ -322,7 +339,7 @@ return (
           <Button 
             form="upload-form"
             type="submit" 
-            disabled={isUploading || !presetFile || !gifFile} 
+            disabled={isUploading || !presetFile || !gifFile || !category} 
             className="w-full upload-submit-btn"
           >
             {isUploading ? (

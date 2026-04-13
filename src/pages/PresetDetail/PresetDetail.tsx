@@ -28,6 +28,7 @@ export default function PresetDetail() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState('');
   const [isPostingComment, setIsPostingComment] = useState(false);
+  const[isInstalled, setIsInstalled] = useState(false)
 
   const [isInstalling, setIsInstalling] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null)
@@ -97,7 +98,9 @@ export default function PresetDetail() {
 
       if (result.success) 
       {
-        supabase.rpc('increment_download_count', {preset_id: id})
+        setIsInstalled(true)
+        const { error } = await supabase.rpc('increment_download_count', { preset_id: id })
+        console.log('increment result:', error)
         toast.success("success!", {
           description: result.message,
         })
@@ -282,7 +285,7 @@ export default function PresetDetail() {
             className="download-button" 
             size="lg"
             onClick={handleDownload}
-            disabled={isInstalling}
+            disabled={isInstalling || isInstalled}
           >
             {isInstalling ? (
               <>

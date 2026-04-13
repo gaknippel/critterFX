@@ -14,7 +14,8 @@
       {
         "title": "critterfx",
         "width": 1000,
-        "height": 720
+        "height": 720,
+        "dragDropEnabled": false
       }
     ],
     "security": {
