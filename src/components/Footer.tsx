@@ -34,12 +34,6 @@ export function Footer() {
           </a>
         </div>
 
-        {/* Center: Copyright */}
-        <div className="footer-center">
-          <p className="footer-copy">
-            &copy; {new Date().getFullYear()} crittercast
-          </p>
-        </div>
 
         {/* Right: Empty (for balance) */}
         <div className="footer-spacer" />

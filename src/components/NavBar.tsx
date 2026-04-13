@@ -29,13 +29,13 @@ export function NavBar() {
             <Upload size={18} />
             <span>Upload</span>
           </Link>
-          <Link to="/settings" className="navbar-link">
-            <Settings size={18} />
-            <span>Settings</span>
-          </Link>
           <Link to="/about" className="navbar-link">
             <FileQuestionMark size={18} />
             <span>About</span>
+          </Link>
+          <Link to="/settings" className="navbar-link">
+            <Settings size={18} />
+            <span>Settings</span>
           </Link>
           {user ? (
             <Link to="/profile" className="navbar-link">

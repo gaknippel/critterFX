@@ -1,19 +1,29 @@
 import './Settings.css'
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { useTheme } from '@/components/theme-provider';
 import {
   Alert,
   AlertDescription,
 } from "@/components/ui/alert"
 import { Input } from "@/components/ui/input"
-import { FolderOpen, CheckCircle, AlertCircle, Search } from 'lucide-react'
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter
+} from '@/components/ui/card'
+import { FolderOpen, CheckCircle, AlertCircle, Search, Monitor, Sun, Moon, Sparkles, Trees, Sunset } from 'lucide-react'
 import SplitText from '@/components/SplitText';
 
 import {
@@ -26,7 +36,7 @@ import {
 } from '@/utils/aePathManager'
 
 export default function Settings() {
-  const {setTheme} = useTheme();
+  const {setTheme, theme} = useTheme();
   const [installations, setInstallations] = useState<AEInstallation[]>([]);
   const [customScriptsPath, setCustomScriptsPath] = useState('');
   const [customPresetsPath, setCustomPresetsPath] = useState('');
@@ -40,11 +50,10 @@ export default function Settings() {
 
   useEffect(() => {
     loadInitialData();
-  }, []); // useEffect runs when page is loaded. the [] mean to only run once per launch.
+  }, []);
 
     const loadInitialData = async () => 
     {
-    // load saved custom paths
     const config = await getPathConfig();
     if (config.custom_scripts_path) 
     {
@@ -123,18 +132,14 @@ const handleBrowseCompositions = async () => {
         customPresetsPath || undefined,
         customCompositionPath || undefined,
       );
-      setSaveMessage('Paths saved successfully!');
+      setSaveMessage('paths saved successfully!');
       setTimeout(() => setSaveMessage(''), 3000);
     } catch (error) 
     {
-      setSaveMessage('Failed to save paths');
+      setSaveMessage('failed to save paths');
       setTimeout(() => setSaveMessage(''), 3000);
     }
   };
-
-  const handleAnimationComplete = () => {
-  console.log('All letters have animated!');
-};
 
   const handleUseDetectedPath = async (installation: AEInstallation) => {
     setCustomScriptsPath(installation.scripts_path);
@@ -145,201 +150,236 @@ const handleBrowseCompositions = async () => {
     
     setScriptsPathValid(scriptsValid);
     setPresetsPathValid(presetsValid);
-
   };
   
   return(
-       <div className="settings-page-wrapper p-4 md:p-6">
-            <SplitText
-              text="settings"
-              className="settings-welcome-message"
-              delay={20}
-              duration={1.5}
-              ease="elastic.out(1, 0.3)"
-              splitType="chars"
-              from={{ opacity: 0, y: 5 }}
-              to={{ opacity: 1, y: 0 }}
-              threshold={0.1}
-              rootMargin="-100px"
-              textAlign="center"
-              onLetterAnimationComplete={handleAnimationComplete}
-            />
+    <div className="settings-wrapper">
+      <div className="settings-header-section">
+        <div className="settings-header-content">
+          <SplitText
+            text="settings"
+            className="settings-welcome-message"
+            delay={20}
+            duration={1.5}
+            ease="elastic.out(1, 0.3)"
+            splitType="chars"
+            from={{ opacity: 0, y: 5 }}
+            to={{ opacity: 1, y: 0 }}
+            threshold={0.1}
+            rootMargin="-100px"
+            textAlign="left"
+          />
+          <p className="settings-header-description">
+            configure your after effects paths and app appearance
+          </p>
+        </div>
+      </div>
 
-      <div className="space-y-6 max-w-4xl mx-auto">
-       <section className="settings-section">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">after effects paths</h2>
-            <Button 
-              className="settings-btn"
-              onClick={handleScan} 
-              disabled={isScanning}
-              variant="outline"
-              size="sm"
-            >
-              <Search className="mr-2 h-4 w-4" />
-              {isScanning ? 'scanning...' : 'scan again'}
-            </Button>
-          </div>
+      {/* AE Paths Section */}
+      <div className="settings-info-section">
+        <div className="settings-section-header">
+          <h2 className="settings-section-title">after effects paths</h2>
+          <Button 
+            onClick={handleScan} 
+            disabled={isScanning}
+            variant="outline"
+            size="sm"
+            className="settings-action-button"
+          >
+            <Search className="mr-2 h-3.5 w-3.5" />
+            {isScanning ? 'scanning...' : 'scan again'}
+          </Button>
+        </div>
 
-
-         {/* detected installations */}
+        <div className="settings-section-content space-y-6">
+          {/* detected installations */}
           {installations.length > 0 && (
-            <Alert className="mb-4">
+            <Alert className="settings-alert">
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
                 <div className="font-semibold mb-2">detected installations:</div>
-                {installations.map((inst) => (
-                  <div key={inst.version} className="flex items-center justify-between gap-4 py-2 border-t border-border">
-                    <div>
-                      <div className="font-medium">after effects {inst.version}</div>
-                      <div className="text-xs">
-                        scripts: {inst.scripts_path}
+                <div className="space-y-3">
+                  {installations.map((inst) => (
+                    <div key={inst.version} className="flex items-center justify-between gap-4 py-2 border-t border-border/50 first:border-t-0">
+                      <div className="overflow-hidden">
+                        <div className="font-medium text-sm">after effects {inst.version}</div>
+                        <div className="text-[10px] text-muted-foreground truncate">
+                          scripts: {inst.scripts_path}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground truncate">
+                          presets: {inst.user_presets_path}
+                        </div>
                       </div>
-                      <div className="text-xs">
-                        presets: {inst.user_presets_path}
-                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="secondary"
+                        className="h-7 px-3 text-xs"
+                        onClick={() => handleUseDetectedPath(inst)}
+                      >
+                        use
+                      </Button>
                     </div>
-                    <Button 
-                      className="settings-btn"
-                      size="sm" 
-                      variant="secondary"
-                      onClick={() => handleUseDetectedPath(inst)}
-                    >
-                      use
-                    </Button>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </AlertDescription>
             </Alert>
           )}
 
           {installations.length === 0 && !isScanning && (
-            <Alert className="mb-4">
-              <AlertCircle className="h-4 w-4" />
+            <Alert className="settings-alert-error">
+              <AlertCircle className="h-4 w-4 text-destructive" />
               <AlertDescription>
                 no after effects installations detected. set custom paths below.
               </AlertDescription>
             </Alert>
           )}
 
-          <div className="space-y-2 mb-4">
-            <label className="text-sm font-medium">scripts folder</label>
-            <div className="flex gap-2">
-              <div className="flex-1 relative">
+          <div className="space-y-4">
+            <div className="settings-field">
+              <div className="flex items-center gap-2">
+                <Label className="settings-field-label">scripts folder</Label>
+                {scriptsPathValid !== null && (
+                  scriptsPathValid ? (
+                    <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                  ) : (
+                    <AlertCircle className="h-3.5 w-3.5 text-destructive" />
+                  )
+                )}
+              </div>
+              <div className="flex gap-2">
                 <Input
                   value={customScriptsPath}
                   onChange={(e) => setCustomScriptsPath(e.target.value)}
                   placeholder="C:\Program Files\Adobe\Adobe After Effects 2024\Support Files\Scripts"
-                  className={scriptsPathValid === false ? 'border-destructive' : ''}
+                  className={scriptsPathValid === false ? 'border-destructive/50' : ''}
                 />
-                {scriptsPathValid !== null && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {scriptsPathValid ? (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <AlertCircle className="h-4 w-4 text-destructive" />
-                    )}
-                  </div>
+                <Button className="shrink-0 h-10 w-10" onClick={handleBrowseScripts} variant="outline" size="icon">
+                  <FolderOpen className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="settings-field">
+              <div className="flex items-center gap-2">
+                <Label className="settings-field-label">user presets folder</Label>
+                {presetsPathValid !== null && (
+                  presetsPathValid ? (
+                    <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                  ) : (
+                    <AlertCircle className="h-3.5 w-3.5 text-destructive" />
+                  )
                 )}
               </div>
-              <Button className="settings-btn" onClick={handleBrowseScripts} variant="outline">
-                <FolderOpen className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2 mb-4">
-            <label className="text-sm font-medium">user presets folder</label>
-            <div className="flex gap-2">
-              <div className="flex-1 relative">
+              <div className="flex gap-2">
                 <Input
                   value={customPresetsPath}
                   onChange={(e) => setCustomPresetsPath(e.target.value)}
                   placeholder="C:\Users\YourName\Documents\Adobe\After Effects\User Presets"
-                  className={presetsPathValid === false ? 'border-destructive' : ''}
+                  className={presetsPathValid === false ? 'border-destructive/50' : ''}
                 />
-                {presetsPathValid !== null && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {presetsPathValid ? (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <AlertCircle className="h-4 w-4 text-destructive" />
-                    )}
-                  </div>
+                <Button className="shrink-0 h-10 w-10" onClick={handleBrowsePresets} variant="outline" size="icon">
+                  <FolderOpen className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="settings-field">
+              <div className="flex items-center gap-2">
+                <Label className="settings-field-label">compositions folder (custom)</Label>
+                {compositionPathValid !== null && (
+                  compositionPathValid ? (
+                    <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                  ) : (
+                    <AlertCircle className="h-3.5 w-3.5 text-destructive" />
+                  )
                 )}
               </div>
-              <Button className="settings-btn" onClick={handleBrowsePresets} variant="outline">
-                <FolderOpen className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-           <div className="space-y-2 mb-4">
-            <label className="text-sm font-medium">compositions folder (custom)</label>
-            <div className="flex gap-2">
-              <div className="flex-1 relative">
+              <div className="flex gap-2">
                 <Input
                   value={customCompositionPath}
                   onChange={(e) => setCustomCompositionPath(e.target.value)}
                   placeholder="C:\Users\YourName\Documents\critterFX\Compositions"
-                  className={compositionPathValid === false ? 'border-destructive' : ''}
+                  className={compositionPathValid === false ? 'border-destructive/50' : ''}
                 />
-                {compositionPathValid !== null && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {compositionPathValid ? (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <AlertCircle className="h-4 w-4 text-destructive" />
-                    )}
-                  </div>
-                )}
+                <Button className="shrink-0 h-10 w-10" onClick={handleBrowseCompositions} variant="outline" size="icon">
+                  <FolderOpen className="h-4 w-4" />
+                </Button>
               </div>
-              <Button className="settings-btn" onClick={handleBrowseCompositions} variant="outline">
-                <FolderOpen className="h-4 w-4" />
-              </Button>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* save button */}
-          <div className="flex items-center gap-3">
-            <Button className="settings-btn" onClick={handleSavePaths}>
-              save paths
-            </Button>
-            {saveMessage && (
-              <span className="text-sm text-muted-foreground">{saveMessage}</span>
-            )}
+      {/* appearance section */}
+      <div className="settings-info-section">
+        <div className="settings-section-header">
+          <h2 className="settings-section-title">appearance</h2>
+        </div>
+        <div className="settings-section-content">
+          <div className="settings-field">
+            <Label className="settings-field-label">app theme</Label>
+            <Select value={theme} onValueChange={(v) => setTheme(v as any)} modal={false}>
+              <SelectTrigger className="w-full h-10">
+                <SelectValue placeholder="select a theme" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <SelectItem value="light">
+                  <div className="flex items-center gap-2">
+                    <Sun className="h-4 w-4" />
+                    <span>light</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="dark">
+                  <div className="flex items-center gap-2">
+                    <Moon className="h-4 w-4" />
+                    <span>dark</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="midnight">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-purple-400" />
+                    <span>midnight</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="forest">
+                  <div className="flex items-center gap-2">
+                    <Trees className="h-4 w-4 text-green-500" />
+                    <span>forest</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="sunset">
+                  <div className="flex items-center gap-2">
+                    <Sunset className="h-4 w-4 text-orange-400" />
+                    <span>sunset</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="system">
+                  <div className="flex items-center gap-2">
+                    <Monitor className="h-4 w-4" />
+                    <span>system</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </section>
+        </div>
+      </div>
 
-        {/* appearance section */}
-        <section className="settings-section">
-          <h2 className="text-xl font-semibold mb-2">appearance</h2>
-          <div className="flex items-center justify-between">
-            <span>theme</span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="settings-btn" variant="outline">theme</Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>light</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>dark</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("midnight")}>midnight</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("forest")}>forest</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("sunset")}>sunset</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>system</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+      <div className="settings-footer">
+        <Button className="settings-save-button w-full" onClick={handleSavePaths}>
+          save all changes
+        </Button>
+        {saveMessage && (
+          <div className={`settings-save-message ${saveMessage.includes('failed') ? 'error' : 'success'}`}>
+            {saveMessage.includes('failed') ? <AlertCircle className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
+            {saveMessage}
           </div>
-        </section>
-
+        )}
       </div>
     </div>
-
-    
   )
-
-
-
 }
+
+
 
 

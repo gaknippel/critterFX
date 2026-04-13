@@ -199,6 +199,16 @@ button:focus-visible {
   html {
     @apply font-sans;
   }
+
+  /* Hide scrollbars but keep functionality */
+  * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+
+  *::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
+  }
 }
 
 .cn-toast {

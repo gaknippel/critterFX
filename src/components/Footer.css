@@ -2,8 +2,6 @@
   width: 100%;
   margin-top: auto;
   padding: 1rem clamp(1rem, 2.5vw, 2rem);
-  border-top: 1px solid var(--border);
-  background-color: color-mix(in oklch, var(--background), transparent 50%);
 }
 
 .footer-content {
