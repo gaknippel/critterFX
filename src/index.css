@@ -193,6 +193,14 @@ button:focus-visible {
   * {
     @apply border-border outline-ring/50;
   }
+  :where(body, body *) {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  :where(input, textarea, [contenteditable="true"], [contenteditable=""], [contenteditable]) {
+    -webkit-user-select: text;
+    user-select: text;
+  }
   body {
     @apply bg-background text-foreground;
   }

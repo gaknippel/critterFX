@@ -45,14 +45,12 @@ export default function About() {
       {/* Header Section */}
       <div className="about-header">
         <div className="about-logo-wrapper">
-          <div className="about-logo">
-            <Sparkles size={32} className="text-primary" />
-          </div>
+
         </div>
 
         <div className="about-header-info">
           <SplitText
-            text="about"
+            text="about this app:"
             className="about-title"
             delay={20}
             duration={1.5}
@@ -135,7 +133,7 @@ export default function About() {
       </div>
 
       <div className="about-footer">
-        <p>made with 🥰 by crittercast</p>
+        <p>made by crittercast</p>
       </div>
     </div>
   )
