@@ -7,23 +7,19 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { 
-  Info, 
   Code2, 
-  Github, 
   Heart, 
-  Sparkles, 
   Terminal,
   Cpu,
   Globe
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 const faqItems = [
   {
     value: "item-1",
     trigger: "what is critterFX?",
     content:
-      "critterFX is a personal hub for motion graphics presets, scripts, and editing tools. download cool stuff from here!",
+      "critterFX is a hub for motion graphics presets, scripts, and editing tools. download cool stuff from here!",
   },
   {
     value: "item-2",
