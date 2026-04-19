@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FileBox, Upload, User, Hexagon, Settings, FileQuestionMark } from 'lucide-react'
+import { FileBox, Upload, User, ToyBrick, Settings, FileQuestionMark } from 'lucide-react'
 import { useUserContext } from '@/context/UserContext'
 import './NavBar.css'
 
@@ -15,7 +15,7 @@ export function NavBar() {
       <nav className="navbar-content">
         <Link to="/" className="navbar-brand">
           <div className="navbar-logo-container">
-            <Hexagon size={22} className="navbar-logo-icon" />
+            <ToyBrick size={22} className="navbar-logo-icon" />
           </div>
           <span>critterFX</span>
         </Link>

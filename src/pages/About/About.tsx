@@ -107,26 +107,7 @@ export default function About() {
           <p>made for the community!</p>
         </div>
       </div>
-{/* FAQ Section */}
-<div className="about-info-section about-faq-section">
-  <div className="about-section-header">
-    <h2 className="about-section-title">faq</h2>
-  </div>
-  <div className="about-faq-content">
-          <Accordion type="single" collapsible className="w-full">
-            {faqItems.map((item) => (
-              <AccordionItem key={item.value} value={item.value} className="border-border/50">
-                <AccordionTrigger className="text-sm font-medium hover:no-underline">
-                  {item.trigger}
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed">
-                  {item.content}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-      </div>
+
 
       <div className="about-footer">
         <p>made by crittercast</p>
