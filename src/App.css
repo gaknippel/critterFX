@@ -194,6 +194,42 @@
   --preset-info-bg: oklch(18% 0.05 35);
 }
 
+.titlebar {
+  height: 32px;
+  background: transparent;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.controls {
+  display: flex;
+  gap: 4px;
+  padding-right: 8px;
+}
+
+.controls button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  color: inherit;
+}
+
+.controls button:hover {
+  background: rgba(128, 128, 128, 0.2);
+}
+
+#close:hover {
+  background: rgba(220, 50, 50, 0.7);
+  color: white;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
