@@ -1,5 +1,5 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { ArrowLeft, Check, Download, FileCode, Info, Loader2, MessageSquare, Package, Pencil, Send, Trash2, X } from 'lucide-react'
+import { ArrowLeft, Check, Download, FileCode, Info, Loader2, MessageSquare, Package, Pencil, Send, Trash2, X, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -15,6 +15,7 @@ import { useUserContext } from '@/context/UserContext'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import FadeContent from '@/components/FadeContent'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
 import { formatBytes } from '@/lib/utils'
@@ -35,7 +36,114 @@ export default function PresetDetail() {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null)
   const [editingCommentText, setEditingCommentText] = useState('')
 
+  //states for editing presets
+  const [editPresetOpen, setEditPresetOpen] = useState(false)
+  const [editName, setEditName] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+  const [editLongDescription, setEditLongDescription] = useState('')
+  const [editCategory, setEditCategory] = useState('')
+  const [editTags, setEditTags] = useState('')
+  const [editDependencies, setEditDependencies] = useState('')
+  const [editAeVersion, setEditAeVersion] = useState('')
+  const [editPresetFile, setEditPresetFile] = useState<File | null>(null)
+  const [editGifFile, setEditGifFile] = useState<File | null>(null)
+  const [isSavingPreset, setIsSavingPreset] = useState(false)
+
   const { user } = useUserContext()
+
+  useEffect(() => {
+  if (editPresetOpen && preset) {
+    setEditName(preset.name)
+    setEditDescription(preset.description)
+    setEditLongDescription(preset.long_description || '')
+    setEditCategory(preset.category)
+    setEditTags(preset.tags?.join(', ') || '')
+    setEditDependencies(preset.dependencies?.join(', ') || '')
+    setEditAeVersion(preset.ae_version || '')
+  }
+}, [editPresetOpen])
+
+const handleSavePreset = async () => {
+  if (!preset || !user) return
+  setIsSavingPreset(true)
+
+  try {
+    let fileUrl = preset.file_url
+    let fileName = preset.file_name
+    let fileSize = preset.file_size
+    let gifUrl = preset.preview_gif_url
+
+    // if user uploaded a new preset file, replace the old one
+    if (editPresetFile) {
+      // delete old file from storage
+      const oldPath = preset.file_url.split('/preset-files/')[1]
+      await supabase.storage.from('preset-files').remove([oldPath])
+
+      // upload new file
+      const newPath = `${user.id}/${Date.now()}_${editPresetFile.name}`
+      const { error: uploadError } = await supabase.storage
+        .from('preset-files')
+        .upload(newPath, editPresetFile)
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage
+        .from('preset-files')
+        .getPublicUrl(newPath)
+
+      fileUrl = urlData.publicUrl
+      fileName = editPresetFile.name
+      fileSize = `${(editPresetFile.size / 1024).toFixed(1)} KB`
+    }
+
+    // if user uploaded a new gif, replace the old one
+    if (editGifFile) {
+      const oldGifPath = preset.preview_gif_url?.split('/preset-previews/')[1]
+      if (oldGifPath) {
+        await supabase.storage.from('preset-previews').remove([oldGifPath])
+      }
+
+      const newGifPath = `${user.id}/${Date.now()}_${editGifFile.name}`
+      const { error: gifUploadError } = await supabase.storage
+        .from('preset-previews')
+        .upload(newGifPath, editGifFile)
+      if (gifUploadError) throw gifUploadError
+
+      const { data: gifUrlData } = supabase.storage
+        .from('preset-previews')
+        .getPublicUrl(newGifPath)
+
+      gifUrl = gifUrlData.publicUrl
+    }
+
+    // update the preset row
+    const { error: updateError } = await supabase
+      .from('presets')
+      .update({
+        name: editName,
+        description: editDescription,
+        long_description: editLongDescription,
+        category: editCategory,
+        ae_version: editAeVersion,
+        tags: editTags.split(',').map(t => t.trim()).filter(Boolean),
+        dependencies: editDependencies.split(',').map(d => d.trim()).filter(Boolean),
+        file_url: fileUrl,
+        file_name: fileName,
+        file_size: fileSize,
+        preview_gif_url: gifUrl,
+      })
+      .eq('id', preset.id)
+
+    if (updateError) throw updateError
+
+    toast.success('preset updated!')
+    setEditPresetOpen(false)
+    loadPreset()  // refresh to show updated data
+  } catch (error: any) {
+    toast.error(error.message)
+  } finally {
+    setIsSavingPreset(false)
+  }
+}
 
   const handleBack = () => {
     if (window.history.length > 1 && location.key !== 'default') {
@@ -435,7 +543,155 @@ const handleDeleteComment = async (commentId: string) => {
               />
             </h1>
             <p className="preset-detail-category">{categoryName}</p>
+              {user?.id === preset.user_id && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="preset-edit-btn"
+                  onClick={() => setEditPresetOpen(true)}
+                >
+                  <Pencil size={14} className="mr-2" />
+                  edit preset
+                </Button>
+              )}
+              <Dialog open={editPresetOpen} onOpenChange={setEditPresetOpen}>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>edit preset</DialogTitle>
+                    <DialogDescription>
+                      make changes to your preset. files are optional — leave empty to keep existing ones.
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="edit-preset-form">
+                    {/* name */}
+                    <div className="edit-field">
+                      <label className="edit-label">preset name</label>
+                      <input
+                        className="edit-input"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        placeholder="preset name"
+                      />
+                    </div>
+
+                    {/* category */}
+                    <div className="edit-field">
+                      <label className="edit-label">category</label>
+                      <Select value={editCategory} onValueChange={setEditCategory}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="select a category" />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                          {categories.filter(c => c.id !== 'all').map(c => (
+                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* short description */}
+                    <div className="edit-field">
+                      <label className="edit-label">short description</label>
+                      <input
+                        className="edit-input"
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                        placeholder="short description"
+                      />
+                    </div>
+
+                    {/* long description */}
+                    <div className="edit-field">
+                      <label className="edit-label">long description</label>
+                      <Textarea
+                        value={editLongDescription}
+                        onChange={(e) => setEditLongDescription(e.target.value)}
+                        placeholder="detailed description..."
+                        className="min-h-[100px]"
+                      />
+                    </div>
+
+                    {/* ae version */}
+                    <div className="edit-field">
+                      <label className="edit-label">after effects version</label>
+                      <input
+                        className="edit-input"
+                        value={editAeVersion}
+                        onChange={(e) => setEditAeVersion(e.target.value)}
+                        placeholder="2023 or later"
+                      />
+                    </div>
+
+                    {/* tags */}
+                    <div className="edit-field">
+                      <label className="edit-label">tags <span className="edit-hint">(comma separated)</span></label>
+                      <input
+                        className="edit-input"
+                        value={editTags}
+                        onChange={(e) => setEditTags(e.target.value)}
+                        placeholder="animation, text, smooth"
+                      />
+                    </div>
+
+                    {/* dependencies */}
+                    <div className="edit-field">
+                      <label className="edit-label">dependencies <span className="edit-hint">(comma separated)</span></label>
+                      <input
+                        className="edit-input"
+                        value={editDependencies}
+                        onChange={(e) => setEditDependencies(e.target.value)}
+                        placeholder="none"
+                      />
+                    </div>
+
+                    {/* preset file */}
+                    <div className="edit-field">
+                      <label className="edit-label">
+                        preset file <span className="edit-hint">(leave empty to keep current: {preset.file_name})</span>
+                      </label>
+                      <input
+                        type="file"
+                        accept=".ffx,.jsx,.aep"
+                        className="edit-file-input"
+                        onChange={(e) => e.target.files?.[0] && setEditPresetFile(e.target.files[0])}
+                      />
+                    </div>
+
+                    {/* gif file */}
+                    <div className="edit-field">
+                      <label className="edit-label">
+                        preview gif <span className="edit-hint">(leave empty to keep current)</span>
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/gif"
+                        className="edit-file-input"
+                        onChange={(e) => e.target.files?.[0] && setEditGifFile(e.target.files[0])}
+                      />
+                    </div>
+
+                    {/* actions */}
+                    <div className="edit-actions">
+                      <Button variant="ghost" onClick={() => setEditPresetOpen(false)}>
+                        cancel
+                      </Button>
+                      <Button onClick={handleSavePreset} disabled={isSavingPreset}>
+                        {isSavingPreset ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            saving...
+                          </>
+                        ) : (
+                          'save changes'
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
           </div>
+
 
           <div className="preset-tags">
             {preset.tags?.map((tag, index) => (
@@ -487,6 +743,7 @@ const handleDeleteComment = async (commentId: string) => {
                   className="tech-value clickable-author"
                   onClick={() => handleAuthorClick(preset.user_id)}
                 >
+                  <User size={14} className="mr-1 inline-block" />
                   {preset.author_name || 'Unknown'}
                 </span>
               </div>
@@ -536,6 +793,7 @@ const handleDeleteComment = async (commentId: string) => {
                               className="font-semibold text-sm clickable-author"
                               onClick={() => handleAuthorClick(comment.user_id)}
                             >
+                              <User size={12} className="mr-1 inline-block" />
                               {comment.author_name}
                             </span>
                             <span className="text-xs text-muted-foreground">

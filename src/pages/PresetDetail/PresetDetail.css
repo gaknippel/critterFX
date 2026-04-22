@@ -278,7 +278,7 @@
 
 .dependencies-list li:before {
   content: "•";
-  color: hsl(var(--primary));
+  color: var(--primary);
   font-weight: bold;
   display: inline-block;
   width: 1rem;
@@ -292,8 +292,8 @@
   background:
     linear-gradient(
       135deg,
-      color-mix(in oklch, hsl(var(--primary)) 12%, transparent),
-      hsl(var(--muted) / 0.55)
+      color-mix(in oklch, var(--primary), transparent 88%),
+      color-mix(in oklch, var(--muted), transparent 45%)
     ) !important;
   border: 1px solid rgb(255 255 255 / 0.9) !important;
   color: hsl(var(--foreground)) !important;
@@ -303,8 +303,8 @@
   text-transform: uppercase;
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 0.9),
-    inset 0 1px 0 hsl(var(--background) / 0.45),
-    0 10px 24px -18px hsl(var(--primary) / 0.8) !important;
+    inset 0 1px 0 color-mix(in oklch, var(--background), transparent 55%),
+    0 10px 24px -18px color-mix(in oklch, var(--primary), transparent 20%) !important;
   transition:
     transform 0.18s ease,
     border-color 0.18s ease,
@@ -318,13 +318,13 @@
   background:
     linear-gradient(
       135deg,
-      color-mix(in oklch, hsl(var(--primary)) 18%, transparent),
-      hsl(var(--muted) / 0.72)
+      color-mix(in oklch, var(--primary), transparent 82%),
+      color-mix(in oklch, var(--muted), transparent 28%)
     ) !important;
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255),
-    inset 0 1px 0 hsl(var(--background) / 0.55),
-    0 14px 28px -18px hsl(var(--primary) / 0.95) !important;
+    inset 0 1px 0 color-mix(in oklch, var(--background), transparent 45%),
+    0 14px 28px -18px color-mix(in oklch, var(--primary), transparent 5%) !important;
 }
 
 
@@ -388,8 +388,8 @@
 }
 
 .comment-action-btn:hover {
-  background: hsl(var(--muted) / 0.55) !important;
-  border-color: color-mix(in oklch, hsl(var(--primary)), transparent 35%) !important;
+  background: color-mix(in oklch, var(--muted), transparent 45%) !important;
+  border-color: color-mix(in oklch, var(--primary), transparent 35%) !important;
   color: hsl(var(--foreground)) !important;
   opacity: 1;
 }
@@ -409,7 +409,7 @@
   margin-top: 1.1rem;
   padding: 0.9rem 1rem;
   border-radius: 0.9rem;
-  background: hsl(var(--muted) / 0.3);
+  background: color-mix(in oklch, var(--muted), transparent 70%);
   border: 1px solid color-mix(in oklch, var(--border), transparent 35%);
   width: 100%;
   min-width: 0;
@@ -422,9 +422,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: hsl(var(--muted) / 0.45);
+  background: color-mix(in oklch, var(--muted), transparent 55%);
   border: 1px solid color-mix(in oklch, var(--border), transparent 35%);
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   flex-shrink: 0;
 }
 
@@ -443,22 +443,22 @@
   font-size: 1.15rem;
   line-height: 1;
   font-weight: 800;
-  color: hsl(var(--foreground));
+  color: var(--foreground);
 }
 
 .download-count-label {
   font-size: 0.72rem;
   line-height: 1;
   letter-spacing: 0.04em;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
 }
 
 .comment-avatar {
   width: 3.25rem;
   height: 3.25rem;
   border-radius: 50%;
-  background: hsl(var(--muted));
-  color: hsl(var(--foreground));
+  background: var(--muted);
+  color: var(--foreground);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -470,42 +470,51 @@
 }
 
 .clickable-author {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   position: relative;
   cursor: pointer;
-  color: inherit;
+  color: var(--primary);
+  font-weight: 700;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
-  background-image: linear-gradient(
-    90deg,
-    color-mix(in oklch, hsl(var(--primary)) 72%, white 28%),
-    color-mix(in oklch, hsl(var(--primary)) 88%, transparent 12%)
-  );
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 0% 2px;
-  transition:
-    color 0.22s ease,
-    transform 0.22s ease,
-    text-shadow 0.22s ease,
-    background-size 0.26s ease;
+  gap: 0.15rem;
 }
 
 .clickable-author:hover {
-  color: color-mix(in oklch, hsl(var(--primary)) 88%, white 12%);
+  color: color-mix(in oklch, var(--primary), white 18%);
   transform: translateY(-1px);
-  text-shadow: 0 0 14px hsl(var(--primary) / 0.22);
-  background-size: 100% 2px;
+}
+
+.clickable-author::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.26s ease;
+  opacity: 0.8;
+}
+
+.clickable-author:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 .tech-info-item .clickable-author {
-  color: oklch(100% 0.00011 271.152) !important;
-  font-weight: 700;
-  font-size: 120%;
+  font-size: 1.1rem;
 }
 
-.tech-info-item .clickable-author:hover {
-  color: oklch(69.103% 0.14942 255.648) !important;
-  font-size: 120%;
+.comment-meta .clickable-author {
+  color: var(--primary);
+}
+
+.comment-meta .clickable-author::after {
+  display: none;
 }
 
 .comment-submit-btn {
@@ -583,6 +592,58 @@
     width: 100%;
     min-width: 0;
   }
+}
+
+.edit-preset-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-top: 0.5rem;
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.edit-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.edit-hint {
+  font-weight: 400;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.8rem;
+}
+
+.edit-input {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  color: hsl(var(--foreground));
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: hsl(var(--primary));
+}
+
+.edit-file-input {
+  color: hsl(var(--foreground));
+  font-size: 0.85rem;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
 }
 
 @media (max-width: 480px) {
