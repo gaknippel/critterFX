@@ -646,6 +646,17 @@
   padding-top: 0.5rem;
 }
 
+.preset-owner-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.preset-delete-btn {
+  color: hsl(var(--destructive)) !important;
+  border-color: hsl(var(--destructive)) !important;
+}
+
 /* Upload styles for edit dialog */
 .upload-card {
   background: color-mix(in oklch, var(--card), transparent 20%) !important;

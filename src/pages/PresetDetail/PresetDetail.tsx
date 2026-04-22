@@ -19,8 +19,7 @@ import {
   Sparkles,
   Image,
   Code,
-  Layers,
-  Upload as UploadIcon
+  Layers
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -28,7 +27,7 @@ import { Progress } from '@/components/ui/progress'
 import { useState, useEffect } from 'react'
 import './PresetDetail.css'
 import { fetchPresets, categories, type Preset } from '@/lib/api'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import SplitText from '@/components/SplitText'
 import { Skeleton } from '@/components/ui/skeleton'
 import { supabase, Comment } from '@/lib/supabase'
@@ -81,6 +80,8 @@ export default function PresetDetail() {
   const [editPresetFile, setEditPresetFile] = useState<File | null>(null)
   const [editGifFile, setEditGifFile] = useState<File | null>(null)
   const [isSavingPreset, setIsSavingPreset] = useState(false)
+  const [deletePresetOpen, setDeletePresetOpen] = useState(false)
+  const [isDeletingPreset, setIsDeletingPreset] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [gifDragOver, setGifDragOver] = useState(false)
 
@@ -107,6 +108,37 @@ const handlePresetFileChange = (file: File) => {
     return
   }
   setEditPresetFile(file)
+}
+
+const handleDeletePreset = async () => {
+  if (!preset || !user) return
+  setIsDeletingPreset(true)
+
+  try {
+    // delete preset file from storage
+    const filePath = preset.file_url.split('/preset-files/')[1]
+    if (filePath) await supabase.storage.from('preset-files').remove([filePath])
+
+    // delete gif from storage
+    const gifPath = preset.preview_gif_url?.split('/preset-previews/')[1]
+    if (gifPath) await supabase.storage.from('preset-previews').remove([gifPath])
+
+    // delete from database
+    const { error } = await supabase
+      .from('presets')
+      .delete()
+      .eq('id', preset.id)
+
+    if (error) throw error
+
+    toast.success('preset deleted!')
+    setDeletePresetOpen(false)
+    navigate('/')
+  } catch (error: any) {
+    toast.error(error.message)
+  } finally {
+    setIsDeletingPreset(false)
+  }
 }
 
 const handlePresetDrop = (e: React.DragEvent) => {
@@ -270,6 +302,8 @@ const handleSavePreset = async () => {
 }, [id])
 
     const handleDownload = async () => {
+    if (!preset) return
+
     setIsInstalling(true)
     setDownloadProgress({ downloaded: 0, total: 0, percentage: 0 })
 
@@ -490,37 +524,6 @@ const handleDeleteComment = async (commentId: string) => {
             <img src={preset.previewGif} alt={preset.name} />
           </div>
 
-        {/* <Dialog onOpenChange={(open) => {
-          if (open) {
-            supabase.rpc('increment_download_count', { preset_id: id })
-          }
-        }}></Dialog>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="download-button" size="lg">
-                <Download className="mr-2" />
-                install to AE
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>get critterFX desktop!</DialogTitle>
-                <DialogDescription>
-                  install presets directly into after effects with one click. :D
-                </DialogDescription>
-              </DialogHeader>
-              <div className="bg-muted p-4 rounded-lg flex items-center justify-between gap-4">
-                <p className="text-sm text-muted-foreground">
-                  download the critterFX desktop app to install presets.
-                </p>
-                <Button asChild size="sm">
-                  <a href="https://github.com/gaknippel/critterFX/releases" target="_blank" rel="noopener noreferrer">
-                    download app
-                  </a>
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog> */}
 
           <Button 
             className="download-button" 
@@ -562,14 +565,28 @@ const handleDeleteComment = async (commentId: string) => {
                   how to install!!! (IMPORTANT)
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>how to import compositions</DialogTitle>
-                  <DialogDescription>
-                    this is a composition preset, so you have to import it manually through AE.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
+                <Card className="upload-card border-none shadow-2xl">
+                  <CardHeader className="pb-4">
+                    <DialogTitle className="text-2xl font-bold">
+                      <SplitText
+                        text="how to import compositions"
+                        delay={20}
+                        duration={1.5}
+                        ease="elastic.out(1, 0.3)"
+                        splitType="chars"
+                        from={{ opacity: 0, y: 5 }}
+                        to={{ opacity: 1, y: 0 }}
+                        threshold={0.1}
+                        rootMargin="-100px"
+                        textAlign="left"
+                      />
+                    </DialogTitle>
+                    <DialogDescription className="text-muted-foreground">
+                      this is a composition preset, so you have to import it manually through AE.
+                    </DialogDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
                   <div className="rounded-lg overflow-hidden border">
                     <img src="/howtoinstallcomps.gif" alt="import tutorial animation" className="w-full" />
                   </div>
@@ -585,7 +602,15 @@ const handleDeleteComment = async (commentId: string) => {
                       💡 <strong>tip:</strong> you can also drag and drop the .aep file directly into the AE project panel.
                     </p>
                   </div>
-                </div>
+                  </CardContent>
+                  <DialogFooter className="p-6 pt-0 flex gap-2 sm:justify-end">
+                    <DialogClose asChild>
+                      <Button variant="ghost" className="preset-cancel-btn">
+                        close
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </Card>
               </DialogContent>
             </Dialog>
           )}
@@ -611,6 +636,7 @@ const handleDeleteComment = async (commentId: string) => {
             </h1>
             <p className="preset-detail-category">{categoryName}</p>
               {user?.id === preset.user_id && (
+                <div className="preset-owner-actions">
                 <Button
                   variant="outline"
                   size="sm"
@@ -620,7 +646,79 @@ const handleDeleteComment = async (commentId: string) => {
                   <Pencil size={14} className="mr-2" />
                   edit preset
                 </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="preset-edit-btn"
+                  onClick={() => setDeletePresetOpen(true)}
+                >
+                  <Trash2 size={14} className="mr-2" />
+                  delete preset
+                </Button>
+                </div>
               )}
+
+              <Dialog open={deletePresetOpen} onOpenChange={setDeletePresetOpen}>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
+                  <Card className="upload-card border-none shadow-2xl">
+                    <CardHeader className="pb-4">
+                      <DialogTitle className="text-2xl font-bold">
+                        <SplitText
+                          text="delete preset"
+                          delay={20}
+                          duration={1.5}
+                          ease="elastic.out(1, 0.3)"
+                          splitType="chars"
+                          from={{ opacity: 0, y: 5 }}
+                          to={{ opacity: 1, y: 0 }}
+                          threshold={0.1}
+                          rootMargin="-100px"
+                          textAlign="left"
+                        />
+                      </DialogTitle>
+                      <DialogDescription className="text-muted-foreground">
+                        your preset will be gone forever! obviously do this at your will.
+                      </DialogDescription>
+                    </CardHeader>
+
+                    <CardContent className="space-y-6">
+                      <div className="upload-form">
+
+                        <div className="upload-field">
+                          <Label>what gets deleted:</Label>
+                          <div className="upload-dropzone has-file cursor-default" style={{ padding: '1.5rem', textAlign: 'left' }}>
+                            <div className="upload-file-info">
+                              <p className="upload-file-name">{preset.file_name}</p>
+                              <p className="upload-file-size">everything will be gone!</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+
+                    <DialogFooter className="p-6 pt-0 flex gap-2 sm:justify-end">
+                      <Button variant="ghost" onClick={() => setDeletePresetOpen(false)} className="preset-cancel-btn">
+                        cancel
+                      </Button>
+                      <Button onClick={handleDeletePreset} disabled={isDeletingPreset} className="upload-submit-btn min-w-[120px]">
+                        {isDeletingPreset ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            deleting...
+                          </>
+                        ) : (
+                          <>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            delete preset
+                          </>
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </Card>
+                </DialogContent>
+              </Dialog>
+
               <Dialog open={editPresetOpen} onOpenChange={setEditPresetOpen}>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
                   <Card className="upload-card border-none shadow-2xl">
