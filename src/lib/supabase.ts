@@ -20,7 +20,7 @@ export type Preset = {
   name: string
   description: string
   long_description?: string
-category: string
+  category: string
   file_name: string
   file_url: string
   preview_gif_url?: string
@@ -32,6 +32,7 @@ category: string
   view_count: number
   is_approved: boolean
   is_featured: boolean
+
 }
 
 export type Comment = {
@@ -44,4 +45,6 @@ export type Comment = {
   profiles?: {
     avatar_url: string | null
   }
+  edited_at?: string | null
+
 }

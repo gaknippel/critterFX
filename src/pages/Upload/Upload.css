@@ -9,8 +9,16 @@
 }
 
 .sign-in-button {
-  color: white;
-  border: 0,0,0;
+  background: transparent !important;
+  border: 1px solid var(--primary) !important;
+  color: var(--primary) !important;
+  transition: all 0.2s ease !important;
+  border-radius: 0.5rem !important;
+}
+
+.sign-in-button:hover {
+  background: color-mix(in oklch, var(--primary), transparent 90%) !important;
+  border-color: var(--primary) !important;
 }
 
 .upload-wrapper {

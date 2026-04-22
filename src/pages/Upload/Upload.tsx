@@ -34,6 +34,7 @@ import {
   Layers
 } from 'lucide-react'
 import { toast } from 'sonner'
+import SplitText from '@/components/SplitText'
 import './Upload.css'
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -196,7 +197,20 @@ return (
     <div className="upload-wrapper">
       <Card className="upload-card">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">upload a preset</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            <SplitText
+              text="upload a preset"
+              delay={20}
+              duration={1.5}
+              ease="elastic.out(1, 0.3)"
+              splitType="chars"
+              from={{ opacity: 0, y: 5 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="left"
+            />
+          </CardTitle>
           <CardDescription>
             share your work with the community! presets are reviewed by me before appearing online, so don't try stupid stuff 😭
           </CardDescription>

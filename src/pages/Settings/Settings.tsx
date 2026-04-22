@@ -212,7 +212,7 @@ const handleBrowseCompositions = async () => {
                       </div>
                       <Button 
                         size="sm" 
-                        variant="secondary"
+                        variant="outline"
                         className="h-7 px-3 text-xs"
                         onClick={() => handleUseDetectedPath(inst)}
                       >
