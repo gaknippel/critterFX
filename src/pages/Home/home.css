@@ -196,13 +196,14 @@
   transition: transform 0.2s ease;
 }
 
-.preset-download-badge {
+.home-page-wrapper .preset-download-badge {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  background: rgba(10, 10, 10, 0.96);
-  backdrop-filter: blur(8px);
-  color: hsl(var(--background));
+  background: rgba(10, 10, 10, 0.96) !important;
+  color: white !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   padding: 0.2rem 0.5rem;
   border-radius: 0.4rem;
   font-size: 0.7rem;
@@ -210,30 +211,30 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.55) !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
   transition: all 0.2s ease;
   z-index: 10;
 }
 
-.preset-download-badge svg {
+.home-page-wrapper .preset-download-badge svg {
   flex-shrink: 0;
   stroke-width: 2.4;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
 }
 
-.preset-download-badge span {
+.home-page-wrapper .preset-download-badge span {
   line-height: 1;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
-.preset-card:hover .preset-download-badge {
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  border-color: hsl(var(--primary));
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+.home-page-wrapper .preset-card:hover .preset-download-badge {
+  background: rgba(10, 10, 10, 0.28) !important;
+  color: rgba(255, 255, 255, 0.78) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .category-item:hover {

@@ -1,5 +1,8 @@
 import { useUserContext } from '@/context/UserContext'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
   Card,
   CardContent,
@@ -7,17 +10,48 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Calendar, MessageSquare, Package, LogOut, Camera, Download, Pencil, Trash2, X, Check } from 'lucide-react'
+import {
+  Calendar,
+  MessageSquare,
+  Package,
+  LogOut,
+  Camera,
+  Download,
+  Pencil,
+  Trash2,
+  X,
+  Check,
+  Loader2,
+  Type as TypeIcon,
+  MoveHorizontal,
+  Shapes,
+  Sparkles,
+  Image as ImageIcon,
+  Code as CodeIcon,
+  Layers,
+} from 'lucide-react'
 import './Profile.css'
-import { formatDate } from '@/lib/utils'
-import { type Preset } from '@/lib/api'
+import SplitText from '@/components/SplitText'
+import { formatBytes, formatDate } from '@/lib/utils'
+import { categories, type Preset } from '@/lib/api'
 import { type Comment } from '@/lib/supabase'
+
+const categoryIcons: Record<string, ReactNode> = {
+  textAnims: <TypeIcon className="size-4" />,
+  transitions: <MoveHorizontal className="size-4" />,
+  shapeAnims: <Shapes className="size-4" />,
+  effects: <Sparkles className="size-4" />,
+  backgrounds: <ImageIcon className="size-4" />,
+  scripts: <CodeIcon className="size-4" />,
+  compositions: <Layers className="size-4" />,
+}
 
 export default function Profile() {
   const { user, signOut } = useUserContext()
@@ -44,10 +78,40 @@ export default function Profile() {
   const [profileUserId, setProfileUserId] = useState('')
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null)
   const [editingCommentText, setEditingCommentText] = useState('')
+  const [editingPreset, setEditingPreset] = useState<Preset | null>(null)
+  const [editPresetOpen, setEditPresetOpen] = useState(false)
+  const [deletePresetOpen, setDeletePresetOpen] = useState(false)
+  const [editName, setEditName] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+  const [editLongDescription, setEditLongDescription] = useState('')
+  const [editCategory, setEditCategory] = useState('')
+  const [editTags, setEditTags] = useState('')
+  const [editDependencies, setEditDependencies] = useState('')
+  const [editAeVersion, setEditAeVersion] = useState('')
+  const [editPresetFile, setEditPresetFile] = useState<File | null>(null)
+  const [editGifFile, setEditGifFile] = useState<File | null>(null)
+  const [isSavingPreset, setIsSavingPreset] = useState(false)
+  const [isDeletingPreset, setIsDeletingPreset] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
+  const [gifDragOver, setGifDragOver] = useState(false)
 
   useEffect(() => {
     fetchProfileData()
   }, [profileId])
+
+  useEffect(() => {
+    if (!editPresetOpen || !editingPreset) return
+
+    setEditName(editingPreset.name)
+    setEditDescription(editingPreset.description)
+    setEditLongDescription(editingPreset.long_description || '')
+    setEditCategory(editingPreset.category)
+    setEditTags(editingPreset.tags?.join(', ') || '')
+    setEditDependencies(editingPreset.dependencies?.join(', ') || '')
+    setEditAeVersion(editingPreset.ae_version || '')
+    setEditPresetFile(null)
+    setEditGifFile(null)
+  }, [editPresetOpen, editingPreset])
 
   const fetchProfileData = async () => {
     console.log('fetchProfileData called')
@@ -229,6 +293,171 @@ export default function Profile() {
     setProfileComments(prev => prev.filter(c => c.id !== commentId))
     setCommentCount(prev => prev - 1)
     toast.success('comment deleted!')
+  }
+
+  const handleEditPreset = (preset: Preset) => {
+    setEditingPreset(preset)
+    setEditPresetOpen(true)
+  }
+
+  const handleAskDeletePreset = (preset: Preset) => {
+    setEditingPreset(preset)
+    setDeletePresetOpen(true)
+  }
+
+  const handlePresetFileChange = (file: File) => {
+    const ext = file.name.split('.').pop()?.toLowerCase()
+    if (!['ffx', 'jsx', 'aep'].includes(ext || '')) {
+      toast.error('invalid file type! only .ffx, .jsx, and .aep files are allowed.')
+      return
+    }
+    setEditPresetFile(file)
+  }
+
+  const handlePresetDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragOver(false)
+    const file = e.dataTransfer.files[0]
+    if (file) handlePresetFileChange(file)
+  }
+
+  const handleGifDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setGifDragOver(false)
+    const file = e.dataTransfer.files[0]
+    if (!file) return
+
+    if (file.type !== 'image/gif') {
+      toast.error('preview must be a GIF!')
+      return
+    }
+
+    setEditGifFile(file)
+  }
+
+  const handleSavePreset = async () => {
+    if (!editingPreset || !user) return
+    setIsSavingPreset(true)
+
+    try {
+      let fileUrl = editingPreset.file_url
+      let fileName = editingPreset.file_name
+      let fileSize = editingPreset.file_size
+      let gifUrl = editingPreset.preview_gif_url
+
+      if (editPresetFile) {
+        const oldPath = editingPreset.file_url.split('/preset-files/')[1]
+        if (oldPath) {
+          await supabase.storage.from('preset-files').remove([oldPath])
+        }
+
+        const newPath = `${user.id}/${Date.now()}_${editPresetFile.name}`
+        const { error: uploadError } = await supabase.storage
+          .from('preset-files')
+          .upload(newPath, editPresetFile)
+        if (uploadError) throw uploadError
+
+        const { data: urlData } = supabase.storage.from('preset-files').getPublicUrl(newPath)
+        fileUrl = urlData.publicUrl
+        fileName = editPresetFile.name
+        fileSize = formatBytes(editPresetFile.size)
+      }
+
+      if (editGifFile) {
+        if (editGifFile.type !== 'image/gif') {
+          throw new Error('preview must be a GIF!')
+        }
+
+        const oldGifPath = editingPreset.preview_gif_url?.split('/preset-previews/')[1]
+        if (oldGifPath) {
+          await supabase.storage.from('preset-previews').remove([oldGifPath])
+        }
+
+        const newGifPath = `${user.id}/${Date.now()}_${editGifFile.name}`
+        const { error: gifUploadError } = await supabase.storage
+          .from('preset-previews')
+          .upload(newGifPath, editGifFile)
+        if (gifUploadError) throw gifUploadError
+
+        const { data: gifUrlData } = supabase.storage.from('preset-previews').getPublicUrl(newGifPath)
+        gifUrl = gifUrlData.publicUrl
+      }
+
+      const updates = {
+        name: editName,
+        description: editDescription,
+        long_description: editLongDescription,
+        category: editCategory,
+        ae_version: editAeVersion,
+        tags: editTags.split(',').map(t => t.trim()).filter(Boolean),
+        dependencies: editDependencies.split(',').map(d => d.trim()).filter(Boolean),
+        file_url: fileUrl,
+        file_name: fileName,
+        file_size: fileSize,
+        preview_gif_url: gifUrl,
+      }
+
+      const { error } = await supabase
+        .from('presets')
+        .update(updates)
+        .eq('id', editingPreset.id)
+
+      if (error) throw error
+
+      setProfilePresets(prev =>
+        prev.map(preset =>
+          preset.id === editingPreset.id
+            ? {
+                ...preset,
+                ...updates,
+                previewGif: gifUrl,
+                fileName,
+                aeVersion: editAeVersion,
+              }
+            : preset
+        )
+      )
+
+      toast.success('preset updated!')
+      setEditPresetOpen(false)
+    } catch (error: any) {
+      toast.error(error.message)
+    } finally {
+      setIsSavingPreset(false)
+    }
+  }
+
+  const handleDeletePreset = async () => {
+    if (!editingPreset || !user) return
+    setIsDeletingPreset(true)
+
+    try {
+      const filePath = editingPreset.file_url.split('/preset-files/')[1]
+      if (filePath) {
+        await supabase.storage.from('preset-files').remove([filePath])
+      }
+
+      const gifPath = editingPreset.preview_gif_url?.split('/preset-previews/')[1]
+      if (gifPath) {
+        await supabase.storage.from('preset-previews').remove([gifPath])
+      }
+
+      const { error } = await supabase
+        .from('presets')
+        .delete()
+        .eq('id', editingPreset.id)
+
+      if (error) throw error
+
+      setProfilePresets(prev => prev.filter(preset => preset.id !== editingPreset.id))
+      setPresetCount(prev => prev - 1)
+      setDeletePresetOpen(false)
+      toast.success('preset deleted!')
+    } catch (error: any) {
+      toast.error(error.message)
+    } finally {
+      setIsDeletingPreset(false)
+    }
   }
 
   if (isLoading) {
@@ -425,6 +654,28 @@ export default function Profile() {
                       <Download size={12} />
                       <span>{preset.download_count}</span>
                     </div>
+                    {isOwnProfile && (
+                      <div className="comment-actions preset-card-actions" onClick={(e) => e.stopPropagation()}>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="comment-action-btn"
+                          onClick={() => handleEditPreset(preset)}
+                          title="Edit"
+                        >
+                          <Pencil size={14} />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="comment-action-btn comment-action-btn-danger"
+                          onClick={() => handleAskDeletePreset(preset)}
+                          title="Delete"
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   <CardHeader className="p-4">
                     <div className="flex flex-col gap-1">
@@ -535,6 +786,260 @@ export default function Profile() {
           )}
         </div>
       )}
+
+      <Dialog open={deletePresetOpen} onOpenChange={setDeletePresetOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
+          <Card className="upload-card border-none shadow-2xl">
+            <CardHeader className="pb-4">
+              <DialogTitle className="text-2xl font-bold">
+                <SplitText
+                  text="delete preset"
+                  delay={20}
+                  duration={1.5}
+                  ease="elastic.out(1, 0.3)"
+                  splitType="chars"
+                  from={{ opacity: 0, y: 5 }}
+                  to={{ opacity: 1, y: 0 }}
+                  threshold={0.1}
+                  rootMargin="-100px"
+                  textAlign="left"
+                />
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                your preset will be gone forever! obviously do this at your will.
+              </DialogDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
+              <div className="upload-form">
+                <div className="upload-field">
+                  <Label>what gets deleted:</Label>
+                  <div className="upload-dropzone has-file cursor-default" style={{ padding: '1.5rem', textAlign: 'left' }}>
+                    <div className="upload-file-info">
+                      <p className="upload-file-name">{editingPreset?.file_name}</p>
+                      <p className="upload-file-size">everything will be gone!</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+
+            <DialogFooter className="p-6 pt-0 flex gap-2 sm:justify-end">
+              <Button variant="ghost" onClick={() => setDeletePresetOpen(false)} className="preset-cancel-btn">
+                cancel
+              </Button>
+              <Button onClick={handleDeletePreset} disabled={isDeletingPreset} className="upload-submit-btn min-w-[120px]">
+                {isDeletingPreset ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    delete preset
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </Card>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editPresetOpen} onOpenChange={setEditPresetOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
+          <Card className="upload-card border-none shadow-2xl">
+            <CardHeader className="pb-4">
+              <DialogTitle className="text-2xl font-bold">
+                <SplitText
+                  text="edit preset"
+                  delay={20}
+                  duration={1.5}
+                  ease="elastic.out(1, 0.3)"
+                  splitType="chars"
+                  from={{ opacity: 0, y: 5 }}
+                  to={{ opacity: 1, y: 0 }}
+                  threshold={0.1}
+                  rootMargin="-100px"
+                  textAlign="left"
+                />
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                edit your preset. leave things unchanged to keep original data.
+              </DialogDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
+              <div className="upload-form">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="upload-field">
+                    <Label htmlFor="edit-name">preset name</Label>
+                    <Input
+                      id="edit-name"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      placeholder="preset name"
+                    />
+                  </div>
+
+                  <div className="upload-field">
+                    <Label htmlFor="edit-category">category</Label>
+                    <Select value={editCategory} onValueChange={setEditCategory}>
+                      <SelectTrigger id="edit-category" className="w-full category-select">
+                        <SelectValue placeholder="select a category" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        {categories.filter(c => c.id !== 'all').map(c => (
+                          <SelectItem key={c.id} value={c.id}>
+                            <div className="flex items-center gap-2">
+                              {categoryIcons[c.id]}
+                              <span>{c.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="upload-field">
+                  <Label htmlFor="edit-description">short description</Label>
+                  <Input
+                    id="edit-description"
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    placeholder="short description"
+                  />
+                </div>
+
+                <div className="upload-field">
+                  <Label htmlFor="edit-long-description">long description</Label>
+                  <Textarea
+                    id="edit-long-description"
+                    value={editLongDescription}
+                    onChange={(e) => setEditLongDescription(e.target.value)}
+                    placeholder="detailed description..."
+                    className="min-h-[120px]"
+                  />
+                </div>
+
+                <div className="upload-field">
+                  <Label htmlFor="edit-ae-version">after effects version</Label>
+                  <Input
+                    id="edit-ae-version"
+                    value={editAeVersion}
+                    onChange={(e) => setEditAeVersion(e.target.value)}
+                    placeholder="2023 or later"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="upload-field">
+                    <Label htmlFor="edit-tags">tags <span className="upload-hint">(comma separated)</span></Label>
+                    <Input
+                      id="edit-tags"
+                      value={editTags}
+                      onChange={(e) => setEditTags(e.target.value)}
+                      placeholder="animation, text, smooth"
+                    />
+                  </div>
+
+                  <div className="upload-field">
+                    <Label htmlFor="edit-dependencies">dependencies <span className="upload-hint">(comma separated)</span></Label>
+                    <Input
+                      id="edit-dependencies"
+                      value={editDependencies}
+                      onChange={(e) => setEditDependencies(e.target.value)}
+                      placeholder="none"
+                    />
+                  </div>
+                </div>
+
+                <div className="upload-field">
+                  <Label>preset file <span className="upload-hint">(leave empty to keep current: {editingPreset?.file_name})</span></Label>
+                  <div
+                    className={`upload-dropzone ${dragOver ? 'dragover' : ''} ${editPresetFile ? 'has-file' : ''}`}
+                    onDrop={handlePresetDrop}
+                    onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                    onDragLeave={() => setDragOver(false)}
+                    onClick={() => document.getElementById('edit-preset-file-input')?.click()}
+                    style={{ padding: '2rem' }}
+                  >
+                    <input
+                      id="edit-preset-file-input"
+                      type="file"
+                      accept=".ffx,.jsx,.aep"
+                      style={{ display: 'none' }}
+                      onChange={(e) => e.target.files?.[0] && handlePresetFileChange(e.target.files[0])}
+                    />
+                    {editPresetFile ? (
+                      <div className="upload-file-info">
+                        <p className="upload-file-name">{editPresetFile.name}</p>
+                        <p className="upload-file-size">{formatBytes(editPresetFile.size)}</p>
+                      </div>
+                    ) : (
+                      <div className="upload-dropzone-prompt">
+                        <p>drag & drop your preset here</p>
+                        <p className="upload-dropzone-sub">or click to browse - .ffx, .jsx, .aep</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="upload-field">
+                  <Label>preview gif <span className="upload-hint">(leave empty to keep current)</span></Label>
+                  <div
+                    className={`upload-dropzone ${gifDragOver ? 'dragover' : ''} ${editGifFile ? 'has-file' : ''}`}
+                    onDrop={handleGifDrop}
+                    onDragOver={(e) => { e.preventDefault(); setGifDragOver(true) }}
+                    onDragLeave={() => setGifDragOver(false)}
+                    onClick={() => document.getElementById('edit-gif-file-input')?.click()}
+                    style={{ padding: '2rem' }}
+                  >
+                    <input
+                      id="edit-gif-file-input"
+                      type="file"
+                      accept="image/gif"
+                      style={{ display: 'none' }}
+                      onChange={(e) => e.target.files?.[0] && setEditGifFile(e.target.files[0])}
+                    />
+                    {editGifFile ? (
+                      <div className="upload-file-info">
+                        <p className="upload-file-name">{editGifFile.name}</p>
+                        <p className="upload-file-size">{formatBytes(editGifFile.size)}</p>
+                      </div>
+                    ) : (
+                      <div className="upload-dropzone-prompt">
+                        <p>drag & drop preview gif here</p>
+                        <p className="upload-dropzone-sub">or click to browse - .gif only</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+
+            <DialogFooter className="p-6 pt-0 flex gap-2 sm:justify-end">
+              <Button variant="ghost" onClick={() => setEditPresetOpen(false)} className="preset-cancel-btn">
+                cancel
+              </Button>
+              <Button onClick={handleSavePreset} disabled={isSavingPreset} className="upload-submit-btn min-w-[120px]">
+                {isSavingPreset ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    saving...
+                  </>
+                ) : (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    save changes
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </Card>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

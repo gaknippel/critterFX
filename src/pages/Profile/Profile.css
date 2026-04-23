@@ -308,7 +308,8 @@
   top: 0.5rem;
   right: 0.5rem;
   background: rgba(10, 10, 10, 0.96);
-  backdrop-filter: blur(8px);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   color: white;
   padding: 0.2rem 0.5rem;
   border-radius: 0.4rem;
@@ -336,11 +337,11 @@
 }
 
 .preset-card:hover .preset-download-badge {
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  border-color: hsl(var(--primary));
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  background: rgba(10, 10, 10, 0.28);
+  color: rgba(255, 255, 255, 0.78);
+  border-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .preset-date {
@@ -381,6 +382,13 @@
   gap: 0.25rem;
 }
 
+.preset-card-actions {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 11;
+}
+
 .comment-action-btn {
   width: 1.9rem !important;
   height: 1.9rem !important;
@@ -408,4 +416,154 @@
 
 .comment-action-btn-danger:hover {
   color: hsl(var(--destructive)) !important;
+}
+
+.upload-card {
+  background: color-mix(in oklch, var(--card), transparent 20%) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in oklch, var(--border), transparent 50%) !important;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.upload-dropzone {
+  border: 2px dashed color-mix(in oklch, var(--border), transparent 20%);
+  border-radius: 0.75rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--muted-foreground);
+  background: color-mix(in oklch, var(--muted), transparent 70%);
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.dragover {
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--accent), transparent 50%);
+  color: var(--foreground);
+}
+
+.upload-dropzone.has-file {
+  border-color: var(--primary);
+  border-style: solid;
+  background: color-mix(in oklch, var(--primary), transparent 95%);
+}
+
+.upload-dropzone-prompt p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.upload-dropzone-sub {
+  font-size: 0.85rem !important;
+  margin-top: 0.5rem !important;
+  opacity: 0.7;
+}
+
+.upload-file-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.upload-file-name {
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.upload-file-size {
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.upload-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.upload-field input[data-slot="input"],
+.upload-field [data-slot="select-trigger"],
+.upload-field textarea {
+  background: color-mix(in oklch, var(--card), transparent 40%) !important;
+  border: 1px solid color-mix(in oklch, var(--border), transparent 20%) !important;
+  border-radius: 0.625rem !important;
+  height: 2.75rem !important;
+  padding: 0 0.875rem !important;
+  width: 100% !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  color: var(--foreground) !important;
+  font-size: 0.9rem !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.upload-field textarea {
+  height: auto !important;
+  min-height: 120px !important;
+  padding: 0.75rem !important;
+}
+
+.upload-field input:hover,
+.upload-field [data-slot="select-trigger"]:hover {
+  border-color: color-mix(in oklch, var(--primary), transparent 30%) !important;
+  background: color-mix(in oklch, var(--card), transparent 20%) !important;
+}
+
+.upload-field input:focus-visible,
+.upload-field [data-slot="select-trigger"][data-state="open"] {
+  outline: none !important;
+  border-color: var(--primary) !important;
+  background: color-mix(in oklch, var(--card), transparent 10%) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary), transparent 85%) !important;
+}
+
+.upload-hint {
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+  font-weight: 400;
+}
+
+.upload-submit-btn {
+  height: 3rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  background: linear-gradient(45deg, var(--primary), #8b5cf6) !important;
+  border: none !important;
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important;
+  transition: all 0.3s ease !important;
+  border-radius: 0.75rem !important;
+}
+
+.upload-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+  filter: brightness(1.1);
+}
+
+.upload-submit-btn:disabled {
+  background: var(--muted) !important;
+  box-shadow: none !important;
+  opacity: 0.5 !important;
+}
+
+.preset-cancel-btn {
+  background: transparent !important;
+  border: 1px solid color-mix(in oklch, var(--border), transparent 40%) !important;
+  color: hsl(var(--muted-foreground)) !important;
+  border-radius: 0.75rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.preset-cancel-btn:hover {
+  background: color-mix(in oklch, var(--muted), transparent 80%) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: color-mix(in oklch, var(--border), transparent 10%) !important;
 }
