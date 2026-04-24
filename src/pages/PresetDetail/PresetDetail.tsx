@@ -1,7 +1,7 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { 
   ArrowLeft, 
-  Check, 
+  Check,
   Download, 
   FileCode, 
   Info, 
@@ -11,15 +11,8 @@ import {
   Pencil, 
   Send, 
   Trash2, 
-  X, 
   User,
-  Type,
-  MoveHorizontal,
-  Shapes,
-  Sparkles,
-  Image,
-  Code,
-  Layers
+  X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -34,24 +27,12 @@ import { supabase, Comment } from '@/lib/supabase'
 import { toast } from 'sonner'
 import { useUserContext } from '@/context/UserContext'
 import { Textarea } from '@/components/ui/textarea'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import FadeContent from '@/components/FadeContent'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
 import { formatBytes } from '@/lib/utils'
-
-const categoryIcons: Record<string, React.ReactNode> = {
-  textAnims: <Type className="size-4" />,
-  transitions: <MoveHorizontal className="size-4" />,
-  shapeAnims: <Shapes className="size-4" />,
-  effects: <Sparkles className="size-4" />,
-  backgrounds: <Image className="size-4" />,
-  scripts: <Code className="size-4" />,
-  compositions: <Layers className="size-4" />,
-}
+import { PresetDeleteDialog, PresetEditDialog } from '@/components/presets/PresetManagementDialogs'
 
 export default function PresetDetail() {
   const { id } = useParams()
@@ -139,27 +120,6 @@ const handleDeletePreset = async () => {
   } finally {
     setIsDeletingPreset(false)
   }
-}
-
-const handlePresetDrop = (e: React.DragEvent) => {
-  e.preventDefault()
-  setDragOver(false)
-  const file = e.dataTransfer.files[0]
-  if (file) handlePresetFileChange(file)
-}
-
-const handleGifDrop = (e: React.DragEvent) => {
-  e.preventDefault()
-  setGifDragOver(false)
-  const file = e.dataTransfer.files[0]
-  if (!file) return
-
-  if (file.type !== 'image/gif') {
-    toast.error('preview must be a GIF!')
-    return
-  }
-
-  setEditGifFile(file)
 }
 
 const handleSavePreset = async () => {
@@ -659,270 +619,43 @@ const handleDeleteComment = async (commentId: string) => {
                 </div>
               )}
 
-              <Dialog open={deletePresetOpen} onOpenChange={setDeletePresetOpen}>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
-                  <Card className="upload-card border-none shadow-2xl">
-                    <CardHeader className="pb-4">
-                      <DialogTitle className="text-2xl font-bold">
-                        <SplitText
-                          text="delete preset"
-                          delay={20}
-                          duration={1.5}
-                          ease="elastic.out(1, 0.3)"
-                          splitType="chars"
-                          from={{ opacity: 0, y: 5 }}
-                          to={{ opacity: 1, y: 0 }}
-                          threshold={0.1}
-                          rootMargin="-100px"
-                          textAlign="left"
-                        />
-                      </DialogTitle>
-                      <DialogDescription className="text-muted-foreground">
-                        your preset will be gone forever! obviously do this at your will.
-                      </DialogDescription>
-                    </CardHeader>
+              <PresetDeleteDialog
+                open={deletePresetOpen}
+                onOpenChange={setDeletePresetOpen}
+                preset={preset}
+                onDelete={handleDeletePreset}
+                isDeleting={isDeletingPreset}
+              />
 
-                    <CardContent className="space-y-6">
-                      <div className="upload-form">
-
-                        <div className="upload-field">
-                          <Label>what gets deleted:</Label>
-                          <div className="upload-dropzone has-file cursor-default" style={{ padding: '1.5rem', textAlign: 'left' }}>
-                            <div className="upload-file-info">
-                              <p className="upload-file-name">{preset.file_name}</p>
-                              <p className="upload-file-size">everything will be gone!</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-
-                    <DialogFooter className="p-6 pt-0 flex gap-2 sm:justify-end">
-                      <Button variant="ghost" onClick={() => setDeletePresetOpen(false)} className="preset-cancel-btn">
-                        cancel
-                      </Button>
-                      <Button onClick={handleDeletePreset} disabled={isDeletingPreset} className="upload-submit-btn min-w-[120px]">
-                        {isDeletingPreset ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            deleting...
-                          </>
-                        ) : (
-                          <>
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            delete preset
-                          </>
-                        )}
-                      </Button>
-                    </DialogFooter>
-                  </Card>
-                </DialogContent>
-              </Dialog>
-
-              <Dialog open={editPresetOpen} onOpenChange={setEditPresetOpen}>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
-                  <Card className="upload-card border-none shadow-2xl">
-                    <CardHeader className="pb-4">
-                      <DialogTitle className="text-2xl font-bold">
-                        <SplitText
-                          text="edit preset"
-                          delay={20}
-                          duration={1.5}
-                          ease="elastic.out(1, 0.3)"
-                          splitType="chars"
-                          from={{ opacity: 0, y: 5 }}
-                          to={{ opacity: 1, y: 0 }}
-                          threshold={0.1}
-                          rootMargin="-100px"
-                          textAlign="left"
-                        />
-                      </DialogTitle>
-                      <DialogDescription className="text-muted-foreground">
-                        edit your preset. leave things unchanged to keep original data.
-                      </DialogDescription>
-                    </CardHeader>
-
-                    <CardContent className="space-y-6">
-                      <div className="upload-form">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {/* name */}
-                          <div className="upload-field">
-                            <Label htmlFor="edit-name">preset name</Label>
-                            <Input
-                              id="edit-name"
-                              value={editName}
-                              onChange={(e) => setEditName(e.target.value)}
-                              placeholder="preset name"
-                            />
-                          </div>
-
-                          {/* category */}
-                          <div className="upload-field">
-                            <Label htmlFor="edit-category">category</Label>
-                            <Select value={editCategory} onValueChange={setEditCategory}>
-                              <SelectTrigger id="edit-category" className="w-full category-select">
-                                <SelectValue placeholder="select a category" />
-                              </SelectTrigger>
-                              <SelectContent position="popper">
-                                {categories.filter(c => c.id !== 'all').map(c => (
-                                  <SelectItem key={c.id} value={c.id}>
-                                    <div className="flex items-center gap-2">
-                                      {categoryIcons[c.id]}
-                                      <span>{c.name}</span>
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-
-                        {/* short description */}
-                        <div className="upload-field">
-                          <Label htmlFor="edit-description">short description</Label>
-                          <Input
-                            id="edit-description"
-                            value={editDescription}
-                            onChange={(e) => setEditDescription(e.target.value)}
-                            placeholder="short description"
-                          />
-                        </div>
-
-                        {/* long description */}
-                        <div className="upload-field">
-                          <Label htmlFor="edit-long-description">long description</Label>
-                          <Textarea
-                            id="edit-long-description"
-                            value={editLongDescription}
-                            onChange={(e) => setEditLongDescription(e.target.value)}
-                            placeholder="detailed description..."
-                            className="min-h-[120px]"
-                          />
-                        </div>
-
-                        {/* ae version */}
-                        <div className="upload-field">
-                          <Label htmlFor="edit-ae-version">after effects version</Label>
-                          <Input
-                            id="edit-ae-version"
-                            value={editAeVersion}
-                            onChange={(e) => setEditAeVersion(e.target.value)}
-                            placeholder="2023 or later"
-                          />
-                        </div>
-
-                        {/* tags and dependencies grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {/* tags */}
-                          <div className="upload-field">
-                            <Label htmlFor="edit-tags">tags <span className="upload-hint">(comma separated)</span></Label>
-                            <Input
-                              id="edit-tags"
-                              value={editTags}
-                              onChange={(e) => setEditTags(e.target.value)}
-                              placeholder="animation, text, smooth"
-                            />
-                          </div>
-
-                          {/* dependencies */}
-                          <div className="upload-field">
-                            <Label htmlFor="edit-dependencies">dependencies <span className="upload-hint">(comma separated)</span></Label>
-                            <Input
-                              id="edit-dependencies"
-                              value={editDependencies}
-                              onChange={(e) => setEditDependencies(e.target.value)}
-                              placeholder="none"
-                            />
-                          </div>
-                        </div>
-
-                        {/* preset file dropzone */}
-                        <div className="upload-field">
-                          <Label>preset file <span className="upload-hint">(leave empty to keep current: {preset.file_name})</span></Label>
-                          <div
-                            className={`upload-dropzone ${dragOver ? 'dragover' : ''} ${editPresetFile ? 'has-file' : ''}`}
-                            onDrop={handlePresetDrop}
-                            onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-                            onDragLeave={() => setDragOver(false)}
-                            onClick={() => document.getElementById('edit-preset-file-input')?.click()}
-                            style={{ padding: '2rem' }}
-                          >
-                            <input
-                              id="edit-preset-file-input"
-                              type="file"
-                              accept=".ffx,.jsx,.aep"
-                              style={{ display: 'none' }}
-                              onChange={(e) => e.target.files?.[0] && handlePresetFileChange(e.target.files[0])}
-                            />
-                            {editPresetFile ? (
-                              <div className="upload-file-info">
-                                <p className="upload-file-name">{editPresetFile.name}</p>
-                                <p className="upload-file-size">{formatBytes(editPresetFile.size)}</p>
-                              </div>
-                            ) : (
-                              <div className="upload-dropzone-prompt">
-                                <p>drag & drop your preset here</p>
-                                <p className="upload-dropzone-sub">or click to browse — .ffx, .jsx, .aep</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* gif file dropzone */}
-                        <div className="upload-field">
-                          <Label>preview gif <span className="upload-hint">(leave empty to keep current)</span></Label>
-                          <div
-                            className={`upload-dropzone ${gifDragOver ? 'dragover' : ''} ${editGifFile ? 'has-file' : ''}`}
-                            onDrop={handleGifDrop}
-                            onDragOver={(e) => { e.preventDefault(); setGifDragOver(true) }}
-                            onDragLeave={() => setGifDragOver(false)}
-                            onClick={() => document.getElementById('edit-gif-file-input')?.click()}
-                            style={{ padding: '2rem' }}
-                          >
-                            <input
-                              id="edit-gif-file-input"
-                              type="file"
-                              accept="image/gif"
-                              style={{ display: 'none' }}
-                              onChange={(e) => e.target.files?.[0] && setEditGifFile(e.target.files[0])}
-                            />
-                            {editGifFile ? (
-                              <div className="upload-file-info">
-                                <p className="upload-file-name">{editGifFile.name}</p>
-                                <p className="upload-file-size">{formatBytes(editGifFile.size)}</p>
-                              </div>
-                            ) : (
-                              <div className="upload-dropzone-prompt">
-                                <p>drag & drop preview gif here</p>
-                                <p className="upload-dropzone-sub">or click to browse — .gif only</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-
-                    <DialogFooter className="p-6 pt-0 flex gap-2 sm:justify-end">
-                      <Button variant="ghost" onClick={() => setEditPresetOpen(false)} className="preset-cancel-btn">
-                        cancel
-                      </Button>
-                      <Button onClick={handleSavePreset} disabled={isSavingPreset} className="upload-submit-btn min-w-[120px]">
-                        {isSavingPreset ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            saving...
-                          </>
-                        ) : (
-                          <>
-                            <Check className="mr-2 h-4 w-4" />
-                            save changes
-                          </>
-                        )}
-                      </Button>
-                    </DialogFooter>
-                  </Card>
-                </DialogContent>
-              </Dialog>
+              <PresetEditDialog
+                open={editPresetOpen}
+                onOpenChange={setEditPresetOpen}
+                preset={preset}
+                editName={editName}
+                setEditName={setEditName}
+                editDescription={editDescription}
+                setEditDescription={setEditDescription}
+                editLongDescription={editLongDescription}
+                setEditLongDescription={setEditLongDescription}
+                editCategory={editCategory}
+                setEditCategory={setEditCategory}
+                editTags={editTags}
+                setEditTags={setEditTags}
+                editDependencies={editDependencies}
+                setEditDependencies={setEditDependencies}
+                editAeVersion={editAeVersion}
+                setEditAeVersion={setEditAeVersion}
+                editPresetFile={editPresetFile}
+                onPresetFileChange={handlePresetFileChange}
+                editGifFile={editGifFile}
+                onGifFileChange={setEditGifFile}
+                dragOver={dragOver}
+                setDragOver={setDragOver}
+                gifDragOver={gifDragOver}
+                setGifDragOver={setGifDragOver}
+                onSave={handleSavePreset}
+                isSaving={isSavingPreset}
+              />
           </div>
 
 
@@ -1147,3 +880,4 @@ const handleDeleteComment = async (commentId: string) => {
     </div>
   )
 }
+
