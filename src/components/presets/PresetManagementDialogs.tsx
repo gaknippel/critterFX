@@ -124,7 +124,7 @@ export function PresetDeleteDialog({
               />
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              your preset will be gone forever! obviously do this at your will.
+              your preset will be gone forever! obviously do this at your own will.
             </DialogDescription>
           </CardHeader>
 

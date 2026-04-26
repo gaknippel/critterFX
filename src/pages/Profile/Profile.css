@@ -361,33 +361,57 @@
   top: 0.5rem;
   left: 0.5rem;
   z-index: 11;
+  display: flex;
+  gap: 0.4rem;
 }
 
 .comment-action-btn {
-  width: 1.9rem !important;
-  height: 1.9rem !important;
-  border-radius: 999px !important;
-  border: 1px solid transparent !important;
+  width: 2.2rem !important;
+  height: 2.2rem !important;
+  border-radius: 0.75rem !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Specific styling for buttons on top of preset/preview images */
+.preset-card-actions .comment-action-btn,
+.comment-actions.absolute .comment-action-btn {
+  background: rgba(15, 15, 15, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+/* Bio buttons and other inline buttons should be cleaner */
+.profile-section-header .comment-action-btn {
   color: hsl(var(--muted-foreground)) !important;
-  opacity: 0.8;
-  transition:
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease,
-    opacity 0.18s ease !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+}
+
+.profile-section-header .comment-action-btn:hover {
+  background: hsl(var(--muted) / 0.5) !important;
+  color: hsl(var(--foreground)) !important;
 }
 
 .comment-action-btn:hover {
-  background: hsl(var(--muted) / 0.55) !important;
-  border-color: color-mix(in oklch, hsl(var(--primary)), transparent 35%) !important;
-  color: hsl(var(--foreground)) !important;
-  opacity: 1;
+  transform: translateY(-2px) scale(1.05);
+}
+
+.preset-card-actions .comment-action-btn:hover {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+  box-shadow: 0 6px 16px color-mix(in oklch, var(--primary), transparent 70%);
 }
 
 .comment-action-btn svg {
-  stroke-width: 2.15;
+  stroke-width: 2.5;
 }
 
 .comment-action-btn-danger:hover {
-  color: hsl(var(--destructive)) !important;
+  background: hsl(var(--destructive)) !important;
+  border-color: hsl(var(--destructive)) !important;
+  color: white !important;
+  box-shadow: 0 6px 16px color-mix(in oklch, hsl(var(--destructive)), transparent 70%);
 }

@@ -2,6 +2,7 @@ import './Settings.css'
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/theme-provider';
+import { toast } from 'sonner';
 import {
   Alert,
   AlertDescription,
@@ -23,7 +24,8 @@ import {
   CardContent,
   CardFooter
 } from '@/components/ui/card'
-import { FolderOpen, CheckCircle, AlertCircle, Search, Monitor, Sun, Moon, Sparkles, Trees, Sunset } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { FolderOpen, CheckCircle, AlertCircle, Search, Monitor, Sun, Moon, Sparkles, Trees, Sunset, Loader2 } from 'lucide-react'
 import SplitText from '@/components/SplitText';
 
 import {
@@ -45,7 +47,6 @@ export default function Settings() {
   const [scriptsPathValid, setScriptsPathValid] = useState<boolean | null>(null);
   const [presetsPathValid, setPresetsPathValid] = useState<boolean | null>(null);
   const [compositionPathValid, setCompositionPathValid] = useState<boolean | null>(null);
-  const [saveMessage, setSaveMessage] = useState('');
 
 
   useEffect(() => {
@@ -82,6 +83,8 @@ export default function Settings() {
     setIsScanning(true);
     try 
     {
+      // Add a small artificial delay to make the scan feel more substantial
+      await new Promise(resolve => setTimeout(resolve, 800));
       const found = await scanAEInstallations();
       setInstallations(found);
     } 
@@ -132,12 +135,10 @@ const handleBrowseCompositions = async () => {
         customPresetsPath || undefined,
         customCompositionPath || undefined,
       );
-      setSaveMessage('paths saved successfully!');
-      setTimeout(() => setSaveMessage(''), 3000);
+      toast.success('paths saved successfully!');
     } catch (error) 
     {
-      setSaveMessage('failed to save paths');
-      setTimeout(() => setSaveMessage(''), 3000);
+      toast.error('failed to save paths');
     }
   };
 
@@ -186,18 +187,43 @@ const handleBrowseCompositions = async () => {
             size="sm"
             className="settings-action-button"
           >
-            <Search className="mr-2 h-3.5 w-3.5" />
+            {isScanning ? (
+              <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Search className="mr-2 h-3.5 w-3.5" />
+            )}
             {isScanning ? 'scanning...' : 'scan again'}
           </Button>
         </div>
 
         <div className="settings-section-content space-y-6">
-          {/* detected installations */}
-          {installations.length > 0 && (
-            <Alert className="settings-alert">
-              <CheckCircle className="h-4 w-4" />
-              <AlertDescription>
-                <div className="font-semibold mb-2">detected installations:</div>
+          <div className="settings-detection-area border rounded-lg overflow-hidden bg-muted/10 relative">
+            {/* detected installations or skeleton */}
+            {isScanning ? (
+              <div className="p-4 h-full">
+                <div className="flex items-center gap-2 mb-4">
+                  <Skeleton className="h-4 w-4 rounded-full" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+                <div className="space-y-6">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="flex items-center justify-between gap-6 py-4 border-t border-border/50 first:border-t-0">
+                      <div className="space-y-2 flex-1">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-3 w-full" />
+                        <Skeleton className="h-3 w-full" />
+                      </div>
+                      <Skeleton className="h-8 w-14 shrink-0 rounded-md" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : installations.length > 0 ? (
+              <div className="p-4 h-full overflow-y-auto custom-scrollbar">
+                <div className="flex items-center gap-2 mb-3 text-primary">
+                  <CheckCircle className="h-4 w-4" />
+                  <span className="font-semibold text-sm">detected installations:</span>
+                </div>
                 <div className="space-y-3">
                   {installations.map((inst) => (
                     <div key={inst.version} className="flex items-center justify-between gap-4 py-2 border-t border-border/50 first:border-t-0">
@@ -213,7 +239,7 @@ const handleBrowseCompositions = async () => {
                       <Button 
                         size="sm" 
                         variant="outline"
-                        className="h-7 px-3 text-xs"
+                        className="h-7 px-4 text-xs w-fit shrink-0"
                         onClick={() => handleUseDetectedPath(inst)}
                       >
                         use
@@ -221,18 +247,14 @@ const handleBrowseCompositions = async () => {
                     </div>
                   ))}
                 </div>
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {installations.length === 0 && !isScanning && (
-            <Alert className="settings-alert-error">
-              <AlertCircle className="h-4 w-4 text-destructive" />
-              <AlertDescription>
-                no after effects installations detected. set custom paths below.
-              </AlertDescription>
-            </Alert>
-          )}
+              </div>
+            ) : (
+              <div className="p-4 h-full flex items-center gap-3 text-destructive">
+                <AlertCircle className="h-4 w-4" />
+                <span className="text-sm">no after effects installations detected. set custom paths below.</span>
+              </div>
+            )}
+          </div>
 
           <div className="space-y-4">
             <div className="settings-field">
@@ -253,7 +275,11 @@ const handleBrowseCompositions = async () => {
                   placeholder="C:\Program Files\Adobe\Adobe After Effects 2024\Support Files\Scripts"
                   className={scriptsPathValid === false ? 'border-destructive/50' : ''}
                 />
-                <Button className="shrink-0 h-10 w-10" onClick={handleBrowseScripts} variant="outline" size="icon">
+                <Button 
+                  className="shrink-0 h-10 w-10 p-0" 
+                  onClick={handleBrowseScripts} 
+                  variant="outline"
+                >
                   <FolderOpen className="h-4 w-4" />
                 </Button>
               </div>
@@ -277,7 +303,11 @@ const handleBrowseCompositions = async () => {
                   placeholder="C:\Users\YourName\Documents\Adobe\After Effects\User Presets"
                   className={presetsPathValid === false ? 'border-destructive/50' : ''}
                 />
-                <Button className="shrink-0 h-10 w-10" onClick={handleBrowsePresets} variant="outline" size="icon">
+                <Button 
+                  className="shrink-0 h-10 w-10 p-0" 
+                  onClick={handleBrowsePresets} 
+                  variant="outline"
+                >
                   <FolderOpen className="h-4 w-4" />
                 </Button>
               </div>
@@ -301,7 +331,11 @@ const handleBrowseCompositions = async () => {
                   placeholder="C:\Users\YourName\Documents\critterFX\Compositions"
                   className={compositionPathValid === false ? 'border-destructive/50' : ''}
                 />
-                <Button className="shrink-0 h-10 w-10" onClick={handleBrowseCompositions} variant="outline" size="icon">
+                <Button 
+                  className="shrink-0 h-10 w-10 p-0" 
+                  onClick={handleBrowseCompositions} 
+                  variant="outline"
+                >
                   <FolderOpen className="h-4 w-4" />
                 </Button>
               </div>
@@ -366,15 +400,9 @@ const handleBrowseCompositions = async () => {
       </div>
 
       <div className="settings-footer">
-        <Button className="settings-save-button w-full" onClick={handleSavePaths}>
+        <Button className="settings-save-button" onClick={handleSavePaths}>
           save all changes
         </Button>
-        {saveMessage && (
-          <div className={`settings-save-message ${saveMessage.includes('failed') ? 'error' : 'success'}`}>
-            {saveMessage.includes('failed') ? <AlertCircle className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
-            {saveMessage}
-          </div>
-        )}
       </div>
     </div>
   )

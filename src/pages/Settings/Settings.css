@@ -124,6 +124,10 @@
   border: 1px solid color-mix(in oklch, var(--destructive), transparent 80%) !important;
 }
 
+.settings-action-button {
+  min-width: 110px; /* Prevent shrinking during scan text change */
+}
+
 .settings-action-button,
 .settings-wrapper [data-variant="outline"] {
   height: 2.25rem;
@@ -133,6 +137,15 @@
   border-color: color-mix(in oklch, var(--primary), transparent 40%) !important;
   color: var(--primary) !important;
   transition: all 0.2s ease !important;
+}
+
+.settings-section-content {
+  min-height: 80px; /* Keep space for alerts to prevent card collapse */
+}
+
+.settings-detection-area {
+  height: 220px; /* Fixed height to prevent layout jumps */
+  width: 100%;
 }
 
 .settings-action-button:hover,
@@ -147,8 +160,16 @@
   width: 2.5rem !important;
 }
 
+.settings-footer {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
 .settings-save-button {
   height: 3rem !important;
+  width: 100%;
+  max-width: 300px;
   font-size: 0.95rem !important;
   font-weight: 600 !important;
   background: var(--primary) !important;
