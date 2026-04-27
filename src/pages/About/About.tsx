@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import './About.css'
 import SplitText from '@/components/SplitText'
-import { Preset, categories } from '@/lib/api'
-import { Comment } from '@/lib/supabase'
+import { categories } from '@/lib/api'
 import { 
   Code2, 
   Heart, 
@@ -57,6 +56,28 @@ export default function About() {
 
       {activeTab === 'user' ? (
         <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-300">
+
+          <div className="about-info-section">
+            <div className="about-section-header">
+              <h2 className="about-section-title flex items-center gap-2">how to use</h2>
+              <p className="text-sm text-muted-foreground mt-1">its simple :D</p>
+            </div>
+            <div className="about-content mt-2 space-y-4 text-sm text-muted-foreground">
+              <p>
+                1. <strong>configure settings:</strong> go to the settings menu to make sure you have the right AE file paths set up.
+              </p>
+              <p>
+                2. <strong>browse presets:</strong> head over to the preset page to find presets shared by the community.
+              </p>
+              <p>
+                3. <strong>download & apply:</strong> click download on any preset. they will be saved to your configured AE preset folder automatically!
+              </p>
+              <p>
+                4. <strong>share your own:</strong> go to the upload tab to share your creations with the community.
+              </p>
+            </div>
+          </div>
+
           <div className="about-info-section">
             <div className="about-section-header">
               <h2 className="about-section-title flex items-center gap-2">
@@ -65,7 +86,7 @@ export default function About() {
             </div>
             <div className="about-content mt-4">
               <p className="about-description">
-                basically free shit for cool people who edit in AE 
+                free presets for everyone to share!! 
               </p>
             </div>
           </div>
@@ -88,23 +109,7 @@ export default function About() {
             </div>
           </div>
 
-          <div className="about-info-section">
-            <div className="about-section-header">
-              <h2 className="about-section-title flex items-center gap-2">how to use</h2>
-              <p className="text-sm text-muted-foreground mt-1">its simple :D</p>
-            </div>
-            <div className="about-content mt-2 space-y-4 text-sm text-muted-foreground">
-              <p>
-                1. <strong>browse presets:</strong> head over to the preset page to find presets shared by the community.
-              </p>
-              <p>
-                2. <strong>download & apply:</strong> click download on any preset. they will be saved to your configured AE preset folder automatically!
-              </p>
-              <p>
-                3. <strong>share your own:</strong> go to the upload tab to share your creations with the community.
-              </p>
-            </div>
-          </div>
+
         </div>
       ) : (
         <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-300">

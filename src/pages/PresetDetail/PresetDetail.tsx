@@ -484,6 +484,17 @@ const handleDeleteComment = async (commentId: string) => {
             <img src={preset.previewGif} alt={preset.name} />
           </div>
 
+          <div className="preset-sidebar-info">
+            <div className="preset-info-item" title="Downloads">
+              <Download size={14} />
+              <span>{preset.download_count}</span>
+            </div>
+            <div className="preset-info-item" title="File Size">
+              <Package size={14} />
+              <span>{preset.file_size}</span>
+            </div>
+          </div>
+
 
           <Button 
             className="download-button" 
@@ -666,28 +677,17 @@ const handleDeleteComment = async (commentId: string) => {
             ))}
           </div>
 
+          <div className="preset-file-info">
+            <FileCode size={14} />
+            <code className="preset-file-name">{preset.file_name}</code>
+          </div>
+
           <div className="detail-section">
             <div className="section-header">
               <Info size={20} />
               <h2>description</h2>
             </div>
             <p className="detail-text">{preset.long_description || preset.description}</p>
-          </div>
-
-          <div className="detail-section">
-            <div className="section-header">
-              <Download size={20} />
-              <h2>downloads</h2>
-            </div>
-            <div className="download-count">
-              <div className="download-count-icon">
-                <Download size={16} />
-              </div>
-              <div className="download-count-copy">
-                <span className="download-count-value">{preset.download_count}</span>
-                <span className="download-count-label">downloads so far</span>
-              </div>
-            </div>
           </div>
 
           <div className="detail-section">

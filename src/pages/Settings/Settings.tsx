@@ -3,10 +3,6 @@ import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/theme-provider';
 import { toast } from 'sonner';
-import {
-  Alert,
-  AlertDescription,
-} from "@/components/ui/alert"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -16,14 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter
-} from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { FolderOpen, CheckCircle, AlertCircle, Search, Monitor, Sun, Moon, Sparkles, Trees, Sunset, Loader2 } from 'lucide-react'
 import SplitText from '@/components/SplitText';
@@ -352,7 +340,7 @@ const handleBrowseCompositions = async () => {
         <div className="settings-section-content">
           <div className="settings-field">
             <Label className="settings-field-label">app theme</Label>
-            <Select value={theme} onValueChange={(v) => setTheme(v as any)} modal={false}>
+            <Select value={theme} onValueChange={(v) => setTheme(v as any)} >
               <SelectTrigger className="w-full h-10">
                 <SelectValue placeholder="select a theme" />
               </SelectTrigger>

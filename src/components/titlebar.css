@@ -1,0 +1,51 @@
+.titlebar {
+  height: 32px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: transparent;
+}
+
+.titlebar-drag-region {
+  flex: 1;
+  height: 100%;
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
+.titlebar-controls {
+  display: flex;
+  align-items: center;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.titlebar-btn {
+  width: 46px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: hsl(var(--foreground));
+  cursor: pointer;
+  transition: background 0.15s ease;
+  opacity: 0.7;
+}
+
+.titlebar-btn:hover {
+  opacity: 1;
+  background: hsl(var(--accent));
+}
+
+.titlebar-close:hover {
+  background: #e81123 !important;
+  color: white;
+  opacity: 1;
+}

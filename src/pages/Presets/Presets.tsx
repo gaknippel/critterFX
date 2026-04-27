@@ -6,9 +6,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Search, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import FadeContent from '@/components/FadeContent'
-import { fetchPresets, refreshPresets, categories, type Preset } from '@/data/presets'
+import { fetchPresets, categories, type Preset } from '@/lib/api'
 import SplitText from '@/components/SplitText'
-
 export default function Presets(){
   const [presets, setPresets] = useState<Preset[]>([])
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -47,7 +46,7 @@ export default function Presets(){
     setIsRefreshing(true)
     try 
     {
-      const data = await refreshPresets()
+      const data = await fetchPresets()
       setPresets(data)
     } 
     catch (error) 
@@ -74,7 +73,7 @@ export default function Presets(){
   })
 
 
-  const handlePresetClick = (presetId: number) => {
+  const handlePresetClick = (presetId: string) => {
     navigate(`/preset/${presetId}`)
   }
 
