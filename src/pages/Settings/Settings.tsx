@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { FolderOpen, CheckCircle, AlertCircle, Search, Monitor, Sun, Moon, Sparkles, Trees, Sunset, Loader2 } from 'lucide-react'
+import { FolderOpen, CheckCircle, AlertCircle, Search, Monitor, Sun, Moon, Sparkles, Trees, Sunset, Loader2, Waves, Flower2, Zap } from 'lucide-react'
 import SplitText from '@/components/SplitText';
 
 import {
@@ -373,6 +373,24 @@ const handleBrowseCompositions = async () => {
                   <div className="flex items-center gap-2">
                     <Sunset className="h-4 w-4 text-orange-400" />
                     <span>sunset</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="ocean">
+                  <div className="flex items-center gap-2">
+                    <Waves className="h-4 w-4 text-blue-400" />
+                    <span>ocean</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="rose">
+                  <div className="flex items-center gap-2">
+                    <Flower2 className="h-4 w-4 text-rose-400" />
+                    <span>rose</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="nebula">
+                  <div className="flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-indigo-400" />
+                    <span>nebula</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="system">
