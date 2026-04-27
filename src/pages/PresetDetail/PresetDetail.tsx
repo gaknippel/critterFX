@@ -30,6 +30,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import FadeContent from '@/components/FadeContent'
 
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
 import { formatBytes } from '@/lib/utils'
 import { PresetDeleteDialog, PresetEditDialog } from '@/components/presets/PresetManagementDialogs'
@@ -679,7 +680,16 @@ const handleDeleteComment = async (commentId: string) => {
 
           <div className="preset-file-info">
             <FileCode size={14} />
-            <code className="preset-file-name">{preset.file_name}</code>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <code className="preset-file-name">{preset.file_name}</code>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>this is what you search up in AE.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
 
           <div className="detail-section">
