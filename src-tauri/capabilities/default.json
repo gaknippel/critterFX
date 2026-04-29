@@ -15,6 +15,7 @@
     "core:window:allow-toggle-maximize", 
     "core:window:allow-close",
     "updater:default",
+    "updater:allow-check",
     "process:allow-restart"
   ]
 }

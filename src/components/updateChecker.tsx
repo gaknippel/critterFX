@@ -13,31 +13,33 @@ export default function UpdateChecker() {
     checkForUpdates()
   }, [])
 
-  const checkForUpdates = async () => {
-    try {
-      const update = await check()
-      if (update?.available) {
-        setUpdateAvailable(true)
-        setUpdateVersion(update.version)
-      }
-    } catch (error) {
-      console.error('failed to check for updates:', error)
+const checkForUpdates = async () => {
+  try {
+    console.log('checking for updates...')
+    const update = await check()
+    console.log('update result:', update)
+    if (update) {
+      setUpdateAvailable(true)
+      setUpdateVersion(update.version)
     }
+  } catch (error) {
+    console.error('failed to check for updates:', error)
   }
+}
 
-  const handleUpdate = async () => {
-    setIsUpdating(true)
-    try {
-      const update = await check()
-      if (update?.available) {
-        await update.downloadAndInstall()
-        await relaunch()
-      }
-    } catch (error: any) {
-      toast.error(`update failed: ${error.message}`)
-      setIsUpdating(false)
+const handleUpdate = async () => {
+  setIsUpdating(true)
+  try {
+    const update = await check()
+    if (update) {
+      await update.downloadAndInstall()
+      await relaunch()
     }
+  } catch (error: any) {
+    toast.error(`update failed: ${error.message}`)
+    setIsUpdating(false)
   }
+}
 
   if (!updateAvailable) return null
 
