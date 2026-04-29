@@ -35,8 +35,9 @@ const handleUpdate = async () => {
       await update.downloadAndInstall()
       await relaunch()
     }
-  } catch (error: any) {
-    toast.error(`update failed: ${error.message}`)
+  } catch (error) {
+    console.error('full error:', error)
+    toast.error(`update failed: ${JSON.stringify(error)}`)
     setIsUpdating(false)
   }
 }
