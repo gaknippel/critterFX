@@ -15,20 +15,17 @@ export default function UpdateChecker() {
 
 const checkForUpdates = async () => {
   try {
-    console.log('checking for updates...')
     const update = await check()
-    console.log('update result:', update)
+    toast.info(`update result: ${JSON.stringify(update)}`)
     if (update) {
       setUpdateAvailable(true)
       setUpdateVersion(update.version)
-    } else {
-      // temporarily show this so you know the checker ran
-      toast.info('no updates found - checker ran successfully')
     }
-  } catch (error: any) {
-    toast.error(`update check failed: ${error.message}`)
+  } catch (error) {
+    toast.error(`error: ${String(error)}`)
   }
 }
+
 
 const handleUpdate = async () => {
   setIsUpdating(true)
