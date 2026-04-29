@@ -21,9 +21,12 @@ const checkForUpdates = async () => {
     if (update) {
       setUpdateAvailable(true)
       setUpdateVersion(update.version)
+    } else {
+      // temporarily show this so you know the checker ran
+      toast.info('no updates found - checker ran successfully')
     }
-  } catch (error) {
-    console.error('failed to check for updates:', error)
+  } catch (error: any) {
+    toast.error(`update check failed: ${error.message}`)
   }
 }
 
