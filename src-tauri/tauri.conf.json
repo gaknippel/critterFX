@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "critterfx",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "identifier": "com.burri.critterfx",
   "build": {
     "beforeDevCommand": "npm run dev",
