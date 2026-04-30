@@ -35,7 +35,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
 import { formatBytes } from '@/lib/utils'
 import { PresetDeleteDialog, PresetEditDialog } from '@/components/presets/PresetManagementDialogs'
-import { scanAEInstallations, type AEInstallation } from '@/utils/aePathManager'
+import { scanAEInstallations } from '@/utils/aePathManager'
 
 export default function PresetDetail() {
   const { id } = useParams()
