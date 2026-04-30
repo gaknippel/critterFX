@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { getVersion } from "@tauri-apps/api/app"
 import { Badge } from "@/components/ui/badge"
 import { supabase } from "@/lib/supabase"
+import UpdateChecker from "./updateChecker"
 import { 
   Tooltip,
   TooltipContent,
@@ -67,6 +68,8 @@ export function Footer() {
 
         {/* version & status */}
         <div className="footer-right">
+          <UpdateChecker />
+          
           <TooltipProvider delayDuration={300}>
             <Tooltip>
               <TooltipTrigger asChild>

@@ -1,5 +1,6 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { 
+  AlertTriangle,
   ArrowLeft, 
   Check,
   Download, 
@@ -34,6 +35,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
 import { formatBytes } from '@/lib/utils'
 import { PresetDeleteDialog, PresetEditDialog } from '@/components/presets/PresetManagementDialogs'
+import { scanAEInstallations, type AEInstallation } from '@/utils/aePathManager'
 
 export default function PresetDetail() {
   const { id } = useParams()
@@ -49,6 +51,7 @@ export default function PresetDetail() {
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null)
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null)
   const [editingCommentText, setEditingCommentText] = useState('')
+  const [installedAEVersions, setInstalledAEVersions] = useState<string[]>([])
 
   //states for editing presets
   const [editPresetOpen, setEditPresetOpen] = useState(false)
@@ -226,6 +229,7 @@ const handleSavePreset = async () => {
   useEffect(() => {
   loadPreset()
   fetchComments()
+  fetchAEVersions()
 
   const subscription = supabase
     .channel('comments')
@@ -261,6 +265,28 @@ const handleSavePreset = async () => {
     subscription.unsubscribe()
   }
 }, [id])
+
+  const fetchAEVersions = async () => {
+    try {
+      const installations = await scanAEInstallations()
+      setInstalledAEVersions(installations.map(inst => inst.version))
+    } catch (error) {
+      console.error('failed to scan AE installations:', error)
+    }
+  }
+
+  const isAEVersionCompatible = (presetVersion: string | undefined) => {
+    if (!presetVersion || presetVersion === 'N/A' || installedAEVersions.length === 0) return true
+    
+    // extract year (e.g., "2024" from "2024" or "CC 2024")
+    const yearMatch = presetVersion.match(/\d{4}/)
+    if (!yearMatch) return true
+    
+    const presetYear = parseInt(yearMatch[0])
+    const maxInstalledYear = Math.max(...installedAEVersions.map(v => parseInt(v)))
+    
+    return maxInstalledYear >= presetYear
+  }
 
     const handleDownload = async () => {
     if (!preset) return
@@ -708,7 +734,34 @@ const handleDeleteComment = async (commentId: string) => {
             <div className="tech-info-grid">
               <div className="tech-info-item">
                 <span className="tech-label">after effects version:</span>
-                <span className="tech-value">{preset.ae_version || 'N/A'}</span>
+                <span className="tech-value flex items-center gap-2">
+                  {preset.ae_version || 'N/A'}
+                  {preset.ae_version && preset.ae_version !== 'N/A' && installedAEVersions.length > 0 && (
+                    isAEVersionCompatible(preset.ae_version) ? (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Check size={14} className="text-green-500 compatibility-icon" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>this preset is compatible with your installed AE version.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <AlertTriangle size={14} className="text-yellow-500 compatibility-icon" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>this preset might be incompatible with your installed AE version(s).</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )
+                  )}
+                </span>
               </div>
               <div className="tech-info-item">
                 <span className="tech-label">file size:</span>
