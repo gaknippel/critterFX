@@ -202,12 +202,23 @@ export function PresetEditDialog({
     e.preventDefault()
     setDragOver(false)
     const file = e.dataTransfer.files[0]
-    if (file) onPresetFileChange(file)
+    if (file) {
+      if (file.size > 3 * 1024 * 1024) {
+        toast.error('preset file too large! max size is 3MB.')
+        return
+      }
+      onPresetFileChange(file)
+    }
   }
 
   const handleGifSelection = (file: File) => {
     if (file.type !== 'image/gif') {
       toast.error('preview must be a GIF!')
+      return
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('gif preview too large! max size is 2MB.')
       return
     }
 
@@ -371,7 +382,16 @@ export function PresetEditDialog({
                     type="file"
                     accept=".ffx,.jsx,.aep"
                     style={{ display: 'none' }}
-                    onChange={(e) => e.target.files?.[0] && onPresetFileChange(e.target.files[0])}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        if (file.size > 3 * 1024 * 1024) {
+                          toast.error('preset file too large! max size is 3MB.')
+                          return
+                        }
+                        onPresetFileChange(file)
+                      }
+                    }}
                   />
                   {editPresetFile ? (
                     <div className="preset-manage-file-info">
@@ -381,7 +401,7 @@ export function PresetEditDialog({
                   ) : (
                     <div className="preset-manage-dropzone-prompt">
                       <p>drag & drop your preset here</p>
-                      <p className="preset-manage-dropzone-sub">or click to browse - .ffx, .jsx, .aep</p>
+                      <p className="preset-manage-dropzone-sub">or click to browse - .ffx, .jsx, .aep (max 3MB)</p>
                     </div>
                   )}
                 </div>
@@ -410,14 +430,14 @@ export function PresetEditDialog({
                     onChange={(e) => e.target.files?.[0] && handleGifSelection(e.target.files[0])}
                   />
                   {editGifFile ? (
-                    <div className="preset-manage-file-info">
-                      <p className="preset-manage-file-name">{editGifFile.name}</p>
-                      <p className="preset-manage-file-size">{formatBytes(editGifFile.size)}</p>
+                    <div className="upload-file-info">
+                      <p className="upload-file-name">{editGifFile.name}</p>
+                      <p className="upload-file-size">{formatBytes(editGifFile.size)}</p>
                     </div>
                   ) : (
                     <div className="preset-manage-dropzone-prompt">
                       <p>drag & drop preview gif here</p>
-                      <p className="preset-manage-dropzone-sub">or click to browse - .gif only</p>
+                      <p className="preset-manage-dropzone-sub">or click to browse - .gif only (max 2MB)</p>
                     </div>
                   )}
                 </div>

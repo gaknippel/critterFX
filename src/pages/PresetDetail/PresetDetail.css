@@ -162,21 +162,23 @@
 
 .how-to-install-btn {
   width: 100% !important;
-  font-size: 1.1rem !important;
-  padding: 1.5rem !important;
+  font-size: 0.85rem !important;
+  padding: 0.6rem 1rem !important;
   height: auto !important;
-  background: color-mix(in oklch, var(--card), transparent 40%) !important;
-  border: 1px solid color-mix(in oklch, var(--border), transparent 20%) !important;
+  background: color-mix(in oklch, var(--primary), transparent 90%) !important;
+  border: 1px solid color-mix(in oklch, var(--primary), transparent 60%) !important;
   color: hsl(var(--foreground)) !important;
-  border-radius: 0.75rem !important;
-  transition: background-color 0.2s ease, border-color 0.2s ease !important;
-  margin-top: 1rem !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease !important;
+  margin-top: 0.75rem !important;
+  box-shadow: 0 0 10px -5px color-mix(in oklch, var(--primary), transparent 50%) !important;
+  font-weight: 600 !important;
 }
 
 .how-to-install-btn:hover {
-  background: color-mix(in oklch, var(--card), transparent 20%) !important;
-  border-color: color-mix(in oklch, var(--primary), transparent 30%) !important;
+  background: color-mix(in oklch, var(--primary), transparent 80%) !important;
+  border-color: var(--primary) !important;
+  transform: translateY(-1px);
 }
 
 .preset-details-section {
@@ -715,8 +717,8 @@
   }
 
   .how-to-install-btn {
-    padding: 1rem !important;
-    font-size: 0.98rem !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.8rem !important;
   }
 
   .download-count {

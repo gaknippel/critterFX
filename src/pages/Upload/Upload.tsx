@@ -96,6 +96,12 @@ if (!user) {
       toast.error('invalid file type! only .ffx, .jsx, and .aep files are allowed.')
       return
     }
+
+    if (file.size > 3 * 1024 * 1024) {
+      toast.error('preset file too large! max size is 3MB.')
+      return
+    }
+
     setPresetFile(file)
     const detected = detectCategory(file)
     if (detected) setCategory(detected)
@@ -116,6 +122,11 @@ if (!user) {
       
       if (file.type !== 'image/gif') {
         toast.error('preview must be a GIF!')
+        return
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('gif preview too large! max size is 2MB.')
         return
       }
       
@@ -241,7 +252,7 @@ return (
               ) : (
                 <div className="upload-dropzone-prompt">
                   <p>drag & drop your preset here</p>
-                  <p className="upload-dropzone-sub">or click to browse — .ffx, .jsx, .aep</p>
+                  <p className="upload-dropzone-sub">or click to browse — .ffx, .jsx, .aep (max 3MB)</p>
                 </div>
               )}
             </div>
@@ -332,7 +343,16 @@ return (
                   type="file"
                   accept="image/gif"
                   style={{ display: 'none' }}
-                  onChange={(e) => e.target.files?.[0] && setGifFile(e.target.files[0])}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      if (file.size > 2 * 1024 * 1024) {
+                        toast.error('gif preview too large! max size is 2MB.')
+                        return
+                      }
+                      setGifFile(file)
+                    }
+                  }}
                 />
                 {gifFile ? (
                   <div className="upload-file-info">
@@ -342,7 +362,7 @@ return (
                 ) : (
                   <div className="upload-dropzone-prompt">
                     <p>drag & drop preview gif here</p>
-                    <p className="upload-dropzone-sub">or click to browse — .gif only</p>
+                    <p className="upload-dropzone-sub">or click to browse — .gif only (max 2MB)</p>
                   </div>
                 )}
               </div>

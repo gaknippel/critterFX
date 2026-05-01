@@ -21,7 +21,7 @@ import { Progress } from '@/components/ui/progress'
 import { useState, useEffect } from 'react'
 import './PresetDetail.css'
 import { fetchPresets, categories, type Preset } from '@/lib/api'
-import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
 import SplitText from '@/components/SplitText'
 import { Skeleton } from '@/components/ui/skeleton'
 import { supabase, Comment } from '@/lib/supabase'
@@ -558,9 +558,9 @@ const handleDeleteComment = async (commentId: string) => {
           {preset.file_name.endsWith('.aep') && (
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="lg" className="w-full mt-4 how-to-install-btn">
-                  <Info className="mr-2 h-5 w-5" />
-                  how to install!!! (IMPORTANT)
+                <Button variant="outline" size="sm" className="w-full mt-2 how-to-install-btn">
+                  <Info className="mr-2 h-4 w-4" />
+                  how to install!!! (READ THIS)
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
@@ -601,13 +601,6 @@ const handleDeleteComment = async (commentId: string) => {
                     </p>
                   </div>
                   </CardContent>
-                  <DialogFooter className="p-6 pt-0 flex gap-2 sm:justify-end">
-                    <DialogClose asChild>
-                      <Button variant="ghost" className="preset-cancel-btn">
-                        close
-                      </Button>
-                    </DialogClose>
-                  </DialogFooter>
                 </Card>
               </DialogContent>
             </Dialog>

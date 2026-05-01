@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { FolderOpen, CheckCircle, AlertCircle, Search, Monitor, Sun, Moon, Sparkles, Trees, Sunset, Loader2, Waves, Flower2, Zap } from 'lucide-react'
+import { FolderOpen, CheckCircle, AlertCircle, Search, Loader2 } from 'lucide-react'
 import SplitText from '@/components/SplitText';
 
 import {
@@ -346,60 +346,15 @@ const handleBrowseCompositions = async () => {
                 <SelectValue placeholder="select a theme" />
               </SelectTrigger>
               <SelectContent position="popper">
-                <SelectItem value="light">
-                  <div className="flex items-center gap-2">
-                    <Sun className="h-4 w-4" />
-                    <span>light</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="dark">
-                  <div className="flex items-center gap-2">
-                    <Moon className="h-4 w-4" />
-                    <span>dark</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="midnight">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-purple-400" />
-                    <span>midnight</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="forest">
-                  <div className="flex items-center gap-2">
-                    <Trees className="h-4 w-4 text-green-500" />
-                    <span>forest</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="sunset">
-                  <div className="flex items-center gap-2">
-                    <Sunset className="h-4 w-4 text-orange-400" />
-                    <span>sunset</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="ocean">
-                  <div className="flex items-center gap-2">
-                    <Waves className="h-4 w-4 text-blue-400" />
-                    <span>ocean</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="rose">
-                  <div className="flex items-center gap-2">
-                    <Flower2 className="h-4 w-4 text-rose-400" />
-                    <span>rose</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="nebula">
-                  <div className="flex items-center gap-2">
-                    <Zap className="h-4 w-4 text-indigo-400" />
-                    <span>nebula</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="system">
-                  <div className="flex items-center gap-2">
-                    <Monitor className="h-4 w-4" />
-                    <span>system</span>
-                  </div>
-                </SelectItem>
+                <SelectItem value="light">light</SelectItem>
+                <SelectItem value="dark">dark</SelectItem>
+                <SelectItem value="midnight">midnight</SelectItem>
+                <SelectItem value="forest">forest</SelectItem>
+                <SelectItem value="sunset">sunset</SelectItem>
+                <SelectItem value="ocean">ocean</SelectItem>
+                <SelectItem value="rose">rose</SelectItem>
+                <SelectItem value="nebula">nebula</SelectItem>
+                <SelectItem value="system">system</SelectItem>
               </SelectContent>
             </Select>
           </div>
