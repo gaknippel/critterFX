@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './About.css'
 import SplitText from '@/components/SplitText'
 import { categories } from '@/lib/api'
@@ -19,6 +19,11 @@ import {
 
 export default function About() {
   const [activeTab, setActiveTab] = useState<'user' | 'dev'>('user')
+
+  // always scroll to top when page renders
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   return (
     <div className="about-wrapper pb-10">

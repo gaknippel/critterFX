@@ -38,6 +38,7 @@ export default function Settings() {
 
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     loadInitialData();
   }, []);
 

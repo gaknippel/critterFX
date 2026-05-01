@@ -1,16 +1,17 @@
 .navbar-wrapper {
   position: sticky;
-  top: 12px;
+  top: 24px; /* Slightly higher */
+  margin-top: 24px; /* Slightly higher */
   z-index: 50;
   width: 100%;
 }
 
 .navbar-fade-mask {
   position: absolute;
-  top: -12px;
+  top: -56px;
   left: 0;
   width: 100%;
-  height: calc(8rem + 12px);
+  height: calc(8rem + 56px);
   pointer-events: none;
   z-index: -10;
   background: linear-gradient(to bottom, var(--bg-top) 0%, transparent 100%);
