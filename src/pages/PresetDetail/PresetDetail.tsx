@@ -14,6 +14,7 @@ import {
   Trash2, 
   User,
   X,
+  Heart
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -30,10 +31,10 @@ import { useUserContext } from '@/context/UserContext'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import FadeContent from '@/components/FadeContent'
-
+import { useFavorite } from '@/hooks/useFavorite'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
-import { formatBytes } from '@/lib/utils'
+import { formatBytes, formatDate } from '@/lib/utils'
 import { PresetDeleteDialog, PresetEditDialog } from '@/components/presets/PresetManagementDialogs'
 import { scanAEInstallations } from '@/utils/aePathManager'
 
@@ -69,7 +70,7 @@ export default function PresetDetail() {
   const [isDeletingPreset, setIsDeletingPreset] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [gifDragOver, setGifDragOver] = useState(false)
-
+  const { isFavorited, toggleFavorite, isLoading: isFavLoading } = useFavorite(id || '')
   const { user } = useUserContext()
 
   useEffect(() => {
@@ -495,6 +496,8 @@ const handleDeleteComment = async (commentId: string) => {
     console.log('All letters have animated!')
   }
 
+
+
   const categoryName = categories.find(cat => cat.id === preset.category)?.name || preset.category
 
   return (
@@ -521,7 +524,6 @@ const handleDeleteComment = async (commentId: string) => {
               <span>{preset.file_size}</span>
             </div>
           </div>
-
 
           <Button 
             className="download-button" 
@@ -697,18 +699,45 @@ const handleDeleteComment = async (commentId: string) => {
             ))}
           </div>
 
-          <div className="preset-file-info">
-            <FileCode size={14} />
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <code className="preset-file-name">{preset.file_name}</code>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>this is what you search up in AE.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          <div className="flex items-center gap-3">
+            <div className="preset-file-info">
+              <FileCode size={14} />
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <code className="preset-file-name">{preset.file_name}</code>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-[10px] font-medium py-1 px-2">
+                    this is what you search up in AE.
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`favorite-btn-small ${isFavorited ? 'favorited' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (!user) {
+                    toast.error('sign in to favorite presets!')
+                    return
+                  }
+                  toggleFavorite()
+                }}
+                disabled={isFavLoading}
+              >
+                <Heart 
+                  size={18} 
+                  fill={isFavorited ? 'currentColor' : 'none'}
+                />
+              </Button>
+              <span className={`favorite-label ${isFavorited ? 'favorited' : ''}`}>
+                {isFavorited ? 'favorited' : 'add to favorites'}
+              </span>
+            </div>
           </div>
 
           <div className="detail-section">
@@ -731,24 +760,24 @@ const handleDeleteComment = async (commentId: string) => {
                   {preset.ae_version || 'N/A'}
                   {preset.ae_version && preset.ae_version !== 'N/A' && installedAEVersions.length > 0 && (
                     isAEVersionCompatible(preset.ae_version) ? (
-                      <TooltipProvider>
+                      <TooltipProvider delayDuration={300}>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Check size={14} className="text-green-500 compatibility-icon" />
                           </TooltipTrigger>
-                          <TooltipContent>
-                            <p>this preset is compatible with your installed AE version.</p>
+                          <TooltipContent side="top" className="text-[10px] font-medium py-1 px-2">
+                            this preset is compatible with your installed AE version.
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     ) : (
-                      <TooltipProvider>
+                      <TooltipProvider delayDuration={300}>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <AlertTriangle size={14} className="text-yellow-500 compatibility-icon" />
                           </TooltipTrigger>
-                          <TooltipContent>
-                            <p>this preset might be incompatible with your installed AE version(s).</p>
+                          <TooltipContent side="top" className="text-[10px] font-medium py-1 px-2">
+                            this preset might be incompatible with your installed AE version(s).
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -820,7 +849,7 @@ const handleDeleteComment = async (commentId: string) => {
                               {comment.author_name}
                             </span>
                             <span className="text-xs text-muted-foreground">
-                              {new Date(comment.created_at).toLocaleDateString()}
+                              {formatDate(comment.created_at)}
                               {comment.edited_at && <span className="ml-1 italic">(edited)</span>}
                             </span>
                           </div>

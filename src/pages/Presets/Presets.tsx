@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button"
 import FadeContent from '@/components/FadeContent'
 import { fetchPresets, categories, type Preset } from '@/lib/api'
 import SplitText from '@/components/SplitText'
+import { formatDate } from '@/lib/utils'
+
 export default function Presets(){
   const [presets, setPresets] = useState<Preset[]>([])
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -166,6 +168,7 @@ export default function Presets(){
                       <div className="preset-info">
                         <h3 className="preset-name">{preset.name}</h3>
                         <p className="preset-description">{preset.description}</p>
+                        <p className="preset-date">{formatDate(preset.created_at)}</p>
                       </div>
                     </div>
                   ))}

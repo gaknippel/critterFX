@@ -19,9 +19,5 @@ export function formatBytes(bytes: number, decimals: number = 2) {
 
 export function formatDate(dateString: string) {
   const date = new Date(dateString)
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  }).format(date)
+  return date.toLocaleDateString('en-US')
 }
