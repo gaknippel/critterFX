@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useUserContext } from '@/context/UserContext'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -65,6 +65,11 @@ export default function Upload() {
   const [dragOver, setDragOver] = useState(false)
   const [gifDragOver, setGifDragOver] = useState(false)
 
+
+    // always scroll to top when page renders
+    useEffect(() => {
+      window.scrollTo(0, 0)
+    }, [])
 
  
 if (!user) {

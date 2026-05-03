@@ -16,6 +16,7 @@ import {
   LayoutGrid,
   Download,
   ArrowUpDown,
+  Heart,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -24,6 +25,8 @@ import { fetchPresets, categories, type Preset } from '@/lib/api'
 import SplitText from '@/components/SplitText'
 import FadeContent from '@/components/FadeContent'
 import { formatDate } from '@/lib/utils'
+import { useUserContext } from '@/context/UserContext'
+import { supabase } from '@/lib/supabase'
 
 const IconMap: Record<string, any> = {
   LayoutGrid,
@@ -43,11 +46,38 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [sortBy, setSortBy] = useState('newest')
+  const [userFavorites, setUserFavorites] = useState<Set<string>>(new Set())
   const navigate = useNavigate()
+  const { user } = useUserContext()
 
   useEffect(() => {
     loadPresets()
   }, [])
+
+  useEffect(() => {
+    if (user) {
+      fetchUserFavorites()
+    } else {
+      setUserFavorites(new Set())
+    }
+  }, [user])
+
+  const fetchUserFavorites = async () => {
+    if (!user) return
+    try {
+      const { data, error } = await supabase
+        .from('favorites')
+        .select('preset_id')
+        .eq('user_id', user.id)
+      
+      if (error) throw error
+      if (data) {
+        setUserFavorites(new Set(data.map(fav => fav.preset_id)))
+      }
+    } catch (error) {
+      console.error('Error fetching favorites:', error)
+    }
+  }
 
   const loadPresets = async () => {
     setIsLoading(true)
@@ -201,33 +231,50 @@ export default function Home() {
              </div>
               ) : (
                 <div className="presets-grid">
-                  {sortedPresets.map((preset) => (
-                    <div 
-                      key={preset.id} 
-                      className="preset-card"
-                      onClick={() => handlePresetClick(preset.id)}
-                    >
-                      <div className="preset-preview">
-                        <img 
-                          src={preset.previewGif} 
-                          alt={preset.name}
-                          loading="lazy"
-                        />
-                        <div className="preset-download-badge">
-                          <Download size={12} />
-                          <span>{preset.download_count}</span>
+                  {sortedPresets.map((preset) => {
+                    const category = categories.find(c => c.id === preset.category)
+                    const CategoryIcon = category ? IconMap[category.icon || 'LayoutGrid'] : LayoutGrid
+                    
+                    return (
+                      <div 
+                        key={preset.id} 
+                        className="preset-card"
+                        onClick={() => handlePresetClick(preset.id)}
+                      >
+                        <div className="preset-preview">
+                          <img 
+                            src={preset.previewGif} 
+                            alt={preset.name}
+                            loading="lazy"
+                          />
+                          <div className="preset-download-badge">
+                            <Download size={12} />
+                            <span>{preset.download_count}</span>
+                          </div>
+                        </div>
+                        <div className="preset-info">
+                          <div className="preset-details">
+                            <div className="category-badge-pill">
+                              {CategoryIcon && <CategoryIcon size={10} />}
+                              <span>{category?.name}</span>
+                            </div>
+                            <h3 className="preset-name">{preset.name}</h3>
+                            <p className="preset-description">{preset.description}</p>
+                          </div>
+                          <div className="preset-metadata">
+                            <div className="flex items-center gap-2">
+                              <span className="preset-author">{preset.author_name || 'Unknown'}</span>
+                              <span className="metadata-dot">•</span>
+                              <span className="preset-date">{formatDate(preset.created_at)}</span>
+                            </div>
+                            {userFavorites.has(preset.id) && (
+                              <Heart size={12} className="favorite-indicator-icon" fill="currentColor" />
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <div className="preset-info">
-                        <div className="preset-details">
-                          <h3 className="preset-name">{preset.name}</h3>
-                          <p className="preset-author">by {preset.author_name || 'Unknown'}</p>
-                          <p className="preset-description">{preset.description}</p>
-                        </div>
-                        <p className="preset-date">{formatDate(preset.created_at)}</p>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </ScrollArea>

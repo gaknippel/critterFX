@@ -14,8 +14,27 @@ import {
   Trash2, 
   User,
   X,
-  Heart
+  Heart,
+  LayoutGrid,
+  Type,
+  MoveHorizontal,
+  Shapes,
+  Sparkles,
+  Image,
+  Code,
+  Layers
 } from 'lucide-react'
+
+const iconMap: Record<string, any> = {
+  LayoutGrid,
+  Type,
+  MoveHorizontal,
+  Shapes,
+  Sparkles,
+  Image,
+  Code,
+  Layers
+}
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -498,7 +517,9 @@ const handleDeleteComment = async (commentId: string) => {
 
 
 
-  const categoryName = categories.find(cat => cat.id === preset.category)?.name || preset.category
+  const categoryObj = categories.find(cat => cat.id === preset.category)
+  const categoryName = categoryObj?.name || preset.category
+  const CategoryIcon = categoryObj ? iconMap[categoryObj.icon] : LayoutGrid
 
   return (
     <div className="preset-detail-wrapper">
@@ -627,7 +648,10 @@ const handleDeleteComment = async (commentId: string) => {
                 onLetterAnimationComplete={handleAnimationComplete}
               />
             </h1>
-            <p className="preset-detail-category">{categoryName}</p>
+            <div className="flex items-center gap-2 preset-detail-category">
+              {CategoryIcon && <CategoryIcon size={16} className="opacity-70" />}
+              <span>{categoryName}</span>
+            </div>
               {user?.id === preset.user_id && (
                 <div className="preset-owner-actions">
                 <Button

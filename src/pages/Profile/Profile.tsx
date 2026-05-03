@@ -17,6 +17,7 @@ import {
   Calendar,
   MessageSquare,
   Package,
+  Heart,
   LogOut,
   Camera,
   Download,
@@ -24,12 +25,31 @@ import {
   Trash2,
   X,
   Check,
+  LayoutGrid,
+  Type,
+  MoveHorizontal,
+  Shapes,
+  Sparkles,
+  Image,
+  Code,
+  Layers,
 } from 'lucide-react'
 import './Profile.css'
 import { formatBytes, formatDate } from '@/lib/utils'
-import { type Preset } from '@/lib/api'
+import { type Preset, categories } from '@/lib/api'
 import { type Comment } from '@/lib/supabase'
 import { PresetDeleteDialog, PresetEditDialog } from '@/components/presets/PresetManagementDialogs'
+
+const IconMap: Record<string, any> = {
+  LayoutGrid,
+  Type,
+  MoveHorizontal,
+  Shapes,
+  Sparkles,
+  Image,
+  Code,
+  Layers,
+}
 
 export default function Profile() {
   const { user, signOut } = useUserContext()
@@ -72,6 +92,9 @@ export default function Profile() {
   const [isDeletingPreset, setIsDeletingPreset] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [gifDragOver, setGifDragOver] = useState(false)
+  const [showFavorites, setShowFavorites] = useState(false)
+  const [profileFavorites, setProfileFavorites] = useState<Preset[]>([])
+  const [favoriteCount, setFavoriteCount] = useState(0)
 
   useEffect(() => {
     fetchProfileData()
@@ -125,9 +148,41 @@ export default function Profile() {
         .select('*', { count: 'exact', head: true })
         .eq('user_id', profileData.id)
       setPresetCount(pc || 0)
+
+      const { count: fc } = await supabase
+        .from('favorites')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', profileData.id)
+      setFavoriteCount(fc || 0)
+
     }
 
+
     setIsLoading(false)
+  }
+
+  const fetchProfileFavorites = async () => {
+
+    try {
+    const { data, error } = await supabase
+      .from('favorites')
+      .select(`
+        preset_id,
+        presets (*)
+      `)
+      .eq('user_id', profileUserId)
+      .order('created_at', { ascending: false })
+
+      if (data) {
+        const presets = data
+          .map(f => f.presets)
+          .filter(Boolean) as unknown as Preset[]
+        setProfileFavorites(presets)
+      }
+    }
+    catch (error){
+      console.log(error);
+    }
   }
 
   const handleSaveBio = async () => {
@@ -435,6 +490,7 @@ export default function Profile() {
         <div className="profile-stats">
           <Skeleton className="h-32 w-full rounded-2xl" />
           <Skeleton className="h-32 w-full rounded-2xl" />
+          <Skeleton className="h-32 w-full rounded-2xl" />
         </div>
       </div>
     )
@@ -560,6 +616,7 @@ export default function Profile() {
             }
             setShowPresets(!showPresets)
             setShowComments(false)
+            setShowFavorites(false)
           }}
         >
           <CardContent className="flex flex-col items-center justify-center p-6 gap-1">
@@ -577,12 +634,31 @@ export default function Profile() {
             }
             setShowComments(!showComments)
             setShowPresets(false)
+            setShowFavorites(false)
           }}
         >
           <CardContent className="flex flex-col items-center justify-center p-6 gap-1">
             <MessageSquare size={24} className={`profile-stat-icon transition-colors ${showComments ? 'text-primary' : 'text-primary/80'}`} />
             <span className="profile-stat-value text-2xl font-bold">{commentCount}</span>
             <span className="profile-stat-label text-xs uppercase tracking-wider text-muted-foreground font-medium">comments</span>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className={`profile-stat-card clickable-stat border-border/50 bg-card/50 backdrop-blur-sm transition-all ${showFavorites ? 'ring-2 ring-primary border-primary/50' : ''}`}
+          onClick={() => {
+            if (!showFavorites) {
+              fetchProfileFavorites()
+            }
+            setShowFavorites(!showFavorites)
+            setShowPresets(false)
+            setShowComments(false)
+          }}
+        >
+          <CardContent className="flex flex-col items-center justify-center p-6 gap-1">
+            <Heart size={24} className={`profile-stat-icon transition-colors ${showFavorites ? 'text-primary' : 'text-primary/80'}`} />
+            <span className="profile-stat-value text-2xl font-bold">{favoriteCount}</span>
+            <span className="profile-stat-label text-xs uppercase tracking-wider text-muted-foreground font-medium">favorites</span>
           </CardContent>
         </Card>
       </div>
@@ -593,56 +669,70 @@ export default function Profile() {
           {profilePresets.length === 0 ? (
             <p className="profile-bio-empty text-center py-8">no presets yet.</p>
           ) : (
-            <div className="profile-presets-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {profilePresets.map(preset => (
-                <Card
-                  key={preset.id}
-                  className="preset-card cursor-pointer overflow-hidden transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1 bg-card/40"
-                  onClick={() => navigate(`/preset/${preset.id}`)}
-                >
-                  <div className="aspect-video relative bg-muted overflow-hidden">
-                    <img 
-                      src={preset.preview_gif_url} 
-                      alt={preset.name} 
-                      className="object-cover w-full h-full"
-                      loading="lazy" 
-                    />
-                    <div className="preset-download-badge">
-                      <Download size={12} />
-                      <span>{preset.download_count}</span>
-                    </div>
-                    {isOwnProfile && (
-                      <div className="comment-actions preset-card-actions" onClick={(e) => e.stopPropagation()}>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="comment-action-btn"
-                          onClick={() => handleEditPreset(preset)}
-                          title="Edit"
-                        >
-                          <Pencil size={14} />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="comment-action-btn comment-action-btn-danger"
-                          onClick={() => handleAskDeletePreset(preset)}
-                          title="Delete"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
+            <div className="presets-grid profile-presets-grid">
+              {profilePresets.map(preset => {
+                const category = categories.find(c => c.id === preset.category)
+                const CategoryIcon = category ? IconMap[category.icon || 'LayoutGrid'] : LayoutGrid
+                
+                return (
+                  <div
+                    key={preset.id}
+                    className="preset-card"
+                    onClick={() => navigate(`/preset/${preset.id}`)}
+                  >
+                    <div className="preset-preview">
+                      <img 
+                        src={preset.preview_gif_url} 
+                        alt={preset.name} 
+                        loading="lazy" 
+                      />
+                      <div className="preset-download-badge">
+                        <Download size={12} />
+                        <span>{preset.download_count}</span>
                       </div>
-                    )}
-                  </div>
-                  <CardHeader className="p-4">
-                    <div className="flex flex-col gap-1">
-                      <CardTitle className="text-base font-semibold truncate">{preset.name}</CardTitle>
-                      <CardDescription className="line-clamp-2 text-xs">{preset.description}</CardDescription>
-                      <p className="preset-date mt-2">{formatDate(preset.created_at)}</p>
+                      {isOwnProfile && (
+                        <div className="comment-actions preset-card-actions" onClick={(e) => e.stopPropagation()}>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="comment-action-btn"
+                            onClick={() => handleEditPreset(preset)}
+                            title="Edit"
+                          >
+                            <Pencil size={14} />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="comment-action-btn comment-action-btn-danger"
+                            onClick={() => handleAskDeletePreset(preset)}
+                            title="Delete"
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                  </CardHeader>
-                </Card>
-              ))}
+                    <div className="preset-info">
+                      <div className="preset-details">
+                        <div className="category-badge-pill">
+                          {CategoryIcon && <CategoryIcon size={10} />}
+                          <span>{category?.name}</span>
+                        </div>
+                        <h3 className="preset-name">{preset.name}</h3>
+                        <p className="preset-description">{preset.description}</p>
+                      </div>
+                      <div className="preset-metadata">
+                        <div className="flex items-center gap-2">
+                          <span className="preset-author">{username}</span>
+                          <span className="metadata-dot">•</span>
+                          <span className="preset-date">{formatDate(preset.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )}
         </div>
@@ -739,6 +829,60 @@ export default function Profile() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {showFavorites && (
+        <div className="profile-presets-section">
+          <h2 className="profile-section-title mb-4">favorites</h2>
+          {profileFavorites.length === 0 ? (
+            <p className="profile-bio-empty text-center py-8">no favorites yet.</p>
+          ) : (
+            <div className="presets-grid profile-presets-grid">
+              {profileFavorites.map(preset => {
+                const category = categories.find(c => c.id === preset.category)
+                const CategoryIcon = category ? IconMap[category.icon || 'LayoutGrid'] : LayoutGrid
+                
+                return (
+                  <div
+                    key={preset.id}
+                    className="preset-card"
+                    onClick={() => navigate(`/preset/${preset.id}`)}
+                  >
+                    <div className="preset-preview">
+                      <img 
+                        src={preset.preview_gif_url} 
+                        alt={preset.name} 
+                        loading="lazy" 
+                      />
+                      <div className="preset-download-badge">
+                        <Download size={12} />
+                        <span>{preset.download_count}</span>
+                      </div>
+                    </div>
+                    <div className="preset-info">
+                      <div className="preset-details">
+                        <div className="category-badge-pill">
+                          {CategoryIcon && <CategoryIcon size={10} />}
+                          <span>{category?.name}</span>
+                        </div>
+                        <h3 className="preset-name">{preset.name}</h3>
+                        <p className="preset-description">{preset.description}</p>
+                      </div>
+                      <div className="preset-metadata">
+                        <div className="flex items-center gap-2">
+                          <span className="preset-author">{preset.author_name || 'Unknown'}</span>
+                          <span className="metadata-dot">•</span>
+                          <span className="preset-date">{formatDate(preset.created_at)}</span>
+                        </div>
+                        <Heart size={12} className="favorite-indicator-icon" fill="currentColor" />
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )}
         </div>
