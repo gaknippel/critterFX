@@ -244,10 +244,7 @@ fn request_admin_and_copy(source: &str, dest: &str) -> Result<(), String> {
     const CREATE_NO_WINDOW: u32 = 0x08000000;
 
     // use cmd instead of powershell to avoid the blue window
-    let script = format!(
-        "Copy-Item -Path '{}' -Destination '{}' -Force",
-        source, dest
-    );
+
 
     let output = Command::new("powershell")
         .args(&[

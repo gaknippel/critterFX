@@ -1,17 +1,15 @@
 import { Minus, Square, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import './TitleBar.css'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 
 export default function TitleBar() {
   const appWindow = getCurrentWindow()
   
   // Track history length (very basic detection)
-  const [historyLength, setHistoryLength] = useState(window.history.length)
 
   useEffect(() => {
     const handlePopState = () => {
-      setHistoryLength(window.history.length)
     }
 
     window.addEventListener('popstate', handlePopState)

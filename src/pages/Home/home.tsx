@@ -2,7 +2,6 @@ import './home.css'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { 
   Search, 
   RefreshCw, 
@@ -193,7 +192,7 @@ export default function Home() {
       <div className="home-content-layout">
         {/* categories sidebar */}
         <aside className="categories-sidebar">
-          <ScrollArea className="categories-scroll">
+          <div className="categories-scroll">
             <h2 className="sidebar-title">categories</h2>
             <nav className="categories-nav">
               {categories.map((category) => {
@@ -210,75 +209,73 @@ export default function Home() {
                 )
               })}
             </nav>
-          </ScrollArea>
+          </div>
         </aside>
 
         {/* presets grid */}
         <FadeContent blur={false} duration={1000} ease="power2.out" initialOpacity={0} className='presets-main'>
-          <main className="presets-main">
-            <ScrollArea className="presets-scroll">
-              {isLoading ? (
-                    <div className="presets-grid">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="preset-card">
-                  <Skeleton className="w-full aspect-video" />
-                  <div className="preset-info">
-                    <Skeleton className="h-5 w-3/4 mb-2" />
-                    <Skeleton className="h-3 w-full" />
-                  </div>
+          <div className="presets-scroll">
+            {isLoading ? (
+                  <div className="presets-grid">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="preset-card">
+                <Skeleton className="w-full aspect-video" />
+                <div className="preset-info">
+                  <Skeleton className="h-5 w-3/4 mb-2" />
+                  <Skeleton className="h-3 w-full" />
                 </div>
-              ))}
-             </div>
-              ) : (
-                <div className="presets-grid">
-                  {sortedPresets.map((preset) => {
-                    const category = categories.find(c => c.id === preset.category)
-                    const CategoryIcon = category ? IconMap[category.icon || 'LayoutGrid'] : LayoutGrid
-                    
-                    return (
-                      <div 
-                        key={preset.id} 
-                        className="preset-card"
-                        onClick={() => handlePresetClick(preset.id)}
-                      >
-                        <div className="preset-preview">
-                          <img 
-                            src={preset.previewGif} 
-                            alt={preset.name}
-                            loading="lazy"
-                          />
-                          <div className="preset-download-badge">
-                            <Download size={12} />
-                            <span>{preset.download_count}</span>
-                          </div>
-                        </div>
-                        <div className="preset-info">
-                          <div className="preset-details">
-                            <div className="category-badge-pill">
-                              {CategoryIcon && <CategoryIcon size={10} />}
-                              <span>{category?.name}</span>
-                            </div>
-                            <h3 className="preset-name">{preset.name}</h3>
-                            <p className="preset-description">{preset.description}</p>
-                          </div>
-                          <div className="preset-metadata">
-                            <div className="flex items-center gap-2">
-                              <span className="preset-author">{preset.author_name || 'Unknown'}</span>
-                              <span className="metadata-dot">•</span>
-                              <span className="preset-date">{formatDate(preset.created_at)}</span>
-                            </div>
-                            {userFavorites.has(preset.id) && (
-                              <Heart size={12} className="favorite-indicator-icon" fill="currentColor" />
-                            )}
-                          </div>
+              </div>
+            ))}
+           </div>
+            ) : (
+              <div className="presets-grid">
+                {sortedPresets.map((preset) => {
+                  const category = categories.find(c => c.id === preset.category)
+                  const CategoryIcon = category ? IconMap[category.icon || 'LayoutGrid'] : LayoutGrid
+                  
+                  return (
+                    <div 
+                      key={preset.id} 
+                      className="preset-card"
+                      onClick={() => handlePresetClick(preset.id)}
+                    >
+                      <div className="preset-preview">
+                        <img 
+                          src={preset.previewGif} 
+                          alt={preset.name}
+                          loading="lazy"
+                        />
+                        <div className="preset-download-badge">
+                          <Download size={12} />
+                          <span>{preset.download_count}</span>
                         </div>
                       </div>
-                    )
-                  })}
-                </div>
-              )}
-            </ScrollArea>
-          </main>
+                      <div className="preset-info">
+                        <div className="preset-details">
+                          <div className="category-badge-pill">
+                            {CategoryIcon && <CategoryIcon size={10} />}
+                            <span>{category?.name}</span>
+                          </div>
+                          <h3 className="preset-name">{preset.name}</h3>
+                          <p className="preset-description">{preset.description}</p>
+                        </div>
+                        <div className="preset-metadata">
+                          <div className="flex items-center gap-2">
+                            <span className="preset-author">{preset.author_name || 'Unknown'}</span>
+                            <span className="metadata-dot">•</span>
+                            <span className="preset-date">{formatDate(preset.created_at)}</span>
+                          </div>
+                          {userFavorites.has(preset.id) && (
+                            <Heart size={12} className="favorite-indicator-icon" fill="currentColor" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
         </FadeContent>
       </div>
     </div>

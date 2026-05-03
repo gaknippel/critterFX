@@ -22,7 +22,8 @@ import {
   Sparkles,
   Image,
   Code,
-  Layers
+  Layers,
+  Copy
 } from 'lucide-react'
 
 const iconMap: Record<string, any> = {
@@ -56,6 +57,12 @@ import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloa
 import { formatBytes, formatDate } from '@/lib/utils'
 import { PresetDeleteDialog, PresetEditDialog } from '@/components/presets/PresetManagementDialogs'
 import { scanAEInstallations } from '@/utils/aePathManager'
+import { ScrollArea } from '@/components/ui/scroll-area'
+
+
+//for source code syntax stuff
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 export default function PresetDetail() {
   const { id } = useParams()
@@ -89,6 +96,11 @@ export default function PresetDetail() {
   const [isDeletingPreset, setIsDeletingPreset] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [gifDragOver, setGifDragOver] = useState(false)
+  const [sourceCode, setSourceCode] = useState<string | null>(null)
+  const [isLoadingSource, setIsLoadingSource] = useState(false)
+  const [showSource, setShowSource] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
+
   const { isFavorited, toggleFavorite, isLoading: isFavLoading } = useFavorite(id || '')
   const { user } = useUserContext()
 
@@ -242,6 +254,9 @@ const handleSavePreset = async () => {
     const presets = await fetchPresets()
     const found = presets.find(p => p.id === id)
     setPreset(found || null)
+    setSourceCode(null)
+    setShowSource(false)
+    setIsCopied(false)
     setIsLoading(false  )
     window.scrollTo(0, 0)
   }
@@ -475,6 +490,42 @@ const handleDeleteComment = async (commentId: string) => {
   toast.success('comment deleted!')
 }
 
+  const fetchSourceCode = async () => {
+    if(!preset?.file_url) return
+
+
+    if(sourceCode) {
+      setShowSource(!showSource)
+      return
+    }
+    setIsLoadingSource(true)
+    try {
+      const response = await fetch(preset?.file_url)
+      const text = await response.text()
+      setSourceCode(text)
+      setShowSource(true)
+    }
+    catch (error){
+      toast.error('failed fetching jsx source code :(')
+    }
+    finally{
+      setIsLoadingSource(false)
+    }
+
+  }
+
+  const handleCopyCode = async () => {
+    if (!sourceCode) return
+    try {
+      await navigator.clipboard.writeText(sourceCode)
+      setIsCopied(true)
+      toast.success('code copied to clipboard!')
+      setTimeout(() => setIsCopied(false), 2000)
+    } catch (err) {
+      toast.error('failed to copy code')
+    }
+  }
+
     if (isLoading) {
     return (
       <div className="preset-detail-wrapper">
@@ -539,10 +590,6 @@ const handleDeleteComment = async (commentId: string) => {
             <div className="preset-info-item" title="Downloads">
               <Download size={14} />
               <span>{preset.download_count}</span>
-            </div>
-            <div className="preset-info-item" title="File Size">
-              <Package size={14} />
-              <span>{preset.file_size}</span>
             </div>
           </div>
 
@@ -772,6 +819,68 @@ const handleDeleteComment = async (commentId: string) => {
             <p className="detail-text">{preset.long_description || preset.description}</p>
           </div>
 
+              {preset.file_name.toLowerCase().endsWith('.jsx') && (
+                <div className="detail-section">
+                  <div className="section-header justify-between">
+                    <div className="flex items-center gap-3">
+                      <FileCode size={20} />
+                      <h2>source code</h2>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={fetchSourceCode}
+                      disabled={isLoadingSource}
+                      className="source-toggle-btn"
+                    >
+                      {isLoadingSource ? (
+                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" />loading...</>
+                      ) : showSource ? 'hide code' : 'view code'}
+                    </Button>
+                  </div>
+                  
+                  {showSource && sourceCode && (
+                    <div className="source-code-container">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="copy-code-btn"
+                        onClick={handleCopyCode}
+                        title="Copy to clipboard"
+                      >
+                        {isCopied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
+                      </Button>
+                      <ScrollArea className="h-[600px] w-full rounded-md border border-white/10 bg-black/30 source-code-viewport selectable-code">
+                        <div className="min-w-max">
+                          <SyntaxHighlighter
+                            language="javascript"
+                            style={vscDarkPlus}
+                            showLineNumbers={true}
+                            lineNumberStyle={{ 
+                              minWidth: '3em', 
+                              paddingRight: '1em', 
+                              color: 'rgba(255,255,255,0.2)', 
+                              textAlign: 'right',
+                              userSelect: 'none' // line numbers should not be selectable
+                            }}
+                            customStyle={{
+                              margin: 0,
+                              padding: '1.5rem 1rem',
+                              background: 'transparent',
+                              fontSize: '0.85rem',
+                              overflow: 'visible',
+                              userSelect: 'text' // ensure code is selectable
+                            }}
+                          >
+                            {sourceCode}
+                          </SyntaxHighlighter>
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  )}
+                </div>
+              )}
+
           <div className="detail-section">
             <div className="section-header">
               <FileCode size={20} />
@@ -837,6 +946,7 @@ const handleDeleteComment = async (commentId: string) => {
               )) || <li>no dependencies</li>}
             </ul>
           </div>
+
 
           <div className="detail-section">
             <div className="section-header">

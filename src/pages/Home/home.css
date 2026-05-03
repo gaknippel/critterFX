@@ -1,10 +1,10 @@
 .home-page-wrapper {
-  min-height: 100vh;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   color: hsl(var(--foreground));
 
-  /* --- CUSTOMIZE YOUR CARD COLOR HERE --- */
   --card-bg: color-mix(in oklch, var(--background), var(--bg-top) 18%);
   --card-hover-bg: color-mix(in oklch, var(--background), var(--bg-top) 30%);
 }
@@ -133,15 +133,21 @@
 .home-content-layout {
   display: flex;
   flex: 1;
-  overflow: hidden;
 }
 
 
 .categories-sidebar {
-  width: 240px; 
+  width: 200px; 
   border-right: 1px solid hsl(var(--border));
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
+  position: fixed;
+  top: 170px;
+  bottom: 0;
+  height: calc(100vh - 170px);
+  overflow-y: auto;
+  z-index: 20;
 }
 
 .sidebar-title {
@@ -159,6 +165,7 @@
 .categories-scroll {
   flex: 1;
   padding: 0 0.75rem; 
+  overflow: visible;
 }
 
 .categories-nav {
@@ -277,7 +284,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  margin-left: 200px;
   font-family: "Instrument Sans", sans-serif;
 }
 
@@ -287,9 +294,9 @@
 
 .presets-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-  gap: 2rem; 
-  padding: 2rem; 
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+  gap: 1.5rem; 
+  padding: 1.5rem; 
   align-content: start; 
 }
 
@@ -497,10 +504,12 @@
   }
   .home-content-layout {
     flex-direction: column; 
-    overflow-y: auto; 
+    overflow-y: visible; 
   }
   .categories-sidebar {
+    position: static;
     width: 100%;
+    height: auto;
     border-right: none;
     border-bottom: 1px solid hsl(var(--border));
     padding-bottom: 0.5rem;
@@ -531,6 +540,7 @@
     border-radius: 4px 4px 0 0;
   }
   .presets-main {
+    margin-left: 0;
     overflow-y: visible;
   }
   .presets-grid {

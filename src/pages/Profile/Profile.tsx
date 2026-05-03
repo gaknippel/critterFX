@@ -3,9 +3,6 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
@@ -164,7 +161,7 @@ export default function Profile() {
   const fetchProfileFavorites = async () => {
 
     try {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('favorites')
       .select(`
         preset_id,
@@ -207,7 +204,7 @@ export default function Profile() {
       return
     }
 
-    const img = new Image()
+    const img = new window.Image()
     const url = URL.createObjectURL(file)
     img.src = url
 
