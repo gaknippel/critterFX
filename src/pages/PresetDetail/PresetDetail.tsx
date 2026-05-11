@@ -552,7 +552,7 @@ const handleDeleteComment = async (commentId: string) => {
     return (
       <div className="preset-detail-wrapper">
         <div className="preset-not-found">
-          <h1>Preset not found</h1>
+          <h1>preset not found</h1>
           <Button onClick={handleBack}>
             <ArrowLeft className="mr-2" />
             back to browser
