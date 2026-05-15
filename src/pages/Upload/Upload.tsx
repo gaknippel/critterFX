@@ -12,14 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter
-} from '@/components/ui/card'
 import { supabase } from '@/lib/supabase'
 import { categories } from '@/lib/api'
 import { 
@@ -61,9 +53,19 @@ export default function Upload() {
   const [aeVersion, setAeVersion] = useState('')
   const [presetFile, setPresetFile] = useState<File | null>(null)
   const [gifFile, setGifFile] = useState<File | null>(null)
+  const [gifPreviewUrl, setGifPreviewUrl] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [gifDragOver, setGifDragOver] = useState(false)
+
+  // Cleanup object URLs to avoid memory leaks
+  useEffect(() => {
+    return () => {
+      if (gifPreviewUrl) {
+        URL.revokeObjectURL(gifPreviewUrl)
+      }
+    }
+  }, [gifPreviewUrl])
 
 
     // always scroll to top when page renders
@@ -210,138 +212,77 @@ if (!user) {
 
 
 return (
-    <div className="upload-wrapper">
-      <Card className="upload-card">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            <SplitText
-              text="upload a preset"
-              delay={20}
-              duration={1.5}
-              ease="elastic.out(1, 0.3)"
-              splitType="chars"
-              from={{ opacity: 0, y: 5 }}
-              to={{ opacity: 1, y: 0 }}
-              threshold={0.1}
-              rootMargin="-100px"
-              textAlign="left"
-            />
-          </CardTitle>
-          <CardDescription>
+    <div className="settings-wrapper">
+      <div className="settings-header-section">
+        <div className="settings-header-content">
+          <SplitText
+            text="upload a preset"
+            className="settings-welcome-message"
+            delay={20}
+            duration={1.5}
+            ease="elastic.out(1, 0.3)"
+            splitType="chars"
+            from={{ opacity: 0, y: 5 }}
+            to={{ opacity: 1, y: 0 }}
+            threshold={0.1}
+            rootMargin="-100px"
+            textAlign="left"
+          />
+          <p className="settings-header-description">
             share your work with the community! presets are reviewed by me before appearing online, so don't try stupid stuff 😭
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form id="upload-form" onSubmit={handleSubmit} className="upload-form">
+          </p>
+        </div>
+      </div>
+
+      <form id="upload-form" onSubmit={handleSubmit} className="flex flex-col gap-6 w-full">
+        
+        {/* Files Section */}
+        <div className="settings-info-section">
+          <div className="settings-section-header">
+            <h2 className="settings-section-title">files</h2>
+          </div>
+          <div className="settings-section-content space-y-4">
             
-            {/* drag and drop zone */}
-            <div
-              className={`upload-dropzone ${dragOver ? 'dragover' : ''} ${presetFile ? 'has-file' : ''}`}
-              onDrop={handlePresetDrop}
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-              onDragLeave={() => setDragOver(false)}
-              onClick={() => document.getElementById('preset-file-input')?.click()}
-            >
-              <input
-                id="preset-file-input"
-                type="file"
-                accept=".ffx,.jsx,.aep"
-                style={{ display: 'none' }}
-                onChange={(e) => e.target.files?.[0] && handlePresetFileChange(e.target.files[0])}
-              />
-              {presetFile ? (
-                <div className="upload-file-info">
-                  <p className="upload-file-name">{presetFile.name}</p>
-                  <p className="upload-file-size">{formatFileSize(presetFile.size)}</p>
-                </div>
-              ) : (
-                <div className="upload-dropzone-prompt">
-                  <p>drag & drop your preset here</p>
-                  <p className="upload-dropzone-sub">or click to browse — .ffx, .jsx, .aep (max 3MB)</p>
-                </div>
-              )}
-            </div>
-
-            {/* Grid for small fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* name */}
-              <div className="upload-field">
-                <Label htmlFor="name">preset name</Label>
-                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="my cool preset" />
-              </div>
-
-              {/* category */}
-              <div className="upload-field">
-                <Label htmlFor="category">category</Label>
-                <Select value={category} onValueChange={setCategory} required>
-                  <SelectTrigger id="category" className="w-full category-select h-10">
-                    <SelectValue placeholder="select a category" />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    {categories.filter(c => c.id !== 'all').map(c => (
-                      <SelectItem key={c.id} value={c.id}>
-                        <div className="flex items-center gap-2">
-                          {categoryIcons[c.id]}
-                          <span>{c.name}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {category && (
-                  <p className="upload-auto-detected">
-                    auto-detected: <span className="font-semibold">{categories.find(c => c.id === category)?.name || category}</span>
-                  </p>
+            {/* preset dropzone */}
+            <div className="settings-field">
+              <Label className="settings-field-label">preset file</Label>
+              <div
+                className={`upload-dropzone ${dragOver ? 'dragover' : ''} ${presetFile ? 'has-file' : ''}`}
+                onDrop={handlePresetDrop}
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                onDragLeave={() => setDragOver(false)}
+                onClick={() => document.getElementById('preset-file-input')?.click()}
+              >
+                <input
+                  id="preset-file-input"
+                  type="file"
+                  accept=".ffx,.jsx,.aep"
+                  style={{ display: 'none' }}
+                  onChange={(e) => e.target.files?.[0] && handlePresetFileChange(e.target.files[0])}
+                />
+                {presetFile ? (
+                  <div className="upload-file-info">
+                    <p className="upload-file-name">{presetFile.name}</p>
+                    <p className="upload-file-size">{formatFileSize(presetFile.size)}</p>
+                  </div>
+                ) : (
+                  <div className="upload-dropzone-prompt">
+                    <p>drag & drop your preset here</p>
+                    <p className="upload-dropzone-sub">or click to browse — .ffx, .jsx, .aep (max 3MB)</p>
+                  </div>
                 )}
               </div>
             </div>
 
-            {/* short description */}
-            <div className="upload-field">
-              <Label htmlFor="description">short description</Label>
-              <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} required placeholder="a short one-liner" />
-            </div>
-
-            {/* long description */}
-            <div className="upload-field">
-              <Label htmlFor="longDescription">long description</Label>
-              <Textarea
-                id="longDescription"
-                value={longDescription}
-                onChange={(e) => setLongDescription(e.target.value)}
-                placeholder="detailed instructions, tips, how to use, etc."
-                className="min-height-[120px]"
-              />
-            </div>
-
-            {/* ae version */}
-            <div className="upload-field">
-              <Label htmlFor="aeVersion">after effects version</Label>
-              <Input id="aeVersion" value={aeVersion} onChange={(e) => setAeVersion(e.target.value)} placeholder="2023 or later" />
-            </div>
-
-            {/* tags */}
-            <div className="upload-field">
-              <Label htmlFor="tags">tags <span className="upload-hint">(comma separated)</span></Label>
-              <Input id="tags" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="animation, text, smooth" />
-            </div>
-
-            {/* dependencies */}
-            <div className="upload-field">
-              <Label htmlFor="dependencies">dependencies <span className="upload-hint">(comma separated, or "none")</span></Label>
-              <Input id="dependencies" value={dependencies} onChange={(e) => setDependencies(e.target.value)} placeholder="none" />
-            </div>
-
-            {/* gif upload dropzone */}
-            <div className="upload-field">
-              <Label htmlFor="gif">preview gif</Label>
+            {/* gif dropzone */}
+            <div className="settings-field">
+              <Label className="settings-field-label">preview gif</Label>
               <div
-                className={`upload-dropzone ${gifDragOver ? 'dragover' : ''} ${gifFile ? 'has-file' : ''}`}
+                className={`upload-dropzone relative overflow-hidden ${gifDragOver ? 'dragover' : ''} ${gifFile ? 'has-file border-none p-0' : 'p-8'}`}
                 onDrop={handleGifDrop}
                 onDragOver={(e) => { e.preventDefault(); setGifDragOver(true) }}
                 onDragLeave={() => setGifDragOver(false)}
                 onClick={() => document.getElementById('gif-file-input')?.click()}
-                style={{ padding: '2rem' }}
               >
                 <input
                   id="gif-file-input"
@@ -356,13 +297,24 @@ return (
                         return
                       }
                       setGifFile(file)
+                      setGifPreviewUrl(URL.createObjectURL(file))
                     }
                   }}
                 />
-                {gifFile ? (
-                  <div className="upload-file-info">
-                    <p className="upload-file-name">{gifFile.name}</p>
-                    <p className="upload-file-size">{formatFileSize(gifFile.size)}</p>
+                {gifPreviewUrl ? (
+                  <div className="relative w-full h-full min-h-[160px] group rounded-xl overflow-hidden">
+                    <img 
+                      src={gifPreviewUrl} 
+                      alt="GIF Preview" 
+                      className="w-full h-full object-scale-down absolute inset-0"
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                       <p className="text-white font-medium text-sm">click to change preview</p>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent flex flex-col items-start pointer-events-none">
+                      <p className="text-white font-semibold text-sm truncate w-full text-left">{gifFile?.name}</p>
+                      <p className="text-white/80 text-xs">{gifFile && formatFileSize(gifFile.size)}</p>
+                    </div>
                   </div>
                 ) : (
                   <div className="upload-dropzone-prompt">
@@ -372,14 +324,86 @@ return (
                 )}
               </div>
             </div>
-          </form>
-        </CardContent>
-        <CardFooter>
+          </div>
+        </div>
+
+        {/* Details Section */}
+        <div className="settings-info-section">
+          <div className="settings-section-header">
+            <h2 className="settings-section-title">details</h2>
+          </div>
+          <div className="settings-section-content space-y-4">
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="settings-field">
+                <Label className="settings-field-label" htmlFor="name">preset name</Label>
+                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="my cool preset" />
+              </div>
+
+              <div className="settings-field">
+                <Label className="settings-field-label" htmlFor="category">category</Label>
+                <Select value={category} onValueChange={setCategory} required>
+                  <SelectTrigger id="category" className="w-full h-10">
+                    <SelectValue placeholder="select a category" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    {categories.filter(c => c.id !== 'all').map(c => (
+                      <SelectItem key={c.id} value={c.id}>
+                        <div className="flex items-center gap-2">
+                          {categoryIcons[c.id]}
+                          <span>{c.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {category && (presetFile?.name.toLowerCase().endsWith('.aep') || presetFile?.name.toLowerCase().endsWith('.jsx')) && (
+                  <p className="upload-auto-detected">
+                    auto detected {category === 'scripts' ? 'script' : 'composition'}!
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="settings-field">
+              <Label className="settings-field-label" htmlFor="description">short description</Label>
+              <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} required placeholder="a short one-liner" />
+            </div>
+
+            <div className="settings-field">
+              <Label className="settings-field-label" htmlFor="longDescription">long description</Label>
+              <Textarea
+                id="longDescription"
+                value={longDescription}
+                onChange={(e) => setLongDescription(e.target.value)}
+                placeholder="detailed instructions, tips, how to use, etc."
+                className="min-height-[120px]"
+              />
+            </div>
+
+            <div className="settings-field">
+              <Label className="settings-field-label" htmlFor="aeVersion">after effects version</Label>
+              <Input id="aeVersion" value={aeVersion} onChange={(e) => setAeVersion(e.target.value)} placeholder="2023 or later" />
+            </div>
+
+            <div className="settings-field">
+              <Label className="settings-field-label" htmlFor="tags">tags <span className="upload-hint">(comma separated)</span></Label>
+              <Input id="tags" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="animation, text, smooth" />
+            </div>
+
+            <div className="settings-field">
+              <Label className="settings-field-label" htmlFor="dependencies">dependencies <span className="upload-hint">(comma separated, or "none")</span></Label>
+              <Input id="dependencies" value={dependencies} onChange={(e) => setDependencies(e.target.value)} placeholder="none" />
+            </div>
+
+          </div>
+        </div>
+
+        <div className="settings-footer">
           <Button 
-            form="upload-form"
             type="submit" 
             disabled={isUploading || !presetFile || !gifFile || !category} 
-            className="w-full upload-submit-btn"
+            className="settings-save-button"
           >
             {isUploading ? (
               <>
@@ -393,8 +417,8 @@ return (
               </>
             )}
           </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </form>
     </div>
   )
 }

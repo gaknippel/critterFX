@@ -87,11 +87,13 @@
 
 /* Consistent styling for all form inputs - matching Upload.tsx & Profile.tsx */
 .settings-field [data-slot="input"],
-.settings-field [data-slot="select-trigger"] {
+.settings-field [data-slot="select-trigger"],
+.settings-field [data-slot="textarea"],
+.settings-field textarea {
   background: color-mix(in oklch, var(--card), transparent 40%) !important;
   border: 1px solid color-mix(in oklch, var(--border), transparent 20%) !important;
   border-radius: 0.625rem !important;
-  height: 2.75rem !important;
+  min-height: 2.75rem !important;
   padding-left: 0.875rem;
   padding-right: 0.875rem;
   width: 100% !important;
@@ -101,14 +103,25 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
 }
 
+.settings-field [data-slot="textarea"],
+.settings-field textarea {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  resize: vertical;
+}
+
 .settings-field [data-slot="input"]:hover,
-.settings-field [data-slot="select-trigger"]:hover {
+.settings-field [data-slot="select-trigger"]:hover,
+.settings-field [data-slot="textarea"]:hover,
+.settings-field textarea:hover {
   border-color: color-mix(in oklch, var(--primary), transparent 30%) !important;
   background: color-mix(in oklch, var(--card), transparent 20%) !important;
 }
 
 .settings-field [data-slot="input"]:focus-visible,
-.settings-field [data-slot="select-trigger"][data-state="open"] {
+.settings-field [data-slot="select-trigger"][data-state="open"],
+.settings-field [data-slot="textarea"]:focus-visible,
+.settings-field textarea:focus-visible {
   outline: none !important;
   border-color: var(--primary) !important;
   background: color-mix(in oklch, var(--card), transparent 10%) !important;

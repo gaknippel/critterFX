@@ -13,9 +13,9 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { FolderOpen, CheckCircle, AlertCircle, Search, Loader2 } from 'lucide-react'
 import SplitText from '@/components/SplitText';
-
 import {
   scanAEInstallations,
   getPathConfig,
@@ -208,35 +208,37 @@ const handleBrowseCompositions = async () => {
                 </div>
               </div>
             ) : installations.length > 0 ? (
-              <div className="p-4 h-full overflow-y-auto custom-scrollbar">
-                <div className="flex items-center gap-2 mb-3 text-primary">
-                  <CheckCircle className="h-4 w-4" />
-                  <span className="font-semibold text-sm">detected installations:</span>
-                </div>
-                <div className="space-y-3">
-                  {installations.map((inst) => (
-                    <div key={inst.version} className="flex items-center justify-between gap-4 py-2 border-t border-border/50 first:border-t-0">
-                      <div className="overflow-hidden">
-                        <div className="font-medium text-sm">after effects {inst.version}</div>
-                        <div className="text-[10px] text-muted-foreground truncate">
-                          scripts: {inst.scripts_path}
+              <ScrollArea className="h-full w-full">
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-3 text-primary">
+                    <CheckCircle className="h-4 w-4" />
+                    <span className="font-semibold text-sm">detected installations:</span>
+                  </div>
+                  <div className="space-y-3">
+                    {installations.map((inst) => (
+                      <div key={inst.version} className="flex items-center justify-between gap-4 py-2 border-t border-border/50 first:border-t-0">
+                        <div className="overflow-hidden">
+                          <div className="font-medium text-sm">after effects {inst.version}</div>
+                          <div className="text-[10px] text-muted-foreground truncate">
+                            scripts: {inst.scripts_path}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground truncate">
+                            presets: {inst.user_presets_path}
+                          </div>
                         </div>
-                        <div className="text-[10px] text-muted-foreground truncate">
-                          presets: {inst.user_presets_path}
-                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="h-7 px-4 text-xs w-fit shrink-0"
+                          onClick={() => handleUseDetectedPath(inst)}
+                        >
+                          use
+                        </Button>
                       </div>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="h-7 px-4 text-xs w-fit shrink-0"
-                        onClick={() => handleUseDetectedPath(inst)}
-                      >
-                        use
-                      </Button>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </ScrollArea>
             ) : (
               <div className="p-4 h-full flex items-center gap-3 text-destructive">
                 <AlertCircle className="h-4 w-4" />
