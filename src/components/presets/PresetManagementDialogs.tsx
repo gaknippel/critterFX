@@ -11,11 +11,14 @@ import {
   Trash2,
   Type as TypeIcon,
   X,
+  Pencil,
+  FileCode,
+  FileText,
+  Upload as UploadIcon
 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { categories, type Preset } from '@/lib/api'
-import { formatBytes } from '@/lib/utils'
 import SplitText from '@/components/SplitText'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -45,6 +48,12 @@ const categoryIcons: Record<string, ReactNode> = {
   backgrounds: <ImageIcon className="size-4" />,
   scripts: <CodeIcon className="size-4" />,
   compositions: <Layers className="size-4" />,
+}
+
+const formatFileSize = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 type PresetDeleteDialogProps = {
@@ -98,58 +107,61 @@ export function PresetDeleteDialog({
         showCloseButton={false}
         className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none"
       >
-        <Card className="preset-manage-card border-none shadow-2xl">
+        <div className="settings-wrapper w-full p-6 md:p-8 bg-background/95 backdrop-blur-xl rounded-xl border shadow-2xl">
           <DialogClose asChild>
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="preset-manage-close"
+              className="absolute right-4 top-4 rounded-full z-10"
               aria-label="Close delete preset dialog"
             >
               <X size={16} />
             </Button>
           </DialogClose>
 
-          <CardHeader className="pb-4">
-            <DialogTitle className="text-2xl font-bold">
-              <SplitText
-                text="delete preset"
-                delay={20}
-                duration={1.5}
-                ease="elastic.out(1, 0.3)"
-                splitType="chars"
-                from={{ opacity: 0, y: 5 }}
-                to={{ opacity: 1, y: 0 }}
-                threshold={0.1}
-                rootMargin="-100px"
-                textAlign="left"
-              />
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground">
-              your preset will be gone forever! obviously do this at your own will.
-            </DialogDescription>
-          </CardHeader>
+          <div className="settings-header-section !bg-transparent !border-none !shadow-none !p-0 !mb-8">
+            <div className="settings-header-content">
+              <DialogTitle asChild>
+                <h1 className="settings-welcome-message text-2xl font-bold">
+                  <SplitText
+                    text="delete preset"
+                    delay={20}
+                    duration={1.5}
+                    ease="elastic.out(1, 0.3)"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 5 }}
+                    to={{ opacity: 1, y: 0 }}
+                    threshold={0.1}
+                    rootMargin="-100px"
+                    textAlign="left"
+                  />
+                </h1>
+              </DialogTitle>
+              <DialogDescription className="settings-header-description mt-2 text-muted-foreground">
+                your preset will be gone forever! obviously do this at your own will.
+              </DialogDescription>
+            </div>
+          </div>
 
-          <CardContent className="space-y-6">
-            <div className="preset-manage-form">
-              <div className="preset-manage-field">
-                <Label>what gets deleted:</Label>
-                <div
-                  className="preset-manage-dropzone has-file cursor-default"
-                  style={{ padding: '1.5rem', textAlign: 'left' }}
-                >
-                  <div className="preset-manage-file-info">
-                    <p className="preset-manage-file-name">{preset?.file_name}</p>
-                    <p className="preset-manage-file-size">everything will be gone!</p>
-                  </div>
-                </div>
+          <div className="settings-info-section">
+            <div className="settings-section-header">
+              <h2 className="settings-section-title">what gets deleted</h2>
+            </div>
+            <div className="settings-section-content">
+              <div className="relative w-full h-[100px] rounded-xl overflow-hidden border border-destructive/20 bg-destructive/5 flex items-center justify-center">
+                    <p className="font-semibold text-foreground truncate">{preset?.file_name}</p>
               </div>
             </div>
-          </CardContent>
+          </div>
 
-          <DialogFooter className="preset-manage-footer p-6 pt-0">
-            <Button onClick={onDelete} disabled={isDeleting} className="preset-manage-submit min-w-[120px]">
+          <div className="flex justify-end mt-8">
+            <Button 
+              variant="destructive"
+              onClick={onDelete} 
+              disabled={isDeleting} 
+              className="h-11 px-8 font-semibold shadow-lg shadow-destructive/20"
+            >
               {isDeleting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -162,8 +174,8 @@ export function PresetDeleteDialog({
                 </>
               )}
             </Button>
-          </DialogFooter>
-        </Card>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   )
@@ -203,8 +215,7 @@ export function PresetEditDialog({
 
   const [gifPreviewUrl, setGifPreviewUrl] = useState<string | null>(null)
 
-  // Initialize preview URL if a gif file is already passed in (e.g. from an aborted edit)
-  // or clean up when closed.
+  // Initialize preview URL if a gif file is already passed in
   useEffect(() => {
     if (editGifFile) {
       const url = URL.createObjectURL(editGifFile)
@@ -249,13 +260,23 @@ export function PresetEditDialog({
     if (file) handleGifSelection(file)
   }
 
+  const handleRemoveGif = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onGifFileChange(null as any) // Parent handles null
+  }
+
+  const handleRemovePreset = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onPresetFileChange(null as any)
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
         className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none custom-scrollbar"
       >
-        <div className="settings-wrapper w-full p-4 md:p-8 bg-background/95 backdrop-blur-xl rounded-xl border">
+        <div className="settings-wrapper w-full p-6 md:p-8 bg-background/95 backdrop-blur-xl rounded-xl border shadow-2xl">
           <DialogClose asChild>
             <Button
               type="button"
@@ -268,7 +289,7 @@ export function PresetEditDialog({
             </Button>
           </DialogClose>
 
-          <div className="settings-header-section !bg-transparent !border-none !shadow-none !p-0 !mb-2">
+          <div className="settings-header-section !bg-transparent !border-none !shadow-none !p-0 !mb-8">
             <div className="settings-header-content">
               <DialogTitle asChild>
                 <h1 className="settings-welcome-message text-2xl font-bold">
@@ -287,12 +308,12 @@ export function PresetEditDialog({
                 </h1>
               </DialogTitle>
               <DialogDescription className="settings-header-description mt-2 text-muted-foreground">
-                edit your preset. leave files unchanged to keep original data.
+                edit your preset details. leave files unchanged to keep original data.
               </DialogDescription>
             </div>
           </div>
 
-          <div className="flex flex-col gap-6 w-full">
+          <div className="flex flex-col gap-8 w-full">
             
             {/* Files Section */}
             <div className="settings-info-section">
@@ -304,11 +325,11 @@ export function PresetEditDialog({
                 {/* preset dropzone */}
                 <div className="settings-field">
                   <Label className="settings-field-label">
-                    preset file{' '}
-                    <span className="text-muted-foreground font-normal normal-case ml-1">(leave empty to keep current: {preset?.file_name})</span>
+                    preset file
+                    <span className="upload-hint ml-2 font-normal">(leave empty to keep: {preset?.file_name})</span>
                   </Label>
                   <div
-                    className={`upload-dropzone ${dragOver ? 'dragover' : ''} ${editPresetFile ? 'has-file' : ''}`}
+                    className={`upload-dropzone relative overflow-hidden ${dragOver ? 'dragover' : ''} ${editPresetFile ? 'has-file border-none p-0' : 'p-8'}`}
                     onDrop={handlePresetDrop}
                     onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
                     onDragLeave={() => setDragOver(false)}
@@ -331,9 +352,39 @@ export function PresetEditDialog({
                       }}
                     />
                     {editPresetFile ? (
-                      <div className="upload-file-info">
-                        <p className="upload-file-name">{editPresetFile.name}</p>
-                        <p className="upload-file-size">{formatBytes(editPresetFile.size)}</p>
+                      <div className="relative w-full h-[140px] group rounded-xl overflow-hidden border border-border bg-muted/20 shadow-inner flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-2 relative z-10 transition-transform duration-300 group-hover:scale-110">
+                          {editPresetFile.name.toLowerCase().endsWith('.jsx') ? (
+                            <FileCode className="size-10 text-primary/80" />
+                          ) : (
+                            <FileText className="size-10 text-primary/80" />
+                          )}
+                        </div>
+
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center z-20 backdrop-blur-[2px]">
+                           <div className="bg-white/10 p-3 rounded-full mb-2 scale-90 group-hover:scale-100 transition-transform duration-300">
+                             <Pencil className="text-white size-5" />
+                           </div>
+                           <p className="text-white font-semibold text-xs tracking-wide">CHANGE FILE</p>
+                        </div>
+
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-3 right-3 z-30 opacity-0 group-hover:opacity-100 transition-all duration-300 h-8 w-8 shadow-lg"
+                          onClick={handleRemovePreset}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+
+                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-20 pointer-events-none translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                          <div className="flex items-center gap-2">
+                            <UploadIcon className="text-white/70 size-4 flex-shrink-0" />
+                            <p className="text-white font-medium text-sm truncate">{editPresetFile.name}</p>
+                          </div>
+                          <p className="text-white/60 text-xs mt-0.5 ml-6">{formatFileSize(editPresetFile.size)}</p>
+                        </div>
                       </div>
                     ) : (
                       <div className="upload-dropzone-prompt">
@@ -347,11 +398,11 @@ export function PresetEditDialog({
                 {/* gif dropzone */}
                 <div className="settings-field">
                   <Label className="settings-field-label">
-                    preview gif{' '}
-                    <span className="text-muted-foreground font-normal normal-case ml-1">(leave empty to keep current)</span>
+                    preview gif
+                    <span className="upload-hint ml-2 font-normal">(leave empty to keep current)</span>
                   </Label>
                   <div
-                    className={`upload-dropzone relative overflow-hidden ${gifDragOver ? 'dragover' : ''} ${editGifFile ? 'has-file border-none p-0' : 'p-8'}`}
+                    className={`upload-dropzone relative overflow-hidden ${gifDragOver ? 'dragover' : ''} ${gifPreviewUrl ? 'has-file border-none p-0' : 'p-8'}`}
                     onDrop={handleGifDrop}
                     onDragOver={(e) => { e.preventDefault(); setGifDragOver(true) }}
                     onDragLeave={() => setGifDragOver(false)}
@@ -365,18 +416,37 @@ export function PresetEditDialog({
                       onChange={(e) => e.target.files?.[0] && handleGifSelection(e.target.files[0])}
                     />
                     {gifPreviewUrl ? (
-                      <div className="relative w-full h-full min-h-[160px] group rounded-xl overflow-hidden">
+                      <div className="relative w-full aspect-video group rounded-xl overflow-hidden border border-border bg-muted/20 shadow-inner">
+                        <div 
+                          className="absolute inset-0 opacity-20 blur-2xl scale-110"
+                          style={{ backgroundImage: `url(${gifPreviewUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                        />
                         <img 
                           src={gifPreviewUrl} 
                           alt="GIF Preview" 
-                          className="w-full h-full object-scale-down absolute inset-0"
+                          className="w-full h-full object-contain relative z-10"
                         />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                           <p className="text-white font-medium text-sm">click to change preview</p>
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center z-20 backdrop-blur-[2px]">
+                           <div className="bg-white/10 p-3 rounded-full mb-2 scale-90 group-hover:scale-100 transition-transform duration-300">
+                             <Pencil className="text-white size-5" />
+                           </div>
+                           <p className="text-white font-semibold text-xs tracking-wide">CHANGE PREVIEW</p>
                         </div>
-                        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent flex flex-col items-start pointer-events-none">
-                          <p className="text-white font-semibold text-sm truncate w-full text-left">{editGifFile?.name}</p>
-                          <p className="text-white/80 text-xs">{editGifFile && formatBytes(editGifFile.size)}</p>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-3 right-3 z-30 opacity-0 group-hover:opacity-100 transition-all duration-300 h-8 w-8 shadow-lg"
+                          onClick={handleRemoveGif}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-20 pointer-events-none translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                          <div className="flex items-center gap-2">
+                            <ImageIcon className="text-white/70 size-4 flex-shrink-0" />
+                            <p className="text-white font-medium text-sm truncate">{editGifFile?.name}</p>
+                          </div>
+                          <p className="text-white/60 text-xs mt-0.5 ml-6">{editGifFile && formatFileSize(editGifFile.size)}</p>
                         </div>
                       </div>
                     ) : (
@@ -446,12 +516,12 @@ export function PresetEditDialog({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="settings-field">
-                    <Label className="settings-field-label" htmlFor="edit-tags">tags <span className="upload-hint normal-case font-normal">(comma separated)</span></Label>
+                    <Label className="settings-field-label" htmlFor="edit-tags">tags <span className="upload-hint ml-1">(comma separated)</span></Label>
                     <Input id="edit-tags" value={editTags} onChange={(e) => setEditTags(e.target.value)} placeholder="animation, text, smooth" />
                   </div>
 
                   <div className="settings-field">
-                    <Label className="settings-field-label" htmlFor="edit-dependencies">dependencies <span className="upload-hint normal-case font-normal">(comma separated)</span></Label>
+                    <Label className="settings-field-label" htmlFor="edit-dependencies">dependencies <span className="upload-hint ml-1">(comma separated)</span></Label>
                     <Input id="edit-dependencies" value={editDependencies} onChange={(e) => setEditDependencies(e.target.value)} placeholder="none" />
                   </div>
                 </div>
@@ -463,7 +533,7 @@ export function PresetEditDialog({
               <Button 
                 onClick={onSave} 
                 disabled={isSaving} 
-                className="settings-save-button"
+                className="settings-save-button h-12 text-base font-semibold"
               >
                 {isSaving ? (
                   <>

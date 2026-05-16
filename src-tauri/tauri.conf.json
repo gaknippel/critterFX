@@ -14,8 +14,8 @@
       {
         "label": "main",
         "title": "critterfx",
-        "width": 1000,
-        "height": 720,
+        "width": 1500,
+        "height": 1000,
         "dragDropEnabled": false,
         "decorations": false,
         "transparent": true,

@@ -23,7 +23,11 @@ import {
   Sparkles,
   Image,
   Code,
-  Layers
+  Layers,
+  Trash2,
+  Pencil,
+  FileCode,
+  FileText
 } from 'lucide-react'
 import { toast } from 'sonner'
 import SplitText from '@/components/SplitText'
@@ -67,6 +71,20 @@ export default function Upload() {
     }
   }, [gifPreviewUrl])
 
+  const handleRemoveGif = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setGifFile(null)
+    if (gifPreviewUrl) {
+      URL.revokeObjectURL(gifPreviewUrl)
+    }
+    setGifPreviewUrl(null)
+  }
+
+  const handleRemovePreset = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setPresetFile(null)
+  }
+
 
     // always scroll to top when page renders
     useEffect(() => {
@@ -87,8 +105,7 @@ if (!user) {
   const detectCategory = (file: File) => {
     const ext = file.name.split('.').pop()?.toLowerCase()
     if (ext === 'jsx') return 'scripts'
-    if (ext === 'aep') return 'compositions'
-    return '' // ffx needs manual selection
+    return '' // others need manual selection
   }
 
   const formatFileSize = (bytes: number) => {
@@ -138,6 +155,7 @@ if (!user) {
       }
       
       setGifFile(file)
+      setGifPreviewUrl(URL.createObjectURL(file))
     }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -247,7 +265,7 @@ return (
             <div className="settings-field">
               <Label className="settings-field-label">preset file</Label>
               <div
-                className={`upload-dropzone ${dragOver ? 'dragover' : ''} ${presetFile ? 'has-file' : ''}`}
+                className={`upload-dropzone relative overflow-hidden ${dragOver ? 'dragover' : ''} ${presetFile ? 'has-file border-none p-0' : 'p-8'}`}
                 onDrop={handlePresetDrop}
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
                 onDragLeave={() => setDragOver(false)}
@@ -261,9 +279,43 @@ return (
                   onChange={(e) => e.target.files?.[0] && handlePresetFileChange(e.target.files[0])}
                 />
                 {presetFile ? (
-                  <div className="upload-file-info">
-                    <p className="upload-file-name">{presetFile.name}</p>
-                    <p className="upload-file-size">{formatFileSize(presetFile.size)}</p>
+                  <div className="relative w-full h-[140px] group rounded-xl overflow-hidden border border-border bg-muted/20 shadow-inner flex items-center justify-center">
+                    
+                    {/* File Icon Representation */}
+                    <div className="flex flex-col items-center gap-2 relative z-10 transition-transform duration-300 group-hover:scale-110">
+                      {presetFile.name.toLowerCase().endsWith('.jsx') ? (
+                        <FileCode className="size-10 text-primary/80" />
+                      ) : (
+                        <FileText className="size-10 text-primary/80" />
+                      )}
+                    </div>
+
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center z-20 backdrop-blur-[2px]">
+                       <div className="bg-white/10 p-3 rounded-full mb-2 scale-90 group-hover:scale-100 transition-transform duration-300">
+                         <Pencil className="text-white size-5" />
+                       </div>
+                    </div>
+
+                    {/* Delete Button */}
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-3 right-3 z-30 opacity-0 group-hover:opacity-100 transition-all duration-300 h-8 w-8 shadow-lg hover:scale-105 active:scale-95"
+                      onClick={handleRemovePreset}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+
+                    {/* File Info Overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-20 pointer-events-none translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                      <div className="flex items-center gap-2">
+                        <UploadIcon className="text-white/70 size-4 flex-shrink-0" />
+                        <p className="text-white font-medium text-sm truncate">{presetFile.name}</p>
+                      </div>
+                      <p className="text-white/60 text-xs mt-0.5 ml-6">{formatFileSize(presetFile.size)}</p>
+                    </div>
                   </div>
                 ) : (
                   <div className="upload-dropzone-prompt">
@@ -302,18 +354,44 @@ return (
                   }}
                 />
                 {gifPreviewUrl ? (
-                  <div className="relative w-full h-full min-h-[160px] group rounded-xl overflow-hidden">
+                  <div className="relative w-full aspect-video group rounded-xl overflow-hidden border border-border bg-muted/20 shadow-inner">
+                    {/* Blurred background for transparency or odd sizes */}
+                    <div 
+                      className="absolute inset-0 opacity-20 blur-2xl scale-110"
+                      style={{ backgroundImage: `url(${gifPreviewUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                    />
+                    
                     <img 
                       src={gifPreviewUrl} 
                       alt="GIF Preview" 
-                      className="w-full h-full object-scale-down absolute inset-0"
+                      className="w-full h-full object-contain relative z-10"
                     />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                       <p className="text-white font-medium text-sm">click to change preview</p>
+
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center z-20 backdrop-blur-[2px]">
+                       <div className="bg-white/10 p-3 rounded-full mb-2 scale-90 group-hover:scale-100 transition-transform duration-300">
+                         <Pencil className="text-white size-6" />
+                       </div>
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent flex flex-col items-start pointer-events-none">
-                      <p className="text-white font-semibold text-sm truncate w-full text-left">{gifFile?.name}</p>
-                      <p className="text-white/80 text-xs">{gifFile && formatFileSize(gifFile.size)}</p>
+
+                    {/* Delete Button */}
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-3 right-3 z-30 opacity-0 group-hover:opacity-100 transition-all duration-300 h-9 w-9 shadow-lg hover:scale-105 active:scale-95"
+                      onClick={handleRemoveGif}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+
+                    {/* File Info Overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-20 pointer-events-none translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                      <div className="flex items-center gap-2">
+                        <Image className="text-white/70 size-4 flex-shrink-0" />
+                        <p className="text-white font-medium text-sm truncate">{gifFile?.name}</p>
+                      </div>
+                      <p className="text-white/60 text-xs mt-0.5 ml-6">{gifFile && formatFileSize(gifFile.size)}</p>
                     </div>
                   </div>
                 ) : (
@@ -357,9 +435,9 @@ return (
                     ))}
                   </SelectContent>
                 </Select>
-                {category && (presetFile?.name.toLowerCase().endsWith('.aep') || presetFile?.name.toLowerCase().endsWith('.jsx')) && (
+                {category && presetFile?.name.toLowerCase().endsWith('.jsx') && (
                   <p className="upload-auto-detected">
-                    auto detected {category === 'scripts' ? 'script' : 'composition'}!
+                    auto detected script!
                   </p>
                 )}
               </div>
