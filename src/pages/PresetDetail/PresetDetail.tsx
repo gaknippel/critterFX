@@ -56,7 +56,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { downloadAndInstall, type DownloadProgress } from '@/utils/presetDownloader'
 import { formatBytes, formatDate } from '@/lib/utils'
 import { PresetDeleteDialog, PresetEditDialog } from '@/components/presets/PresetManagementDialogs'
-import { scanAEInstallations } from '@/utils/aePathManager'
+import { scanAEInstallations, getActivePaths } from '@/utils/aePathManager'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 
@@ -79,6 +79,8 @@ export default function PresetDetail() {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null)
   const [editingCommentText, setEditingCommentText] = useState('')
   const [installedAEVersions, setInstalledAEVersions] = useState<string[]>([])
+  const [activeCompositionPath, setActiveCompositionPath] = useState<string | null>(null)
+  const [activeScriptsPath, setActiveScriptsPath] = useState<string | null>(null)
 
   //states for editing presets
   const [editPresetOpen, setEditPresetOpen] = useState(false)
@@ -260,6 +262,15 @@ const handleSavePreset = async () => {
     setIsLoading(false  )
     window.scrollTo(0, 0)
   }
+
+  useEffect(() => {
+    const fetchPaths = async () => {
+      const paths = await getActivePaths()
+      setActiveCompositionPath(paths.compositionPath)
+      setActiveScriptsPath(paths.scriptsPath)
+    }
+    fetchPaths()
+  }, [])
 
   useEffect(() => {
   loadPreset()
@@ -581,16 +592,15 @@ const handleDeleteComment = async (commentId: string) => {
               <ArrowLeft className="mr-2" size={20} />
               back to browser
             </Button>
+            <div className="preset-sidebar-info">
+              <div className="preset-info-item">
+                <Download size={14} />
+                <span>{preset.download_count}</span>
+              </div>
+            </div>
           </div>
           <div className="preset-preview-large">
             <img src={preset.previewGif} alt={preset.name} />
-          </div>
-
-          <div className="preset-sidebar-info">
-            <div className="preset-info-item" title="Downloads">
-              <Download size={14} />
-              <span>{preset.download_count}</span>
-            </div>
           </div>
 
           <Button 
@@ -661,13 +671,62 @@ const handleDeleteComment = async (commentId: string) => {
                   <ol className="space-y-2 list-decimal list-inside">
                     <li className="text-sm">open AE</li>
                     <li className="text-sm">go to <strong>file → import → file</strong> (or press <kbd className="px-2 py-1 bg-muted rounded text-xs">Ctrl+I</kbd>)</li>
-                    <li className="text-sm">go to: <code className="px-2 py-1 bg-muted rounded text-xs">Documents\critterFX\Compositions</code></li>
+                    <li className="text-sm">go to: <code className="px-2 py-1 bg-muted rounded text-xs">{activeCompositionPath || 'Documents\\critterFX\\Compositions'}</code></li>
                     <li className="text-sm">select <strong>{preset.file_name}</strong></li>
                     <li className="text-sm">click "import" and use it in the project panel</li>
                   </ol>
                   <div className="bg-muted p-3 rounded-lg">
                     <p className="text-sm text-muted-foreground">
                       💡 <strong>tip:</strong> you can also drag and drop the .aep file directly into the AE project panel.
+                    </p>
+                  </div>
+                  </CardContent>
+                </Card>
+              </DialogContent>
+            </Dialog>
+          )}
+
+          {preset.file_name.toLowerCase().endsWith('.jsx') && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="w-full mt-2 how-to-install-btn">
+                  <Info className="mr-2 h-4 w-4" />
+                  how to use script!!! (READ THIS)
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
+                <Card className="upload-card border-none shadow-2xl">
+                  <CardHeader className="pb-4">
+                    <DialogTitle className="text-2xl font-bold">
+                      <SplitText
+                        text="how to run scripts"
+                        delay={20}
+                        duration={1.5}
+                        ease="elastic.out(1, 0.3)"
+                        splitType="chars"
+                        from={{ opacity: 0, y: 5 }}
+                        to={{ opacity: 1, y: 0 }}
+                        threshold={0.1}
+                        rootMargin="-100px"
+                        textAlign="left"
+                      />
+                    </DialogTitle>
+                    <DialogDescription className="text-muted-foreground">
+                      scripts are cool! idk why adobe makes them kind of hard to access though
+                    </DialogDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                  <div className="rounded-lg overflow-hidden border">
+                    <img src="/howtoScript.gif" alt="script tutorial animation" className="w-full" />
+                  </div>
+                  <ol className="space-y-2 list-decimal list-inside">
+                    <li className="text-sm">open AE</li>
+                    <li className="text-sm">scripts should be in: <code className="px-2 py-1 bg-muted rounded text-xs">{activeScriptsPath || 'Support Files\\Scripts'}</code></li>
+                    <li className="text-sm">go to <strong>file → scripts → and file your script file!</strong></li>
+                  </ol>
+                  <div className="bg-muted p-3 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      💡 <strong>tip:</strong> restart AE for scripts to appear in the <strong>file → scripts</strong> menu automatically!
                     </p>
                   </div>
                   </CardContent>
@@ -773,16 +832,7 @@ const handleDeleteComment = async (commentId: string) => {
           <div className="flex items-center gap-3">
             <div className="preset-file-info">
               <FileCode size={14} />
-              <TooltipProvider delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <code className="preset-file-name">{preset.file_name}</code>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="text-[10px] font-medium py-1 px-2">
-                    this is what you search up in AE.
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <code className="preset-file-name">{preset.file_name}</code>
             </div>
 
             <div className="flex items-center gap-2">
