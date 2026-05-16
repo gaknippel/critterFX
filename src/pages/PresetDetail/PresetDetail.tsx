@@ -41,8 +41,9 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { useState, useEffect } from 'react'
 import './PresetDetail.css'
+import '@/components/presets/PresetManagementDialogs.css'
 import { fetchPresets, categories, type Preset } from '@/lib/api'
-import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogDescription, DialogClose } from "@/components/ui/dialog"
 import SplitText from '@/components/SplitText'
 import { Skeleton } from '@/components/ui/skeleton'
 import { supabase, Comment } from '@/lib/supabase'
@@ -643,8 +644,19 @@ const handleDeleteComment = async (commentId: string) => {
                   how to install!!! (READ THIS)
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
-                <Card className="upload-card border-none shadow-2xl">
+              <DialogContent showCloseButton={false} className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
+                <Card className="preset-manage-card shadow-2xl">
+                  <DialogClose asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="preset-manage-close"
+                      aria-label="Close dialog"
+                    >
+                      <X size={16} />
+                    </Button>
+                  </DialogClose>
                   <CardHeader className="pb-4">
                     <DialogTitle className="text-2xl font-bold">
                       <SplitText
@@ -694,10 +706,13 @@ const handleDeleteComment = async (commentId: string) => {
                   how to use script!!! (READ THIS)
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
-                <Card className="upload-card border-none shadow-2xl">
-                  <CardHeader className="pb-4">
-                    <DialogTitle className="text-2xl font-bold">
+              <DialogContent showCloseButton={false} className="preset-manage-card" style={{ maxWidth: '42rem', maxHeight: '90vh', overflowY: 'auto', padding: '2rem' }}>
+                <DialogClose className="preset-manage-close">
+                  <X size={16} />
+                </DialogClose>
+                <div className="preset-manage-form">
+                  <div className="preset-manage-file-info">
+                    <DialogTitle style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
                       <SplitText
                         text="how to run scripts"
                         delay={20}
@@ -711,26 +726,29 @@ const handleDeleteComment = async (commentId: string) => {
                         textAlign="left"
                       />
                     </DialogTitle>
-                    <DialogDescription className="text-muted-foreground">
+                    <DialogDescription style={{ color: 'var(--muted-foreground)', marginTop: '0.5rem' }}>
                       scripts are cool! idk why adobe makes them kind of hard to access though
                     </DialogDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                  <div className="rounded-lg overflow-hidden border">
-                    <img src="/howtoScript.gif" alt="script tutorial animation" className="w-full" />
                   </div>
-                  <ol className="space-y-2 list-decimal list-inside">
-                    <li className="text-sm">open AE</li>
-                    <li className="text-sm">scripts should be in: <code className="px-2 py-1 bg-muted rounded text-xs">{activeScriptsPath || 'Support Files\\Scripts'}</code></li>
-                    <li className="text-sm">go to <strong>file → scripts → and file your script file!</strong></li>
-                  </ol>
-                  <div className="bg-muted p-3 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
+
+                  <div className="preset-manage-field">
+                    <img src="/howtoScript.gif" alt="script tutorial animation" style={{ width: '100%', borderRadius: '0.75rem', border: '1px solid color-mix(in oklch, var(--border), transparent 50%)' }} />
+                  </div>
+
+                  <div className="preset-manage-field">
+                    <ol style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
+                      <li>open AE</li>
+                      <li>scripts should be in: <code style={{ padding: '0.25rem 0.5rem', background: 'color-mix(in oklch, var(--muted), transparent 50%)', borderRadius: '0.25rem', fontSize: '0.85rem' }}>{activeScriptsPath || 'Support Files\\Scripts'}</code></li>
+                      <li>go to <strong>file → scripts → and file your script file!</strong></li>
+                    </ol>
+                  </div>
+
+                  <div className="preset-manage-dropzone" style={{ padding: '1rem', textAlign: 'left', cursor: 'text' }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem' }}>
                       💡 <strong>tip:</strong> restart AE for scripts to appear in the <strong>file → scripts</strong> menu automatically!
                     </p>
                   </div>
-                  </CardContent>
-                </Card>
+                </div>
               </DialogContent>
             </Dialog>
           )}
@@ -832,7 +850,16 @@ const handleDeleteComment = async (commentId: string) => {
           <div className="flex items-center gap-3">
             <div className="preset-file-info">
               <FileCode size={14} />
-              <code className="preset-file-name">{preset.file_name}</code>
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <code className="preset-file-name">{preset.file_name}</code>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-[10px] font-medium py-1 px-2">
+                    <p>this is the file you search for in AE.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
 
             <div className="flex items-center gap-2">
@@ -1149,4 +1176,5 @@ const handleDeleteComment = async (commentId: string) => {
     </div>
   )
 }
+
 
