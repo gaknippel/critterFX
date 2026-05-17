@@ -706,49 +706,59 @@ const handleDeleteComment = async (commentId: string) => {
                   how to use script!!! (READ THIS)
                 </Button>
               </DialogTrigger>
-              <DialogContent showCloseButton={false} className="preset-manage-card" style={{ maxWidth: '42rem', maxHeight: '90vh', overflowY: 'auto', padding: '2rem' }}>
-                <DialogClose className="preset-manage-close">
-                  <X size={16} />
-                </DialogClose>
-                <div className="preset-manage-form">
-                  <div className="preset-manage-file-info">
-                    <DialogTitle style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
-                      <SplitText
-                        text="how to run scripts"
-                        delay={20}
-                        duration={1.5}
-                        ease="elastic.out(1, 0.3)"
-                        splitType="chars"
-                        from={{ opacity: 0, y: 5 }}
-                        to={{ opacity: 1, y: 0 }}
-                        threshold={0.1}
-                        rootMargin="-100px"
-                        textAlign="left"
-                      />
-                    </DialogTitle>
-                    <DialogDescription style={{ color: 'var(--muted-foreground)', marginTop: '0.5rem' }}>
-                      scripts are cool! idk why adobe makes them kind of hard to access though
-                    </DialogDescription>
-                  </div>
+              <DialogContent showCloseButton={false} className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
+                <Card className="preset-manage-card shadow-2xl" style={{ padding: '2rem' }}>
+                  <DialogClose asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="preset-manage-close"
+                      aria-label="Close dialog"
+                    >
+                      <X size={16} />
+                    </Button>
+                  </DialogClose>
+                  <div className="preset-manage-form">
+                    <div className="preset-manage-file-info">
+                      <DialogTitle style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
+                        <SplitText
+                          text="how to run scripts"
+                          delay={20}
+                          duration={1.5}
+                          ease="elastic.out(1, 0.3)"
+                          splitType="chars"
+                          from={{ opacity: 0, y: 5 }}
+                          to={{ opacity: 1, y: 0 }}
+                          threshold={0.1}
+                          rootMargin="-100px"
+                          textAlign="left"
+                        />
+                      </DialogTitle>
+                      <DialogDescription style={{ color: 'var(--muted-foreground)', marginTop: '0.5rem' }}>
+                        scripts are cool! idk why adobe makes them kind of hard to access though
+                      </DialogDescription>
+                    </div>
 
-                  <div className="preset-manage-field">
-                    <img src="/howtoScript.gif" alt="script tutorial animation" style={{ width: '100%', borderRadius: '0.75rem', border: '1px solid color-mix(in oklch, var(--border), transparent 50%)' }} />
-                  </div>
+                    <div className="preset-manage-field">
+                      <img src="/howtoScript.gif" alt="script tutorial animation" style={{ width: '100%', borderRadius: '0.75rem', border: '1px solid color-mix(in oklch, var(--border), transparent 50%)' }} />
+                    </div>
 
-                  <div className="preset-manage-field">
-                    <ol style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
-                      <li>open AE</li>
-                      <li>scripts should be in: <code style={{ padding: '0.25rem 0.5rem', background: 'color-mix(in oklch, var(--muted), transparent 50%)', borderRadius: '0.25rem', fontSize: '0.85rem' }}>{activeScriptsPath || 'Support Files\\Scripts'}</code></li>
-                      <li>go to <strong>file → scripts → and file your script file!</strong></li>
-                    </ol>
-                  </div>
+                    <div className="preset-manage-field">
+                      <ol style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
+                        <li>open AE</li>
+                        <li>scripts should be in: <code style={{ padding: '0.25rem 0.5rem', background: 'color-mix(in oklch, var(--muted), transparent 50%)', borderRadius: '0.25rem', fontSize: '0.85rem' }}>{activeScriptsPath || 'Support Files\\Scripts'}</code></li>
+                        <li>go to <strong>file → scripts → and file your script file!</strong></li>
+                      </ol>
+                    </div>
 
-                  <div className="preset-manage-dropzone" style={{ padding: '1rem', textAlign: 'left', cursor: 'text' }}>
-                    <p style={{ margin: 0, fontSize: '0.9rem' }}>
-                      💡 <strong>tip:</strong> restart AE for scripts to appear in the <strong>file → scripts</strong> menu automatically!
-                    </p>
+                    <div className="preset-manage-dropzone" style={{ padding: '1rem', textAlign: 'left', cursor: 'text' }}>
+                      <p style={{ margin: 0, fontSize: '0.9rem' }}>
+                        💡 <strong>tip:</strong> restart AE for scripts to appear in the <strong>file → scripts</strong> menu automatically!
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </Card>
               </DialogContent>
             </Dialog>
           )}
