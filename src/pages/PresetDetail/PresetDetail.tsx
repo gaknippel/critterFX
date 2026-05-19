@@ -82,7 +82,7 @@ export default function PresetDetail() {
   const [installedAEVersions, setInstalledAEVersions] = useState<string[]>([])
   const [activeCompositionPath, setActiveCompositionPath] = useState<string | null>(null)
   const [activeScriptsPath, setActiveScriptsPath] = useState<string | null>(null)
-
+//ybg stan
   //states for editing presets
   const [editPresetOpen, setEditPresetOpen] = useState(false)
   const [editName, setEditName] = useState('')
