@@ -54,7 +54,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        // Break out of the auth callback before fetching profile data.
+        // break out of the auth callback before fetching profile data.
         setTimeout(() => {
           void syncUserProfile(session.user.id)
         }, 0)

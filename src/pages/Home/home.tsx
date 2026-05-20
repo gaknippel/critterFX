@@ -16,6 +16,8 @@ import {
   Download,
   ArrowUpDown,
   Heart,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -46,6 +48,8 @@ export default function Home() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [sortBy, setSortBy] = useState('newest')
   const [userFavorites, setUserFavorites] = useState<Set<string>>(new Set())
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 9
   const navigate = useNavigate()
   const { user } = useUserContext()
 
@@ -60,6 +64,16 @@ export default function Home() {
       setUserFavorites(new Set())
     }
   }, [user])
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedCategory, searchQuery, sortBy])
+
+  // Scroll to top when page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [currentPage])
 
   const fetchUserFavorites = async () => {
     if (!user) return
@@ -113,28 +127,31 @@ export default function Home() {
   })
 
   const sortedPresets = [...filteredPresets].sort((a,b) => {
-  switch (sortBy){
-    case 'most_downloads':
-      return b.download_count - a.download_count
-    case 'newest':
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    case 'oldest':
-      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    case 'az':
-      return a.name.localeCompare(b.name)
-    default:
-      return 0
-  }
-})
+    switch (sortBy){
+      case 'most_downloads':
+        return b.download_count - a.download_count
+      case 'newest':
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      case 'oldest':
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      case 'az':
+        return a.name.localeCompare(b.name)
+      default:
+        return 0
+    }
+  })
+
+  const totalPages = Math.ceil(sortedPresets.length / itemsPerPage)
+  const paginatedPresets = sortedPresets.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
 
   const handlePresetClick = (presetId: string) => {
     navigate(`/preset/${presetId}`)
   }
 
-
-
   return(
-
     <div className="home-page-wrapper">
       <div className="home-header">
         <div className="title-container">
@@ -186,7 +203,6 @@ export default function Home() {
             </SelectContent>
           </Select>
         </div>
-
       </div>
 
       <div className="home-content-layout">
@@ -216,64 +232,99 @@ export default function Home() {
         <FadeContent blur={false} duration={1000} ease="power2.out" initialOpacity={0} className='presets-main'>
           <div className="presets-scroll">
             {isLoading ? (
-                  <div className="presets-grid">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="preset-card">
-                <Skeleton className="w-full aspect-video" />
-                <div className="preset-info">
-                  <Skeleton className="h-5 w-3/4 mb-2" />
-                  <Skeleton className="h-3 w-full" />
-                </div>
-              </div>
-            ))}
-           </div>
-            ) : (
               <div className="presets-grid">
-                {sortedPresets.map((preset) => {
-                  const category = categories.find(c => c.id === preset.category)
-                  const CategoryIcon = category ? IconMap[category.icon || 'LayoutGrid'] : LayoutGrid
-                  
-                  return (
-                    <div 
-                      key={preset.id} 
-                      className="preset-card"
-                      onClick={() => handlePresetClick(preset.id)}
-                    >
-                      <div className="preset-preview">
-                        <img 
-                          src={preset.previewGif} 
-                          alt={preset.name}
-                          loading="lazy"
-                        />
-                        <div className="preset-download-badge">
-                          <Download size={12} />
-                          <span>{preset.download_count}</span>
-                        </div>
-                      </div>
-                      <div className="preset-info">
-                        <div className="preset-details">
-                          <div className="category-badge-pill">
-                            {CategoryIcon && <CategoryIcon size={10} />}
-                            <span>{category?.name}</span>
-                          </div>
-                          <h3 className="preset-name">{preset.name}</h3>
-                          <p className="preset-description">{preset.description}</p>
-                        </div>
-                        <div className="preset-metadata">
-                          <div className="flex items-center gap-2">
-                            <span className="preset-author">{preset.author_name || 'Unknown'}</span>
-                            <span className="metadata-dot">•</span>
-                            <span className="preset-date">{formatDate(preset.created_at)}</span>
-                          </div>
-                          {userFavorites.has(preset.id) && (
-                            <Heart size={12} className="favorite-indicator-icon" fill="currentColor" />
-                          )}
-                        </div>
-                      </div>
+                {Array.from({ length: itemsPerPage }).map((_, i) => (
+                  <div key={i} className="preset-card">
+                    <Skeleton className="w-full aspect-video" />
+                    <div className="preset-info">
+                      <Skeleton className="h-5 w-3/4 mb-2" />
+                      <Skeleton className="h-3 w-full" />
                     </div>
-                  )
-                })}
+                  </div>
+                ))}
               </div>
+            ) : (
+              <>
+                <div className="presets-grid">
+                  {paginatedPresets.map((preset) => {
+                    const category = categories.find(c => c.id === preset.category)
+                    const CategoryIcon = category ? IconMap[category.icon || 'LayoutGrid'] : LayoutGrid
+                    
+                    return (
+                      <div 
+                        key={preset.id} 
+                        className="preset-card"
+                        onClick={() => handlePresetClick(preset.id)}
+                      >
+                        <div className="preset-preview">
+                          <img 
+                            src={preset.previewGif} 
+                            alt={preset.name}
+                            loading="lazy"
+                          />
+                          <div className="preset-download-badge">
+                            <Download size={12} />
+                            <span>{preset.download_count}</span>
+                          </div>
+                        </div>
+                        <div className="preset-info">
+                          <div className="preset-details">
+                            <div className="category-badge-pill">
+                              {CategoryIcon && <CategoryIcon size={10} />}
+                              <span>{category?.name}</span>
+                            </div>
+                            <h3 className="preset-name">{preset.name}</h3>
+                            <p className="preset-description">{preset.description}</p>
+                          </div>
+                          <div className="preset-metadata">
+                            <div className="flex items-center gap-2">
+                              <span className="preset-author">{preset.author_name || 'Unknown'}</span>
+                              <span className="metadata-dot">•</span>
+                              <span className="preset-date">{formatDate(preset.created_at)}</span>
+                            </div>
+                            {userFavorites.has(preset.id) && (
+                              <Heart size={12} className="favorite-indicator-icon" fill="currentColor" />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* page stuff */}
+                {totalPages > 1 && (
+                  <div className="pagination-container">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                      className="pagination-btn"
+                    >
+                      <ChevronLeft size={16} />
+                      <span>previous</span>
+                    </Button>
+                    
+                    <div className="pagination-info">
+                      <span className="current-page">{currentPage}</span>
+                      <span className="page-separator">/</span>
+                      <span className="total-pages">{totalPages}</span>
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                      className="pagination-btn"
+                    >
+                      <span>next</span>
+                      <ChevronRight size={16} />
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </FadeContent>
