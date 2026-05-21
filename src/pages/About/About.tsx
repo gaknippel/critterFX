@@ -91,7 +91,7 @@ export default function About() {
             </div>
             <div className="about-content mt-4">
               <p className="about-description">
-                free presets for everyone to share!! 
+                free presets for everyone to use & share!! 
               </p>
             </div>
           </div>
@@ -275,6 +275,84 @@ npm run tauri dev
                     <div className="text-sm text-muted-foreground">
                       <p>i suggest looking at <code>api.ts</code> to get more information.</p>
                     </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <Terminal size={16} /> 8. backend architecture
+                </h3>
+                <div className="text-sm text-muted-foreground">
+                  <p>the backend is built with rust using tauri, handling the file system management and executing elevated commands.</p>
+                  
+                  <h4 className="font-semibold mt-4 mb-2 text-foreground">core structures in `src-tauri/src/main.rs`</h4>
+                  <pre className="bg-muted text-foreground p-3 rounded-md mt-2 overflow-x-auto font-mono text-xs border border-border/50">
+                    <code>{`#[derive(Debug, Serialize, Deserialize, Clone)]
+struct AEInstallation {
+    version: String,
+    scripts_path: String,
+    user_presets_path: String,
+    exists: bool,
+}`}</code>
+                  </pre>
+                  <p className="mt-2 text-xs italic">stores information about a detected after effects installation.</p>
+
+                  <pre className="bg-muted text-foreground p-3 rounded-md mt-4 overflow-x-auto font-mono text-xs border border-border/50">
+                    <code>{`#[derive(Debug, Serialize, Deserialize)]
+struct PathConfig {
+    custom_scripts_path: Option<String>,
+    custom_presets_path: Option<String>,
+    custom_composition_path: Option<String>,
+}`}</code>
+                  </pre>
+                  <p className="mt-2 text-xs italic">manages user-defined custom paths for scripts, presets, and compositions.</p>
+
+                  <h4 className="font-semibold mt-6 mb-2 text-foreground">tauri commands exposed to frontend</h4>
+                  <ul className="list-disc pl-6 space-y-2 mt-2">
+                    <li><strong>`scan_ae_installations`</strong>: automatically scans the system to find valid after effects script and user preset directories.</li>
+                    <li><strong>`get_path_config` / `save_path_config`</strong>: reads from and writes to the local `path_config.json` file.</li>
+                    <li><strong>`verify_path`</strong>: a utility command to check if a provided directory path actually exists on the filesystem.</li>
+                    <li><strong>`install_preset`</strong>: the main command for installing downloaded assets. it dynamically determines the correct destination based on the preset type.</li>
+                    <li><strong>`write_binary_file`</strong>: allows the frontend to write raw byte arrays to temporary files before they are installed.</li>
+                  </ul>
+
+                  <h4 className="font-semibold mt-6 mb-2 text-foreground">privilege escalation (windows)</h4>
+                  <p>installing `.jsx` scripts often requires writing to the `C:\Program Files` directory, which requires administrator privileges on windows. the backend handles this gracefully:</p>
+                  <ol className="list-decimal pl-6 space-y-1 mt-2">
+                    <li>`install_preset` first attempts a standard file copy.</li>
+                    <li>if it fails due to permission errors, it falls back to a custom `request_admin_and_copy` function:</li>
+                  </ol>
+                  <pre className="bg-muted text-foreground p-3 rounded-md mt-2 overflow-x-auto font-mono text-xs border border-border/50">
+                    <code>{`#[cfg(windows)]
+fn request_admin_and_copy(source: &str, dest: &str) -> Result<(), String> {
+    use std::process::Command;
+    use std::os::windows::process::CommandExt;
+    
+    const CREATE_NO_WINDOW: u32 = 0x08000000;
+
+    let output = Command::new("powershell")
+        .args(&[
+            "-NonInteractive",
+            "-NoProfile", 
+            "-WindowStyle", "Hidden",
+            "-Command",
+            &format!(
+                "Start-Process powershell -Verb RunAs -Wait -WindowStyle Hidden -ArgumentList '-NonInteractive -NoProfile -WindowStyle Hidden -Command \\"Copy-Item -Path ''{}'' -Destination ''{}'' -Force\\"'",
+                source, dest
+            )
+        ])
+        .creation_flags(CREATE_NO_WINDOW)
+        .output()
+        .map_err(|e| e.to_string())?;
+
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(format!("copy failed: {}", String::from_utf8_lossy(&output.stderr)))
+    }
+}`}</code>
+                  </pre>
+                  <p className="mt-2">this function spawns a hidden powershell process using `-Verb RunAs` to prompt the user for UAC elevation and performs the copy with admin rights.</p>
+                </div>
               </div>
             </div>
           </div>

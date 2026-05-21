@@ -92,6 +92,10 @@ export default function Profile() {
   const [showFavorites, setShowFavorites] = useState(false)
   const [profileFavorites, setProfileFavorites] = useState<Preset[]>([])
   const [favoriteCount, setFavoriteCount] = useState(0)
+  
+  const [isFetchingPresets, setIsFetchingPresets] = useState(false)
+  const [isFetchingComments, setIsFetchingComments] = useState(false)
+  const [isFetchingFavorites, setIsFetchingFavorites] = useState(false)
 
   useEffect(() => {
     fetchProfileData()
@@ -159,7 +163,7 @@ export default function Profile() {
   }
 
   const fetchProfileFavorites = async () => {
-
+    setIsFetchingFavorites(true)
     try {
     const { data } = await supabase
       .from('favorites')
@@ -179,6 +183,8 @@ export default function Profile() {
     }
     catch (error){
       console.log(error);
+    } finally {
+      setIsFetchingFavorites(false)
     }
   }
 
@@ -244,32 +250,42 @@ export default function Profile() {
   }
 
   const fetchProfilePresets = async () => {
-    const { data, error } = await supabase
-      .from('presets')
-      .select('*')
-      .eq('user_id', profileUserId)
-      .eq('is_approved', true)
-      .order('created_at', { ascending: false })
+    setIsFetchingPresets(true)
+    try {
+      const { data, error } = await supabase
+        .from('presets')
+        .select('*')
+        .eq('user_id', profileUserId)
+        .eq('is_approved', true)
+        .order('created_at', { ascending: false })
 
-    if (error) {
-      console.error('error fetching profile presets:', error)
-      return
+      if (error) {
+        console.error('error fetching profile presets:', error)
+        return
+      }
+      if (data) setProfilePresets(data)
+    } finally {
+      setIsFetchingPresets(false)
     }
-    if (data) setProfilePresets(data)
   }
 
   const fetchProfileComments = async () => {
-    const { data, error } = await supabase
-      .from('comments')
-      .select('*, presets(name)')
-      .eq('user_id', profileUserId)
-      .order('created_at', { ascending: false })
+    setIsFetchingComments(true)
+    try {
+      const { data, error } = await supabase
+        .from('comments')
+        .select('*, presets(name)')
+        .eq('user_id', profileUserId)
+        .order('created_at', { ascending: false })
 
-    if (error) {
-      console.error('error fetching profile comments:', error)
-      return
+      if (error) {
+        console.error('error fetching profile comments:', error)
+        return
+      }
+      if (data) setProfileComments(data)
+    } finally {
+      setIsFetchingComments(false)
     }
-    if (data) setProfileComments(data)
   }
 
   const handleEditComment = (commentId: string, currentText: string) => {
@@ -663,7 +679,27 @@ export default function Profile() {
       {showPresets && (
         <div className="profile-presets-section">
           <h2 className="profile-section-title mb-4">presets</h2>
-          {profilePresets.length === 0 ? (
+          {isFetchingPresets ? (
+            <div className="presets-grid profile-presets-grid">
+              {[1, 2, 3, 4, 5, 6].map(n => (
+                <div key={n} className="preset-card">
+                  <div className="preset-preview">
+                    <Skeleton className="w-full h-[160px] rounded-b-none" />
+                  </div>
+                  <div className="preset-info">
+                    <div className="preset-details space-y-2">
+                      <Skeleton className="h-4 w-20 rounded-full" />
+                      <Skeleton className="h-5 w-3/4" />
+                      <Skeleton className="h-4 w-full" />
+                    </div>
+                    <div className="preset-metadata mt-4">
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : profilePresets.length === 0 ? (
             <p className="profile-bio-empty text-center py-8">no presets yet.</p>
           ) : (
             <div className="presets-grid profile-presets-grid">
@@ -738,7 +774,22 @@ export default function Profile() {
       {showComments && (
         <div className="profile-presets-section">
           <h2 className="profile-section-title mb-4">comments</h2>
-          {profileComments.length === 0 ? (
+          {isFetchingComments ? (
+            <div className="flex flex-col gap-3">
+              {[1, 2, 3].map(n => (
+                <Card key={n} className="bg-card/40 border-border/40">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex flex-col gap-1">
+                      <Skeleton className="h-4 w-1/4" />
+                      <Skeleton className="h-3 w-1/6" />
+                    </div>
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : profileComments.length === 0 ? (
             <p className="profile-bio-empty text-center py-8">no comments yet.</p>
           ) : (
             <div className="flex flex-col gap-3">
@@ -834,7 +885,27 @@ export default function Profile() {
       {showFavorites && (
         <div className="profile-presets-section">
           <h2 className="profile-section-title mb-4">favorites</h2>
-          {profileFavorites.length === 0 ? (
+          {isFetchingFavorites ? (
+            <div className="presets-grid profile-presets-grid">
+              {[1, 2, 3, 4, 5, 6].map(n => (
+                <div key={n} className="preset-card">
+                  <div className="preset-preview">
+                    <Skeleton className="w-full h-[160px] rounded-b-none" />
+                  </div>
+                  <div className="preset-info">
+                    <div className="preset-details space-y-2">
+                      <Skeleton className="h-4 w-20 rounded-full" />
+                      <Skeleton className="h-5 w-3/4" />
+                      <Skeleton className="h-4 w-full" />
+                    </div>
+                    <div className="preset-metadata mt-4">
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : profileFavorites.length === 0 ? (
             <p className="profile-bio-empty text-center py-8">no favorites yet.</p>
           ) : (
             <div className="presets-grid profile-presets-grid">

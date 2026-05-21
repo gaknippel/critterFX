@@ -192,8 +192,8 @@ fn request_admin_and_copy(source: &str, dest: &str) -> Result<(), String> {
 ## stack
 
 - **frontend**: react, typescript, vite, tailwind (for base layers), lucide react, shadcnui, reactbits
-- **Backend**: rust (tauri)
-- **Database/Auth**: supabase
+- **backend**: rust (tauri)
+- **database/auth**: supabase
 - **some animations**: GSAP / custom CSS
 
 ## license
