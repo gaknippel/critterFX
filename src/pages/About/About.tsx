@@ -359,7 +359,7 @@ fn request_admin_and_copy(source: &str, dest: &str) -> Result<(), String> {
         </div>
       )}
 
-      <div className="about-footer mt-auto">
+      <div className="about-footer">
         <p>made by crittercast</p>
       </div>
     </div>
