@@ -117,8 +117,27 @@ the backend is built with rust using tauri, handling the file system management 
 
 ### core structures in `src-tauri/src/main.rs`
 
-- **`AEInstallation`**: stores information about a detected after effects installation, including the version year, the path to its scripts folder, the path to its user presets folder, and a boolean flag indicating if it exists on the system.
-- **`PathConfig`**: manages user-defined custom paths for scripts, presets, and compositions. this is stored locally in `path_config.json` within the app data directory. this is what you change in the settings.
+```rust
+#[derive(Debug, Serialize, Deserialize, Clone)] //deserialize and serialize allow to convert
+struct AEInstallation {
+    //to JSON
+    version: String,
+    scripts_path: String,
+    user_presets_path: String,
+    exists: bool,
+}
+```
+*stores information about a detected after effects installation, including the version year, the path to its scripts folder, the path to its user presets folder, and a boolean flag indicating if it exists on the system.*
+
+```rust
+#[derive(Debug, Serialize, Deserialize)]
+struct PathConfig {
+    custom_scripts_path: Option<String>,
+    custom_presets_path: Option<String>,
+    custom_composition_path: Option<String>,
+}
+```
+*manages user-defined custom paths for scripts, presets, and compositions. this is stored locally in `path_config.json` within the app data directory. this is what you change in the settings.*
 
 ### tauri commands exposed to frontend
 
@@ -132,7 +151,42 @@ the backend is built with rust using tauri, handling the file system management 
 
 installing `.jsx` scripts often requires writing to the `C:\Program Files` directory, which requires administrator privileges on windows. the backend handles this gracefully:
 1. `install_preset` first attempts a standard file copy.
-2. if it fails due to permission errors, it falls back to a custom `request_admin_and_copy` function.
+2. if it fails due to permission errors, it falls back to a custom `request_admin_and_copy` function:
+
+```rust
+#[cfg(windows)]
+fn request_admin_and_copy(source: &str, dest: &str) -> Result<(), String> {
+    use std::process::Command;
+    use std::os::windows::process::CommandExt;
+    
+    const CREATE_NO_WINDOW: u32 = 0x08000000;
+
+    // use cmd instead of powershell to avoid the blue window
+
+
+    let output = Command::new("powershell")
+        .args(&[
+            "-NonInteractive",
+            "-NoProfile", 
+            "-WindowStyle", "Hidden",
+            "-Command",
+            &format!(
+                "Start-Process powershell -Verb RunAs -Wait -WindowStyle Hidden -ArgumentList '-NonInteractive -NoProfile -WindowStyle Hidden -Command \"Copy-Item -Path ''{}'' -Destination ''{}'' -Force\"'",
+                source, dest
+            )
+        ])
+        .creation_flags(CREATE_NO_WINDOW)
+        .output()
+        .map_err(|e| e.to_string())?;
+
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(format!("copy failed: {}", String::from_utf8_lossy(&output.stderr)))
+    }
+}
+```
+
 3. this function spawns a hidden powershell process using `-Verb RunAs` to prompt the user for UAC (User Account Control) elevation and performs the copy with admin rights.
 
 ## stack
