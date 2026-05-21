@@ -111,6 +111,30 @@ type Comment = {
 
 i suggest looking at `api.ts` in `/src/lib` to get more information.
 
+## backend architecture
+
+the backend is built with rust using tauri, handling the file system management and executing elevated commands.
+
+### core structures in `src-tauri/src/main.rs`
+
+- **`AEInstallation`**: stores information about a detected after effects installation, including the version year, the path to its scripts folder, the path to its user presets folder, and a boolean flag indicating if it exists on the system.
+- **`PathConfig`**: manages user-defined custom paths for scripts, presets, and compositions. this is stored locally in `path_config.json` within the app data directory. this is what you change in the settings.
+
+### tauri commands exposed to frontend
+
+- **`scan_ae_installations`**: automatically scans the system (checking standard installation paths for versions 2020 through 2025) to find valid after effects script and user preset directories.
+- **`get_path_config` / `save_path_config`**: reads from and writes to the local `path_config.json` file, allowing users to override the default installation paths.
+- **`verify_path`**: a utility command to check if a provided directory path actually exists on the filesystem.
+- **`install_preset`**: the main command for installing downloaded assets. it dynamically determines the correct destination based on the preset type ("script", "preset", or "composition") and the user's path configuration. it automatically creates missing directories.
+- **`write_binary_file`**: allows the frontend to write raw byte arrays to temporary files before they are installed.
+
+### privilege escalation (windows)
+
+installing `.jsx` scripts often requires writing to the `C:\Program Files` directory, which requires administrator privileges on windows. the backend handles this gracefully:
+1. `install_preset` first attempts a standard file copy.
+2. if it fails due to permission errors, it falls back to a custom `request_admin_and_copy` function.
+3. this function spawns a hidden powershell process using `-Verb RunAs` to prompt the user for UAC (User Account Control) elevation and performs the copy with admin rights.
+
 ## stack
 
 - **frontend**: react, typescript, vite, tailwind (for base layers), lucide react, shadcnui, reactbits
