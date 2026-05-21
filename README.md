@@ -2,6 +2,14 @@
 
 critterFX is a free preset manager for Adobe After Effects, with the main gimmick being that everyone can share their own effects, scripts, and project files (compositions)
 
+## UPCOMING FEATURES
+
+- **MACOS support!!**: i dont have a macbook so idk :(
+- **LINUX support!!**: who uses AE on linux 😭
+- **custom css themes!**: upload and use your own custom css themes to the app!
+- **plug-in hub!**: tired of not having those plug-in dependencies? use a secret method 👀 of obtaining them with this hub!
+- **much more stuff**: just wait :D
+
 ## features
 
 - **automated installation**: one-click install for `.ffx` presets, `.jsx` scripts, and `.aep` compositions into your AE folders.
@@ -11,6 +19,7 @@ critterFX is a free preset manager for Adobe After Effects, with the main gimmic
 - **different themes**: apply cool themes to the app if you think the original one is boring!
 - **multi-version support**: detects your installed After Effects versions to for compatibility.
 - **profiles**: create your own profile for other people to see!
+- **easy-updates**: update the app without ever having to visit this repo again through my update system!
 
 ## getting started
 

@@ -212,7 +212,7 @@ const handleBrowseCompositions = async () => {
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-3 text-primary">
                     <CheckCircle className="h-4 w-4" />
-                    <span className="font-semibold text-sm">detected installations:</span>
+                    <span className="font-semibold text-sm">detected installation(s):</span>
                   </div>
                   <div className="space-y-3">
                     {installations.map((inst) => (
