@@ -99,18 +99,18 @@ export default function About() {
           <div className="about-features-grid">
             <div className="about-feature-card">
               <Cpu size={24} className="mb-2 text-primary/80" />
-              <h3>its fast!</h3>
+              <h3>its fast</h3>
               <p>native performance with rust</p>
             </div>
             <div className="about-feature-card">
               <Globe size={24} className="mb-2 text-primary/80" />
-              <h3>its free!</h3>
+              <h3>everythings free!</h3>
               <p>I LOVE FREE STUFF! :D</p>
             </div>
             <div className="about-feature-card">
               <Heart size={24} className="mb-2 text-primary/80" />
               <h3>open source</h3>
-              <p>made for the community!</p>
+              <p>made for the community</p>
             </div>
           </div>
 
@@ -171,12 +171,12 @@ export default function About() {
               <div className="space-y-2">
                 <h3 className="font-semibold text-foreground">2. supabase setup</h3>
                 <div className="text-sm text-muted-foreground">
-                  <p>we use supabase for authentication and data storage.</p>
+                  <p>i use supabase for authentication and data storage.</p>
                   <ul className="list-disc pl-6 space-y-1 mt-2">
                     <li>create a project at <a href="https://supabase.com/" target="_blank" rel="noreferrer" className="text-primary hover:underline">supabase.com</a></li>
                     <li>set up an authentication provider (email/password or discord/google).</li>
                     <li>create the necessary tables (presets, users, etc.) in the SQL editor.</li>
-                    <li>create a storage bucket for preset files.</li>
+                    <li>create a storage bucket for preset files (and pfp images/other stuff if you want).</li>
                   </ul>
                 </div>
               </div>
@@ -188,7 +188,8 @@ export default function About() {
                   <pre className="bg-muted text-foreground p-3 rounded-md mt-2 overflow-x-auto font-mono text-xs border border-border/50">
                     <code>
 VITE_SUPABASE_URL=your_project_url{'\n'}
-VITE_SUPABASE_ANON_KEY=your_anon_key
+VITE_SUPABASE_ANON_KEY=your_anon_key{'\n'}
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
                     </code>
                   </pre>
                   <p className="mt-2 text-xs italic">note: Never commit your <code>.env</code> file!</p>

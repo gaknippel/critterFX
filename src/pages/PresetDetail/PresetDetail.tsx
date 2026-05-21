@@ -645,7 +645,7 @@ const handleDeleteComment = async (commentId: string) => {
                 </Button>
               </DialogTrigger>
               <DialogContent showCloseButton={false} className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
-                <Card className="preset-manage-card shadow-2xl">
+                <Card className="preset-manage-card shadow-2xl" style={{ padding: '2rem' }}>
                   <DialogClose asChild>
                     <Button
                       type="button"
@@ -657,42 +657,47 @@ const handleDeleteComment = async (commentId: string) => {
                       <X size={16} />
                     </Button>
                   </DialogClose>
-                  <CardHeader className="pb-4">
-                    <DialogTitle className="text-2xl font-bold">
-                      <SplitText
-                        text="how to import compositions"
-                        delay={20}
-                        duration={1.5}
-                        ease="elastic.out(1, 0.3)"
-                        splitType="chars"
-                        from={{ opacity: 0, y: 5 }}
-                        to={{ opacity: 1, y: 0 }}
-                        threshold={0.1}
-                        rootMargin="-100px"
-                        textAlign="left"
-                      />
-                    </DialogTitle>
-                    <DialogDescription className="text-muted-foreground">
-                      this is a composition preset, so you have to import it manually through AE.
-                    </DialogDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                  <div className="rounded-lg overflow-hidden border">
-                    <img src="/howtoinstallcomps.gif" alt="import tutorial animation" className="w-full" />
+                  <div className="preset-manage-form">
+                    <div className="preset-manage-file-info">
+                      <DialogTitle style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
+                        <SplitText
+                          text="how to import compositions"
+                          delay={20}
+                          duration={1.5}
+                          ease="elastic.out(1, 0.3)"
+                          splitType="chars"
+                          from={{ opacity: 0, y: 5 }}
+                          to={{ opacity: 1, y: 0 }}
+                          threshold={0.1}
+                          rootMargin="-100px"
+                          textAlign="left"
+                        />
+                      </DialogTitle>
+                      <DialogDescription style={{ color: 'var(--muted-foreground)', marginTop: '0.5rem' }}>
+                        this is a composition preset, so you have to import it manually through AE.
+                      </DialogDescription>
+                    </div>
+
+                    <div className="preset-manage-field">
+                      <img src="/howtoinstallcomps.gif" alt="import tutorial animation" style={{ width: '100%', borderRadius: '0.75rem', border: '1px solid color-mix(in oklch, var(--border), transparent 50%)' }} />
+                    </div>
+
+                    <div className="preset-manage-field">
+                      <ol style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
+                        <li>open AE</li>
+                        <li>go to <strong>file → import → file</strong> (or press <kbd style={{ padding: '0.25rem 0.5rem', background: 'color-mix(in oklch, var(--muted), transparent 50%)', borderRadius: '0.25rem', fontSize: '0.85rem' }}>Ctrl+I</kbd>)</li>
+                        <li>go to: <code style={{ padding: '0.25rem 0.5rem', background: 'color-mix(in oklch, var(--muted), transparent 50%)', borderRadius: '0.25rem', fontSize: '0.85rem' }}>{activeCompositionPath || 'Documents\\critterFX\\Compositions'}</code></li>
+                        <li>select <strong>{preset.file_name}</strong></li>
+                        <li>click "import" and use it in the project panel</li>
+                      </ol>
+                    </div>
+
+                    <div className="preset-manage-dropzone" style={{ padding: '1rem', textAlign: 'left', cursor: 'text' }}>
+                      <p style={{ margin: 0, fontSize: '0.9rem' }}>
+                        💡 <strong>tip:</strong> you can also drag and drop the .aep file directly into the AE project panel.
+                      </p>
+                    </div>
                   </div>
-                  <ol className="space-y-2 list-decimal list-inside">
-                    <li className="text-sm">open AE</li>
-                    <li className="text-sm">go to <strong>file → import → file</strong> (or press <kbd className="px-2 py-1 bg-muted rounded text-xs">Ctrl+I</kbd>)</li>
-                    <li className="text-sm">go to: <code className="px-2 py-1 bg-muted rounded text-xs">{activeCompositionPath || 'Documents\\critterFX\\Compositions'}</code></li>
-                    <li className="text-sm">select <strong>{preset.file_name}</strong></li>
-                    <li className="text-sm">click "import" and use it in the project panel</li>
-                  </ol>
-                  <div className="bg-muted p-3 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      💡 <strong>tip:</strong> you can also drag and drop the .aep file directly into the AE project panel.
-                    </p>
-                  </div>
-                  </CardContent>
                 </Card>
               </DialogContent>
             </Dialog>

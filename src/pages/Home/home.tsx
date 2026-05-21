@@ -49,7 +49,7 @@ export default function Home() {
   const [sortBy, setSortBy] = useState('newest')
   const [userFavorites, setUserFavorites] = useState<Set<string>>(new Set())
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 9
+  const itemsPerPage = 12
   const navigate = useNavigate()
   const { user } = useUserContext()
 
@@ -65,12 +65,12 @@ export default function Home() {
     }
   }, [user])
 
-  // Reset to first page when filters change
+  // reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1)
   }, [selectedCategory, searchQuery, sortBy])
 
-  // Scroll to top when page changes
+  // scroll to top when page changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [currentPage])
