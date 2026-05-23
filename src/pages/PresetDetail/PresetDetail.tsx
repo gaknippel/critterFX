@@ -644,8 +644,8 @@ const handleDeleteComment = async (commentId: string) => {
                   how to install!!! (READ THIS)
                 </Button>
               </DialogTrigger>
-              <DialogContent showCloseButton={false} className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
-                <Card className="preset-manage-card shadow-2xl" style={{ padding: '2rem' }}>
+              <DialogContent showCloseButton={false} className="composition-import-dialog max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
+                <Card className="preset-manage-card composition-import-card shadow-2xl" style={{ padding: '2rem' }}>
                   <DialogClose asChild>
                     <Button
                       type="button"
@@ -711,8 +711,8 @@ const handleDeleteComment = async (commentId: string) => {
                   how to use script!!! (READ THIS)
                 </Button>
               </DialogTrigger>
-              <DialogContent showCloseButton={false} className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
-                <Card className="preset-manage-card shadow-2xl" style={{ padding: '2rem' }}>
+              <DialogContent showCloseButton={false} className="script-import-dialog max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-none bg-transparent shadow-none">
+                <Card className="preset-manage-card script-import-card shadow-2xl" style={{ padding: '2rem' }}>
                   <DialogClose asChild>
                     <Button
                       type="button"

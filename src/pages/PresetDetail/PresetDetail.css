@@ -215,6 +215,24 @@
   transform: translateY(-1px);
 }
 
+.composition-import-dialog,
+.script-import-dialog {
+  width: min(calc(100vw - 2rem), 40rem) !important;
+  max-width: 40rem !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.composition-import-dialog::-webkit-scrollbar,
+.script-import-dialog::-webkit-scrollbar {
+  display: none;
+}
+
+.composition-import-card,
+.script-import-card {
+  background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom)) !important;
+}
+
 .preset-details-section {
   grid-column: 2;
   display: flex;
