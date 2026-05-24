@@ -1,0 +1,99 @@
+.first-launch-dialog {
+  width: min(calc(100vw - 2rem), 38rem) !important;
+  max-width: 38rem !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.first-launch-dialog::-webkit-scrollbar {
+  display: none;
+}
+
+.first-launch-card {
+  position: relative;
+  padding: 2rem;
+  border: 1px solid var(--border) !important;
+  border-radius: 0.75rem !important;
+  background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom)) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(24px) !important;
+}
+
+.first-launch-close {
+  position: absolute !important;
+  top: 1rem;
+  right: 1rem;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  border-radius: 999px !important;
+  border: 1px solid color-mix(in oklch, var(--border), transparent 40%) !important;
+  background: color-mix(in oklch, var(--bg-bottom), white 16%) !important;
+  color: hsl(var(--muted-foreground)) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
+  backdrop-filter: blur(10px) !important;
+  transition: all 0.2s ease !important;
+}
+
+.first-launch-close:hover {
+  background: color-mix(in oklch, var(--bg-bottom), white 24%) !important;
+  border-color: color-mix(in oklch, var(--primary), transparent 35%) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.first-launch-close:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary), transparent 82%) !important;
+}
+
+.first-launch-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.first-launch-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.first-launch-footer {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  gap: 1rem !important;
+  margin-top: 1rem;
+}
+
+.first-launch-submit {
+  height: 3rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  background: var(--primary) !important;
+  border: 1px solid color-mix(in oklch, var(--primary), transparent 50%) !important;
+  color: var(--primary-foreground) !important;
+  box-shadow: none !important;
+  transition: all 0.3s ease !important;
+  border-radius: 0.75rem !important;
+  padding: 0 1.5rem !important;
+}
+
+.first-launch-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: color-mix(in oklch, var(--primary), transparent 10%) !important;
+  box-shadow: none !important;
+  filter: brightness(1.1);
+}
+
+.first-launch-cancel {
+  border-radius: 0.75rem !important;
+  height: 3rem !important;
+  padding: 0 1.5rem !important;
+}

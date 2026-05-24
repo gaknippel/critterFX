@@ -28,6 +28,8 @@ import FadeContent from '@/components/FadeContent'
 import { formatDate } from '@/lib/utils'
 import { useUserContext } from '@/context/UserContext'
 import { supabase } from '@/lib/supabase'
+import FirstLaunchDialog from '@/components/FirstLaunchDialogue'
+
 
 const IconMap: Record<string, any> = {
   LayoutGrid,
@@ -153,6 +155,7 @@ export default function Home() {
 
   return(
     <div className="home-page-wrapper">
+      <FirstLaunchDialog />
       <div className="home-header">
         <div className="title-container">
           <SplitText
