@@ -1,11 +1,11 @@
 {
-  "version": "1.0.1",
-  "notes": "UI update, jsx source code viewer, & more!",
+  "version": "1.0.0",
+  "notes": "initial release!",
   "pub_date": "2026-04-29T00:00:00Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUWGhuWDlCMEd2eVhya2oreDkyMG4xNGRmUWZSSHRrVDcxamphcWdHeHBINithOE8xbW92dnh4QjZ5bzF3Y0pjTytTUWlvOTZLbXVHUUlEM3hqMVVGTjJ6cmRCblg3aUE0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc3ODQxOTUzCWZpbGU6Y3JpdHRlcmZ4XzEuMC4xX3g2NC1zZXR1cC5leGUKMG9haUxIc0wrbTlmRXNjQWI5aE0wbUhMdk1IenBuVHNFbHNHVEpOcld6SzFPYWc5RHNaT0Ywc3ZmUnoyN1kwME5GQnFqWWo5REJ4Tnh4SnI1MWJNRHc9PQo=",
-      "url": "https://github.com/gaknippel/critterFX/releases/download/v1.0.1/critterFX_1.0.1_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUWGhuWDlCMEd2eVhKYUd1V0p1anE0N2EyM3VMcGVXR05sRWs1U2xXYmNSMGlQMW8zNitDZ0k1VHVXRGJqNmcxUzVJSG5HMHBTeS85TGt4cGVPVnJmOHRnaS9aNWE2b2dzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc5NTk2NDMzCWZpbGU6Y3JpdHRlcmZ4XzEuMC4wX3g2NC1zZXR1cC5leGUKZldXY3FrZGg2d3lrVDNPNlMrM0czckJjcHEzQmN5bnlYQXFFaS8vQm5xZzN1cmtWVTcrWTA0RmZFK24zK3dyTUdYQnJxaGs4VEo0ek44UHNrTjdTRFE9PQo=",
+      "url": "https://github.com/gaknippel/critterFX/releases/download/v1.0.0/critterFX_1.0.0_x64-setup.exe"
     }
   }
 }
