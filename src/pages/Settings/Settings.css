@@ -85,7 +85,6 @@
   letter-spacing: 0.05em;
 }
 
-/* Consistent styling for all form inputs - matching Upload.tsx & Profile.tsx */
 .settings-field [data-slot="input"],
 .settings-field [data-slot="select-trigger"],
 .settings-field [data-slot="textarea"],
@@ -139,7 +138,7 @@
 }
 
 .settings-action-button {
-  min-width: 110px; /* Prevent shrinking during scan text change */
+  min-width: 110px; 
 }
 
 .settings-action-button,
@@ -154,11 +153,11 @@
 }
 
 .settings-section-content {
-  min-height: 80px; /* Keep space for alerts to prevent card collapse */
+  min-height: 80px; 
 }
 
 .settings-detection-area {
-  height: 220px; /* Fixed height to prevent layout jumps */
+  height: 220px; 
   width: 100%;
 }
 
@@ -170,7 +169,7 @@
 }
 
 .settings-field [data-variant="outline"] {
-  height: 2.5rem !important; /* Folder browse buttons are a bit taller */
+  height: 2.5rem !important; 
   width: 2.5rem !important;
 }
 

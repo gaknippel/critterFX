@@ -27,7 +27,7 @@ export default function About() {
 
   return (
     <div className="about-wrapper pb-10">
-      {/* Header Section */}
+      {/* header section */}
       <div className="about-header-centered">
         <SplitText
           text="about critterFX!"

@@ -46,7 +46,7 @@ export async function fetchPresets(): Promise<Preset[]> {
     .eq('is_approved', true)  // only show approved presets
     .order('created_at', { ascending: false })  // newest 
 
-  console.log('fetchPresets result:', data, error)  // ← add this
+  console.log('fetchPresets result:', data, error)  
 
 
   if (error) {
@@ -56,8 +56,8 @@ export async function fetchPresets(): Promise<Preset[]> {
 
    return (data || []).map(preset => ({
     ...preset,
-    previewGif: preset.preview_gif_url,  // add alias
-    fileName: preset.file_name,           // add alias
-    aeVersion: preset.ae_version,         // add alias
+    previewGif: preset.preview_gif_url,  
+    fileName: preset.file_name,          
+    aeVersion: preset.ae_version,         
   }))
 }

@@ -7,7 +7,7 @@
   color: #fafafa;
   position: relative;
   padding: 1rem;
-  padding-bottom: 5vh; /* Move card up slightly from center */
+  padding-bottom: 5vh; 
   box-sizing: border-box;
 }
 
@@ -148,7 +148,7 @@
   text-shadow: 0 0 8px var(--primary);
 }
 
-/* Fallback classes for lucide-react */
+
 .mr-2 {
   margin-right: 0.5rem;
 }

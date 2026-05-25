@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { supabase } from '@/lib/supabase'
 
-
+//user context is the main source of how we fetch user info and other database info to the client.
 type UserProfile = {
   id: string
   username: string

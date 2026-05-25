@@ -282,7 +282,6 @@
   padding: 0.5rem 0 !important;
 }
 
-/* Preset Card Styling (Synced with home.css) */
 .presets-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 

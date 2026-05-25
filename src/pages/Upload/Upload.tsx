@@ -69,7 +69,7 @@ export default function Upload() {
   const [dragOver, setDragOver] = useState(false)
   const [gifDragOver, setGifDragOver] = useState(false)
 
-  // Cleanup object URLs to avoid memory leaks
+  // cleanup object URLs to avoid memory leaks
   useEffect(() => {
     return () => {
       if (gifPreviewUrl) {
@@ -261,7 +261,7 @@ return (
 
       <form id="upload-form" onSubmit={handleSubmit} className="flex flex-col gap-6 w-full">
         
-        {/* Files Section */}
+        {/* files Section */}
         <div className="settings-info-section">
           <div className="settings-section-header">
             <h2 className="settings-section-title">files</h2>
@@ -288,7 +288,7 @@ return (
                 {presetFile ? (
                   <div className="relative w-full h-[140px] group rounded-xl overflow-hidden border border-border bg-muted/20 shadow-inner flex items-center justify-center">
                     
-                    {/* File Icon Representation */}
+                    {/* file icon representation */}
                     <div className="flex flex-col items-center gap-2 relative z-10 transition-transform duration-300 group-hover:scale-110">
                       {presetFile.name.toLowerCase().endsWith('.jsx') ? (
                         <FileCode className="size-10 text-primary/80" />
@@ -297,14 +297,14 @@ return (
                       )}
                     </div>
 
-                    {/* Hover Overlay */}
+                    {/* hover overlay */}
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center z-20 backdrop-blur-[2px]">
                        <div className="bg-white/10 p-3 rounded-full mb-2 scale-90 group-hover:scale-100 transition-transform duration-300">
                          <Pencil className="text-white size-5" />
                        </div>
                     </div>
 
-                    {/* Delete Button */}
+                    {/* delete button */}
                     <Button
                       type="button"
                       variant="destructive"
@@ -315,7 +315,7 @@ return (
                       <Trash2 className="h-4 w-4" />
                     </Button>
 
-                    {/* File Info Overlay */}
+                    {/* file info overlay */}
                     <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-20 pointer-events-none translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                       <div className="flex items-center gap-2">
                         <UploadIcon className="text-white/70 size-4 flex-shrink-0" />
@@ -376,7 +376,7 @@ return (
                 />
                 {gifPreviewUrl ? (
                   <div className="relative w-full aspect-video group rounded-xl overflow-hidden border border-border bg-muted/20 shadow-inner">
-                    {/* Blurred background for transparency or odd sizes */}
+                    {/* blurred background for transparency or odd sizes */}
                     <div 
                       className="absolute inset-0 opacity-20 blur-2xl scale-110"
                       style={{ backgroundImage: `url(${gifPreviewUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
@@ -399,14 +399,14 @@ return (
                       />
                     )}
 
-                    {/* Hover Overlay */}
+                    {/* hover overlay */}
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center z-20 backdrop-blur-[2px]">
                        <div className="bg-white/10 p-3 rounded-full mb-2 scale-90 group-hover:scale-100 transition-transform duration-300">
                          <Pencil className="text-white size-6" />
                        </div>
                     </div>
 
-                    {/* Delete Button */}
+                    {/* delete button */}
                     <Button
                       type="button"
                       variant="destructive"
@@ -417,7 +417,7 @@ return (
                       <Trash2 className="h-4 w-4" />
                     </Button>
 
-                    {/* File Info Overlay */}
+                    {/* file info overlay */}
                     <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-20 pointer-events-none translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                       <div className="flex items-center gap-2">
                         <Image className="text-white/70 size-4 flex-shrink-0" />
@@ -437,7 +437,7 @@ return (
           </div>
         </div>
 
-        {/* Details Section */}
+        {/* details section */}
         <div className="settings-info-section">
           <div className="settings-section-header">
             <h2 className="settings-section-title">details</h2>

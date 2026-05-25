@@ -73,7 +73,7 @@ export default function Settings() {
     setIsScanning(true);
     try 
     {
-      // Add a small artificial delay to make the scan feel more substantial
+      // artificial delay lol
       await new Promise(resolve => setTimeout(resolve, 800));
       const found = await scanAEInstallations();
       setInstallations(found);
@@ -176,7 +176,7 @@ const handleBrowseCompositions = async () => {
         </div>
       </div>
 
-      {/* AE Paths Section */}
+      {/* AE paths */}
       <div className="settings-info-section">
         <div className="settings-section-header">
           <h2 className="settings-section-title">after effects paths</h2>

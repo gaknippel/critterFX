@@ -6,7 +6,6 @@ import { getCurrentWindow } from '@tauri-apps/api/window'
 export default function TitleBar() {
   const appWindow = getCurrentWindow()
   
-  // Track history length (very basic detection)
 
   useEffect(() => {
     const handlePopState = () => {

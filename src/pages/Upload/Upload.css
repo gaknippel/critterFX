@@ -137,7 +137,6 @@
   gap: 0.5rem;
 }
 
-/* Consistent styling for all form inputs */
 .upload-field [data-slot="input"],
 .upload-field [data-slot="select-trigger"],
 .upload-field textarea {

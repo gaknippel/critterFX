@@ -325,7 +325,7 @@ const handleSavePreset = async () => {
   const isAEVersionCompatible = (presetVersion: string | undefined) => {
     if (!presetVersion || presetVersion === 'N/A' || installedAEVersions.length === 0) return true
     
-    // extract year (e.g., "2024" from "2024" or "CC 2024")
+    // extract year (2024, or 2025, etc)
     const yearMatch = presetVersion.match(/\d{4}/)
     if (!yearMatch) return true
     
@@ -400,7 +400,7 @@ const handleSavePreset = async () => {
     .eq('preset_id', id)
     .order('created_at', { ascending: true })
 
-  console.log('fetchComments result:', data, error)  // ← add this
+  console.log('fetchComments result:', data, error)  
 
 
   if (error) {

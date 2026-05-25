@@ -27,9 +27,8 @@ export default function UpdateChecker() {
         setUpdateAvailable(true)
         setUpdateVersion(update.version)
       } else {
-        // Only hide if we explicitly checked and found nothing
+        // only hide if we explicitly checked and found nothing
         // setUpdateAvailable(false) 
-        // For now, let's keep it true so the user can see it's there
       }
     } catch (error) {
       console.error('Update check failed:', error)
