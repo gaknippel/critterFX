@@ -35,6 +35,7 @@ export default function Settings() {
   const [scriptsPathValid, setScriptsPathValid] = useState<boolean | null>(null);
   const [presetsPathValid, setPresetsPathValid] = useState<boolean | null>(null);
   const [compositionPathValid, setCompositionPathValid] = useState<boolean | null>(null);
+  const [usedInstallation, setUsedInstallation] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -140,6 +141,16 @@ const handleBrowseCompositions = async () => {
     
     setScriptsPathValid(scriptsValid);
     setPresetsPathValid(presetsValid);
+
+    setUsedInstallation(installation.version);
+    toast.info("paths updated! remember to save your changes below", {
+      icon: <CheckCircle className="h-4 w-4 text-green-500" />,
+      duration: 4000
+    });
+
+    setTimeout(() => {
+      setUsedInstallation(null);
+    }, 2000);
   };
   
   return(
@@ -228,11 +239,15 @@ const handleBrowseCompositions = async () => {
                         </div>
                         <Button 
                           size="sm" 
-                          variant="outline"
-                          className="h-7 px-4 text-xs w-fit shrink-0"
+                          variant={usedInstallation === inst.version ? "default" : "outline"}
+                          className={`h-7 px-4 text-xs w-fit shrink-0 transition-all duration-300 ${usedInstallation === inst.version ? 'bg-green-600 hover:bg-green-700 text-white scale-105' : ''}`}
                           onClick={() => handleUseDetectedPath(inst)}
                         >
-                          use
+                          {usedInstallation === inst.version ? (
+                            <span className="flex items-center gap-1">
+                              <CheckCircle className="h-3 w-3" /> used
+                            </span>
+                          ) : 'use'}
                         </Button>
                       </div>
                     ))}

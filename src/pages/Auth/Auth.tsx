@@ -88,6 +88,7 @@ export default function Auth() {
     } 
     finally {
       setIsLoading(false)
+      setIsSignUp(false)
     }
   }
 

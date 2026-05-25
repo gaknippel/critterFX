@@ -601,7 +601,18 @@ const handleDeleteComment = async (commentId: string) => {
             </div>
           </div>
           <div className="preset-preview-large">
-            <img src={preset.previewGif} alt={preset.name} />
+            {preset.previewGif?.toLowerCase().endsWith('.webm') ? (
+              <video 
+                src={preset.previewGif} 
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <img src={preset.previewGif} alt={preset.name} />
+            )}
           </div>
 
           <Button 
@@ -1119,7 +1130,7 @@ const handleDeleteComment = async (commentId: string) => {
                                   <Button
                                     size="icon"
                                     variant="ghost"
-                                    className="comment-action-btn comment-action-btn-danger"
+                                    className="comment-action-btn"
                                     onClick={() => handleDeleteComment(comment.id)}
                                     aria-label="Delete comment"
                                     title="Delete"

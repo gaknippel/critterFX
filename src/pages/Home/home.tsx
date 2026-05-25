@@ -252,7 +252,7 @@ export default function Home() {
                   {paginatedPresets.map((preset) => {
                     const category = categories.find(c => c.id === preset.category)
                     const CategoryIcon = category ? IconMap[category.icon || 'LayoutGrid'] : LayoutGrid
-                    
+                    const previewGif = preset.previewGif ?? ''
                     return (
                       <div 
                         key={preset.id} 
@@ -260,11 +260,21 @@ export default function Home() {
                         onClick={() => handlePresetClick(preset.id)}
                       >
                         <div className="preset-preview">
-                          <img 
-                            src={preset.previewGif} 
-                            alt={preset.name}
-                            loading="lazy"
-                          />
+                          {previewGif.toLowerCase().endsWith('.webm') ? (
+                            <video 
+                              src={preset.previewGif} 
+                              autoPlay 
+                              loop 
+                              muted 
+                              playsInline
+                            />
+                          ) : (
+                            <img 
+                              src={preset.previewGif} 
+                              alt={preset.name}
+                              loading="lazy"
+                            />
+                          )}
                           <div className="preset-download-badge">
                             <Download size={12} />
                             <span>{preset.download_count}</span>

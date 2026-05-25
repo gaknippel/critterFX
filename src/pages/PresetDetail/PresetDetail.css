@@ -576,10 +576,6 @@
   stroke-width: 2.15;
 }
 
-.comment-action-btn-danger:hover {
-  color: hsl(var(--destructive)) !important;
-}
-
 .download-count {
   display: flex;
   align-items: center;
